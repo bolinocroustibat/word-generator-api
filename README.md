@@ -1,7 +1,6 @@
 # Word Generator in Python
 
 
-
 ## Main dependencies
 
 Python API with a MySQL database, using FastAPI framework.
@@ -19,6 +18,17 @@ Create a virtual environnement and install the dependencies in it with Poetry si
 poetry install
 ```
 
+## Configure
+
+In `config.py`:
+
+- `ALLOW_ORIGINS`: list
+- `MYSQL_URL`: str
+- `DICTIONNARY_EN_API_URL`: str
+- `DATA_DIR`: str
+- `ALLOWED_TYPES`: list
+
+
 ## Run 
 
 Activate the virtual environement:
@@ -33,4 +43,6 @@ uvicorn api:app --reload
 
 ## Commands
 
-# TODO
+  - `build.py`
+  - `classify_db_generated.py`
+  - `classify_db_real.py` (from a dictionary TXT file)

@@ -30,9 +30,9 @@ async def get_definition_en(word: str) -> Tuple[str, str, str]:
         return type, definition, example
 
 
-async def get_random_definition() -> Tuple[str, str]:
+async def get_random_definition() -> Tuple[str, str, str]:
     """
-    Returns a random definition and type.
+    Returns a random definition, type and example.
     """
     words = await RealWordEN.objects.all()
     word = random.choice(list(words))
