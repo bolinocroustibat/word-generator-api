@@ -5,12 +5,11 @@ import random
 def generate_word(lang: str, not_existing: bool = True) -> str:
     """
     Generate a word, by retrying the algorithm if:
-    - the generated word is too long
-    - the generated word is too short
+    - the generated word is too long (max 12 chars)
+    - the generated word is too short (min 3 chars)
     - the generated word already exists in the dictionnary (optional)
     Try only 5 times, if not possible, will return the word generated before.
     """
-
     json_proba_file = f"{lang}/data/proba_table_2char_{lang.upper()}.json"
 
     dictionary = []
@@ -23,10 +22,11 @@ def generate_word(lang: str, not_existing: bool = True) -> str:
 
     i = 0
     while (
-        len(generated_word) < 3
+        len(generated_word) < 4
         or len(generated_word) > 12
         or generated_word in dictionary
     ) and i < 5:
+        print(f"Generated word '{generated_word}' not acceptable. Retrying...")
         generated_word = generate_word_core(json_proba_file=json_proba_file)
         i += 1
 

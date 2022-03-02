@@ -1,15 +1,15 @@
 import random
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import ALLOW_ORIGINS, DICTIONNARY_API_URL
+from common.generate import generate_word
+from config import ALLOW_ORIGINS
 from en.classify import classify_en
-from en.get_definition import get_definition_en
+from en.get_definition import get_random_definition, alter_definition
 from fr.classify import classify_fr
-from helpers.generate import generate_word
-from models import GenereratedWordEN, database
+from models import GenereratedWordEN, RealWordEN, database
+
 
 app = FastAPI()
 
@@ -20,6 +20,7 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
+app.state.database = database
 
 
 @app.on_event("startup")
@@ -34,10 +35,10 @@ async def shutdown() -> None:
         await database.disconnect()
 
 
-@app.get("/{lang}")
+@app.get("/{lang}/generate")
 async def generate(lang: str):
-    if lang not in ["fr", "en", "it", "es"]:
-        raise HTTPException(status_code=400, detail="Invalid language")
+    if lang not in ["en", "fr", "it", "es"]:
+        raise HTTPException(status_code=400, detail="Language not supported.")
     word: str = generate_word(lang=lang, not_existing=True)
     response: dict = {"string": word}
     if lang == "fr":
@@ -49,10 +50,10 @@ async def generate(lang: str):
     return response
 
 
-@app.get("/db/{lang}")
+@app.get("/{lang}/get")
 async def get_word_from_db(lang: str):
-    if lang not in ["fr", "en"]:
-        raise HTTPException(status_code=400, detail="Invalid language")
+    if lang not in ["en", "fr"]:
+        raise HTTPException(status_code=400, detail="Language not supported.")
     if lang == "en":
         words = await GenereratedWordEN.objects.all()
     if lang == "fr":
@@ -61,10 +62,27 @@ async def get_word_from_db(lang: str):
     return word
 
 
-@app.get("/definition/{lang}/{word}")
+@app.get("/{lang}/definition")
 async def get_definition(lang: str):
-    
-    
+    if lang == "en":
+        type, definition, example = await get_random_definition()
+        definition = await alter_definition(definition=definition, max_k=2)
+        if type == "verb":
+            generated_words = await GenereratedWordEN.objects.all(
+                type=type, tense="infinitive"
+            )
+        else:
+            generated_words = await GenereratedWordEN.objects.all(type=type)
+        string = random.choice(list(generated_words)).string
+        return {
+            "string": string,
+            "type": type,
+            "definition": definition,
+            "example": example,
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+
     # if lang == "en":
     #     return get_definition_en(word=word)
     # else:

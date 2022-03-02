@@ -10,12 +10,10 @@ database = databases.Database(MYSQL_URL)
 
 class RealWordEN(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
-    word: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16)
-    gender: str = ormar.String(max_length=1)
-    number: str = ormar.String(max_length=1)
-    tense: str = ormar.String(max_length=16)
-    complex: bool = ormar.Boolean()
+    string: str = ormar.String(max_length=100)
+    type: str = ormar.String(max_length=16, nullable=True)
+    number: str = ormar.String(max_length=1, nullable=True)
+    tense: str = ormar.String(max_length=16, nullable=True)
 
     class Meta:
         tablename = "real_words_EN"
@@ -25,25 +23,25 @@ class RealWordEN(ormar.Model):
 
 class RealWordFR(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
-    word: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16)
-    number: str = ormar.String(max_length=1)
-    tense: str = ormar.String(max_length=16)
-    date = ormar.DateTime()
-    ip: str = ormar.String(max_length=16)
+    string: str = ormar.String(max_length=100)
+    type: str = ormar.String(max_length=16, nullable=True)
+    gender: str = ormar.String(max_length=1, nullable=True)
+    number: str = ormar.String(max_length=1, nullable=True)
+    tense: str = ormar.String(max_length=16, nullable=True)
+    complex: bool = ormar.Boolean()
 
     class Meta:
-        tablename = "real_words_EN"
+        tablename = "real_words_FR"
         database = database
         metadata = metadata
 
 
 class GenereratedWordEN(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
-    word: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16)
-    number: str = ormar.String(max_length=1)
-    tense: str = ormar.String(max_length=16)
+    string: str = ormar.String(max_length=100)
+    type: str = ormar.String(max_length=16, nullable=True)
+    number: str = ormar.String(max_length=1, nullable=True)
+    tense: str = ormar.String(max_length=16, nullable=True)
     date = ormar.DateTime()
     ip: str = ormar.String(max_length=16)
 
@@ -55,12 +53,12 @@ class GenereratedWordEN(ormar.Model):
 
 class GenereratedWordFR(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
-    word: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16)
-    gender: str = ormar.String(max_length=1)
-    number: str = ormar.String(max_length=1)
-    tense: str = ormar.String(max_length=16)
-    conjug: str = ormar.String(max_length=16)
+    string: str = ormar.String(max_length=100)
+    type: str = ormar.String(max_length=16, nullable=True)
+    gender: str = ormar.String(max_length=1, nullable=True)
+    number: str = ormar.String(max_length=1, nullable=True)
+    tense: str = ormar.String(max_length=16, nullable=True)
+    conjug: str = ormar.String(max_length=16, nullable=True)
     date = ormar.DateTime()
     ip: str = ormar.String(max_length=16)
 

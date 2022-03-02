@@ -48,10 +48,10 @@ def classify_en(word: str) -> dict:
         type = "adverb"
     elif word[-2:] == "en":
         type = "verb"
-        number = "infinitive"
+        tense = "infinitive"
     elif word[-2:] == "ed":
         type = "verb"
-        number = "past-participle"
+        tense = "past-participle"
     elif word[-1:] == "y":
         type = "adjective"
     elif word[-1:] == "s":

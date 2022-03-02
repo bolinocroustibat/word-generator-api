@@ -7,13 +7,13 @@ import typer
 
 
 def build_proba_table(lang: str) -> None:
-    with open(f"{lang}/alphabet_{lang}.json", "r") as alphabet_file:
+    with open(f"{lang}/data/alphabet_{lang}.json", "r") as alphabet_file:
         alphabet = json.load(alphabet_file)
 
     # build output structure
     # TODO
 
-    with open(f"{lang}/dictionary_{lang}.txt", "r") as dictionary_file:
+    with open(f"{lang}/data/dictionary_{lang}.txt", "r") as dictionary_file:
         for word in dictionary_file:
             #TODO
             pass
