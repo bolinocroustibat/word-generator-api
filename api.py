@@ -1,7 +1,9 @@
+import asyncio
 import random
+from datetime import datetime
 
 import nltk
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from common.generate import generate_word
@@ -9,7 +11,7 @@ from config import ALLOW_ORIGINS
 from en.classify import classify_en
 from en.get_definition import alter_definition, get_random_definition
 from fr.classify import classify_fr
-from models import GenereratedWordFR, GenereratedWordEN, database
+from models import GenereratedWordEN, GenereratedWordFR, database
 
 app = FastAPI()
 
@@ -39,16 +41,34 @@ async def shutdown() -> None:
 
 
 @app.get("/{lang}/generate")
-async def generate(lang: str):
+async def generate(lang: str, request: Request):
     if lang not in ["en", "fr", "it", "es"]:
         raise HTTPException(status_code=400, detail="Language not supported.")
-    word: str = generate_word(lang=lang, not_existing=True)
-    response: dict = {"string": word}
-    if lang == "fr":
-        word_classes: dict = classify_fr(word=word)
-        response.update(word_classes)
+    string: str = generate_word(lang=lang, not_existing=True)
+    response: dict = {"string": string}
     if lang == "en":
-        word_classes: dict = classify_en(word=word)
+        word_classes: dict = classify_en(word=string)
+        await GenereratedWordEN.objects.create(
+            string=string,
+            type=word_classes["type"],
+            number=word_classes["number"],
+            tense=word_classes["tense"],
+            date=datetime.now(),
+            ip=request.client.host,
+        ) # TODO fire and forget
+        response.update(word_classes)
+    if lang == "fr":
+        word_classes: dict = classify_fr(word=string)
+        await GenereratedWordFR.objects.create(
+            string=string,
+            type=word_classes["type"],
+            gender=word_classes["gender"],
+            number=word_classes["number"],
+            tense=word_classes["tense"],
+            conjug=word_classes["conjug"],
+            date=datetime.now(),
+            ip=request.client.host,
+        ) # TODO fire and forget
         response.update(word_classes)
     return response
 
