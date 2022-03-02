@@ -22,7 +22,7 @@ def generate_word(lang: str, not_existing: bool = True) -> str:
 
     i = 0
     while (
-        len(generated_word) < 4
+        len(generated_word) < 3
         or len(generated_word) > 12
         or generated_word in dictionary
     ) and i < 5:

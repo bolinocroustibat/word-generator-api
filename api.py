@@ -1,15 +1,15 @@
 import random
 
+import nltk
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from common.generate import generate_word
 from config import ALLOW_ORIGINS
 from en.classify import classify_en
-from en.get_definition import get_random_definition, alter_definition
+from en.get_definition import alter_definition, get_random_definition
 from fr.classify import classify_fr
 from models import GenereratedWordEN, RealWordEN, database
-
 
 app = FastAPI()
 
@@ -21,6 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.state.database = database
+
+
+nltk.download("averaged_perceptron_tagger")
 
 
 @app.on_event("startup")
@@ -66,7 +69,7 @@ async def get_word_from_db(lang: str):
 async def get_definition(lang: str):
     if lang == "en":
         type, definition, example = await get_random_definition()
-        definition = await alter_definition(definition=definition, max_k=2)
+        definition = await alter_definition(definition=definition, percentage=0.2)
         if type == "verb":
             generated_words = await GenereratedWordEN.objects.all(
                 type=type, tense="infinitive"
@@ -78,7 +81,6 @@ async def get_definition(lang: str):
             "string": string,
             "type": type,
             "definition": definition,
-            "example": example,
         }
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
