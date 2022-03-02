@@ -53,7 +53,7 @@ async def generate(lang: str, request: Request):
             type=word_classes["type"],
             number=word_classes["number"],
             tense=word_classes["tense"],
-            date=datetime.now(),
+            date=datetime.utcnow(),
             ip=request.client.host,
         ) # TODO fire and forget
         response.update(word_classes)
@@ -66,7 +66,7 @@ async def generate(lang: str, request: Request):
             number=word_classes["number"],
             tense=word_classes["tense"],
             conjug=word_classes["conjug"],
-            date=datetime.now(),
+            date=datetime.utcnow(),
             ip=request.client.host,
         ) # TODO fire and forget
         response.update(word_classes)
