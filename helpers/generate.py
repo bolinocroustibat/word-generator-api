@@ -1,0 +1,71 @@
+import json
+import random
+
+
+def generate_word(lang: str, not_existing: bool = True) -> str:
+    """
+    Generate a word, by retrying the algorithm if:
+    - the generated word is too long
+    - the generated word is too short
+    - the generated word already exists in the dictionnary (optional)
+    Try only 5 times, if not possible, will return the word generated before.
+    """
+
+    json_proba_file = f"{lang}/data/proba_table_2char_{lang.upper()}.json"
+
+    dictionary = []
+    if not_existing:
+        with open(f"{lang}/data/dictionary_{lang}.txt", "r") as dictionary_file:
+            for word in dictionary_file:
+                dictionary.append(word)
+
+    generated_word = generate_word_core(json_proba_file=json_proba_file)
+
+    i = 0
+    while (
+        len(generated_word) < 3
+        or len(generated_word) > 12
+        or generated_word in dictionary
+    ) and i < 5:
+        generated_word = generate_word_core(json_proba_file=json_proba_file)
+        i += 1
+
+    return generated_word
+
+
+def generate_word_core(json_proba_file: str) -> str:
+    """
+    Generate a word that don't exist, based on the characters probability table, depending on each language.
+    """
+    with open(json_proba_file, "r") as file:
+        probas: dict = json.load(file)
+    char1 = random.choices(
+        list(probas["first_letter"].keys()),
+        weights=list(probas["first_letter"].values()),
+        k=1,
+    )[0]
+    word = char1
+    # for _ in probas[char1]:
+    # choose second char
+    char2 = random.choices(
+        list(probas[char1].keys()), weights=list(probas[char1].values()), k=1
+    )[0]
+    if char2 == "last_letter":
+        # it's a 1-letter word
+        return word
+    # it's more than a 1-letter
+    word = word + char2
+    # now loop for other chars
+    for i in range(0, 25):
+        chosen_char = random.choices(
+            list(probas[char1 + char2].keys()),
+            weights=list(probas[char1 + char2].values()),
+            k=1,
+        )[0]
+        if chosen_char == "last_letter":
+            return word
+        else:
+            word = word + chosen_char
+            char1 = char2
+            char2 = chosen_char
+    return word
