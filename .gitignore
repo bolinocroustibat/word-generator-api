@@ -142,5 +142,4 @@ dmypy.json
 .direnv/
 .envrc
 
-static/
-staticfiles/
+config.py
