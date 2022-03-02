@@ -5,6 +5,11 @@ def classify_fr(word: str) -> dict:
     """
     Classify French word
     """
+    type = None
+    gender = None
+    number = None
+    tense = None
+    conjug = None
     if word[-5:] == "aient":
         type = "verb"
         tense = "past"

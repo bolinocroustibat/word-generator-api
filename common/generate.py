@@ -14,7 +14,7 @@ def generate_word(lang: str, not_existing: bool = True) -> str:
 
     dictionary = []
     if not_existing:
-        with open(f"{lang}/data/dictionary_{lang}.txt", "r") as dictionary_file:
+        with open(f"{lang}/data/dictionary_{lang.upper()}.txt", "r") as dictionary_file:
             for word in dictionary_file:
                 dictionary.append(word)
 
