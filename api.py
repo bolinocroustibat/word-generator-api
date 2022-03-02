@@ -9,7 +9,7 @@ from config import ALLOW_ORIGINS
 from en.classify import classify_en
 from en.get_definition import alter_definition, get_random_definition
 from fr.classify import classify_fr
-from models import GenereratedWordEN, RealWordEN, database
+from models import GenereratedWordEN, database
 
 app = FastAPI()
 
