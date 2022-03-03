@@ -25,8 +25,11 @@ In `config.py`:
 - `ALLOW_ORIGINS`: list
 - `MYSQL_URL`: str
 - `DICTIONNARY_EN_API_URL`: str
-- `DATA_DIR`: str
 - `ALLOWED_TYPES`: list
+- `TWITTER_API_KEY`: str
+- `TWITTER_API_SECRET`: str
+- `TWITTER_ACCESS_TOKEN`: str
+- `TWITTER_TOKEN_SECRET`: str
 
 
 ## Run 
