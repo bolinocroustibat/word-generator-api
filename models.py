@@ -28,7 +28,7 @@ class RealWordFR(ormar.Model):
     gender: str = ormar.String(max_length=1, nullable=True)
     number: str = ormar.String(max_length=1, nullable=True)
     tense: str = ormar.String(max_length=16, nullable=True)
-    complex: bool = ormar.Boolean()
+    complex: bool = ormar.Boolean(nullable=True)
 
     class Meta:
         tablename = "real_words_FR"

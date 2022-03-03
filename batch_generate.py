@@ -22,8 +22,8 @@ def batch_generate(lang: str, number: int = 100) -> None:
             typer.secho(f"'{response['string']}' saved to the DB.", fg="blue")
             i += 1
 
-        if database.is_connected:
-            await database.disconnect()
+        # if database.is_connected:
+        #     await database.disconnect()
 
         typer.secho(f"{i} words generated and saved in the DB.", fg=typer.colors.GREEN)
 
