@@ -43,6 +43,8 @@ uvicorn api:app --reload
 
 ## Commands
 
+  - `batch_generate.py` + language
   - `build.py`
-  - `classify_db_generated.py`
-  - `classify_db_real.py` (from a dictionary TXT file)
+  - `classify_db_generated.py` + language
+  - `classify_db_real.py` +language (from a dictionary TXT file)
+  - `tweet.py`

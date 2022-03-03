@@ -1,11 +1,46 @@
 import json
 import random
+from datetime import datetime
+
+from en.classify import classify_en
+from fr.classify import classify_fr
+from models import GenereratedWordEN, GenereratedWordFR
+
+
+async def generate_word_and_save(lang: str, ip: str) -> str:
+    string: str = generate_word(lang=lang, not_existing=True)
+    response: dict = {"string": string}
+    if lang == "en":
+        word_classes: dict = classify_en(word=string)
+        await GenereratedWordEN.objects.create(
+            string=string,
+            type=word_classes["type"],
+            number=word_classes["number"],
+            tense=word_classes["tense"],
+            date=datetime.utcnow(),
+            ip=ip,
+        )  # TODO fire and forget
+        response.update(word_classes)
+    if lang == "fr":
+        word_classes: dict = classify_fr(word=string)
+        await GenereratedWordFR.objects.create(
+            string=string,
+            type=word_classes["type"],
+            gender=word_classes["gender"],
+            number=word_classes["number"],
+            tense=word_classes["tense"],
+            conjug=word_classes["conjug"],
+            date=datetime.utcnow(),
+            ip=ip,
+        )  # TODO fire and forget
+        response.update(word_classes)
+    return response
 
 
 def generate_word(lang: str, not_existing: bool = True) -> str:
     """
     Generate a word, by retrying the algorithm if:
-    - the generated word is too long (max 12 chars)
+    - the generated word is too long (max 13 chars)
     - the generated word is too short (min 3 chars)
     - the generated word already exists in the dictionnary (optional)
     Try only 5 times, if not possible, will return the word generated before.
@@ -23,7 +58,7 @@ def generate_word(lang: str, not_existing: bool = True) -> str:
     i = 0
     while (
         len(generated_word) < 3
-        or len(generated_word) > 12
+        or len(generated_word) > 13
         or generated_word in dictionary
     ) and i < 5:
         print(f"Generated word '{generated_word}' not acceptable. Retrying...")

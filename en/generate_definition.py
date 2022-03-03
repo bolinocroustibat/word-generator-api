@@ -9,7 +9,24 @@ from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 
 
-async def get_random_definition() -> Tuple[str, str, str]:
+async def generate_definition_en() -> str:
+    type, definition, example = await get_random_definition_en()
+    definition = await alter_definition_en(definition=definition, percentage=0.2)
+    if type == "verb":
+        generated_words = await GenereratedWordEN.objects.all(
+            type=type, tense="infinitive"
+        )
+    else:
+        generated_words = await GenereratedWordEN.objects.all(type=type)
+    string = random.choice(list(generated_words)).string
+    return {
+        "string": string,
+        "type": type,
+        "definition": definition,
+    }
+
+
+async def get_random_definition_en() -> Tuple[str, str, str]:
     """
     Returns a random real word definition, type and example.
     """
@@ -45,7 +62,7 @@ async def get_definition_en(word: str) -> Tuple[str, str, str]:
         return type, definition, example
 
 
-async def alter_definition(definition: str, percentage: float) -> str:
+async def alter_definition_en(definition: str, percentage: float) -> str:
     """
     Alter a sentence randomly using NLTK POS tagging.
     See https://www.guru99.com/pos-tagging-chunking-nltk.html
