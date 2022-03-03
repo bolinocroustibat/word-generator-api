@@ -12,21 +12,32 @@ from en.generate_definition import generate_definition_en
 from models import database
 
 
+async def generate_tweet():
+    generated: dict = await generate_definition_en()
+    string: str = generated["string"].capitalize()
+    type: str = generated["type"]
+    definition: str = generated["definition"]
+    return f"{string} ({type}): {definition}"
+
+
 async def send_tweet() -> None:
 
     if not database.is_connected:
         await database.connect()
 
-    generated: dict = await generate_definition_en()
-    string: str = generated["string"].capitalize()
-    type: str = generated["type"]
-    definition: str = generated["definition"]
+    tweet: str = await generate_tweet()
+    tries = 0
+    while (len(tweet) > 275) and (tries < 6):
+        # If tweet os too long, regenerate it.
+        # Don't try more than 6 times for security reasons.
+        tweet: str = await generate_tweet()
+        tries += 1
 
     auth = tweepy.OAuthHandler(TWITTER_API_KEY, TWITTER_KEY_SECRET)
     auth.set_access_token(TWITTER_ACCESS_TOKEN, TWITTER_TOKEN_SECRET)
 
     api = tweepy.API(auth)
-    api.update_status(f"{string} ({type}): {definition}")
+    api.update_status(tweet)
 
     if database.is_connected:
         await database.disconnect()
