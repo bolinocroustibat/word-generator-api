@@ -12,7 +12,7 @@ from fr.classify import classify_fr
 from models import RealWordEN, RealWordFR, database
 
 
-def classify(lang: str) -> None:
+def dictionary_to_db(lang: str) -> None:
 
     if lang not in ["en", "fr"]:
         raise typer.Abort(f"Invalid language: {lang}")
@@ -74,4 +74,4 @@ def classify(lang: str) -> None:
 
 
 if __name__ == "__main__":
-    typer.run(classify)
+    typer.run(dictionary_to_db)

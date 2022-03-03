@@ -47,6 +47,7 @@ def generate_word(lang: str, not_existing: bool = True) -> str:
     """
     json_proba_file = f"{lang}/data/proba_table_2char_{lang.upper()}.json"
 
+    # TODO for fr and en, replace by a check in DB table, including plural of nouns
     dictionary = []
     if not_existing:
         with open(f"{lang}/data/dictionary_{lang.upper()}.txt", "r") as dictionary_file:

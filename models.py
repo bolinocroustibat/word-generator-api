@@ -10,7 +10,7 @@ database = databases.Database(MYSQL_URL)
 
 class RealWordEN(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
-    string: str = ormar.String(max_length=100)
+    string: str = ormar.String(max_length=50)
     type: str = ormar.String(max_length=16, nullable=True)
     number: str = ormar.String(max_length=1, nullable=True)
     tense: str = ormar.String(max_length=16, nullable=True)
