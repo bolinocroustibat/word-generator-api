@@ -16,6 +16,8 @@ async def generate_definition_en() -> str:
         generated_words = await GenereratedWordEN.objects.all(
             type=type, tense="infinitive"
         )
+    elif type == "noun":
+        generated_words = await GenereratedWordEN.objects.all(type=type, number="s")
     else:
         generated_words = await GenereratedWordEN.objects.all(type=type)
     string = random.choice(list(generated_words)).string
