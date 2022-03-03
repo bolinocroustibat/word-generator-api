@@ -1,5 +1,6 @@
 import asyncio
 
+import typer
 import tweepy
 
 from config import (
@@ -38,6 +39,8 @@ async def send_tweet() -> None:
 
     api = tweepy.API(auth)
     api.update_status(tweet)
+    typer.secho(f"Tweet posted:", fg="green", bold=True)
+    typer.secho(tweet, fg="green")
 
     if database.is_connected:
         await database.disconnect()
