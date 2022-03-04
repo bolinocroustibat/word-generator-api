@@ -42,7 +42,10 @@ async def generate(lang: str, request: Request):
         raise HTTPException(status_code=400, detail="Language not supported.")
     ip: str = request.client.host
     response: dict = await generate_word_and_save(lang=lang, ip=ip)
-    return response
+    if response:
+        return response
+    else:
+        raise HTTPException(status_code=500, detail="Too many retries.")
 
 
 @app.get("/{lang}/get")

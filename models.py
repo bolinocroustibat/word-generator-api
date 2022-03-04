@@ -49,6 +49,7 @@ class GenereratedWordEN(ormar.Model):
         tablename = "generated_words_EN"
         database = database
         metadata = metadata
+        constraints = [ormar.UniqueColumns("string")]
 
 
 class GenereratedWordFR(ormar.Model):
@@ -66,3 +67,4 @@ class GenereratedWordFR(ormar.Model):
         tablename = "generated_words_FR"
         database = database
         metadata = metadata
+        constraints = [ormar.UniqueColumns("string")]

@@ -1,45 +1,52 @@
-import asyncio
 import json
 import random
 from datetime import datetime
+from typing import Optional
+
+from pymysql.err import IntegrityError
 
 from en.classify import classify_en
 from fr.classify import classify_fr
 from models import GenereratedWordEN, GenereratedWordFR, RealWordEN, RealWordFR
 
 
-async def generate_word_and_save(lang: str, ip: str) -> str:
-    string: str = await generate_word(lang=lang, not_existing=True)
-    response: dict = {"string": string}
-    if lang == "en":
-        word_classes: dict = await classify_en(word=string)
-        asyncio.create_task(  # Fire and forget
-            GenereratedWordEN.objects.create(
-                string=string,
-                type=word_classes["type"],
-                number=word_classes["number"],
-                tense=word_classes["tense"],
-                date=datetime.utcnow(),
-                ip=ip,
-            )
-        )
-        response.update(word_classes)
-    if lang == "fr":
-        word_classes: dict = await classify_fr(word=string)
-        asyncio.create_task(  # Fire and forget
-            GenereratedWordFR.objects.create(
-                string=string,
-                type=word_classes["type"],
-                gender=word_classes["gender"],
-                number=word_classes["number"],
-                tense=word_classes["tense"],
-                conjug=word_classes["conjug"],
-                date=datetime.utcnow(),
-                ip=ip,
-            )
-        )
-        response.update(word_classes)
-    return response
+async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
+    already_generated = True  # assume it has already been generated so we enter the while loop at least once
+    retries = 0
+    while already_generated and retries < 10:
+        try:
+            string: str = await generate_word(lang=lang, not_existing=True)
+            response: dict = {"string": string}
+            if lang == "en":
+                word_classes: dict = await classify_en(word=string)
+                await GenereratedWordEN.objects.create(
+                    string=string,
+                    type=word_classes["type"],
+                    number=word_classes["number"],
+                    tense=word_classes["tense"],
+                    date=datetime.utcnow(),
+                    ip=ip,
+                )
+                response.update(word_classes)
+            if lang == "fr":
+                word_classes: dict = await classify_fr(word=string)
+                await GenereratedWordFR.objects.create(
+                    string=string,
+                    type=word_classes["type"],
+                    gender=word_classes["gender"],
+                    number=word_classes["number"],
+                    tense=word_classes["tense"],
+                    conjug=word_classes["conjug"],
+                    date=datetime.utcnow(),
+                    ip=ip,
+                )
+                response.update(word_classes)
+            return response
+        except IntegrityError:
+            print(f"Generated word '{string}' was already generated. Retrying...")
+            already_generated = True
+        retries += 1
+    return None
 
 
 async def generate_word(lang: str, not_existing: bool = True) -> str:
@@ -54,12 +61,14 @@ async def generate_word(lang: str, not_existing: bool = True) -> str:
 
     generated_word = generate_word_core(json_proba_file=json_proba_file)
 
-    exists = False
+    real_exists = False
     if not_existing:
-        exists = await if_exists(lang=lang, string=generated_word)
+        real_exists = await if_real_exists(lang=lang, string=generated_word)
 
     i = 0
-    while (len(generated_word) < 3 or len(generated_word) > 13 or exists) and i < 5:
+    while (
+        len(generated_word) < 3 or len(generated_word) > 13 or real_exists
+    ) and i < 5:
         print(f"Generated word '{generated_word}' not acceptable. Retrying...")
         generated_word = generate_word_core(json_proba_file=json_proba_file)
         i += 1
@@ -67,9 +76,9 @@ async def generate_word(lang: str, not_existing: bool = True) -> str:
     return generated_word
 
 
-async def if_exists(lang: str, string: str) -> bool:
+async def if_real_exists(lang: str, string: str) -> bool:
     """
-    Check if the word exists among real dictionary word
+    Check if the word exists among real dictionary words
     """
     if lang == "en":
         real_words = await RealWordEN.objects.all(string=string.lower())

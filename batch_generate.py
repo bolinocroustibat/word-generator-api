@@ -6,10 +6,11 @@ from common.generate_word import generate_word_and_save
 from models import database
 
 
-def batch_generate(lang: str, number: int = 100) -> None:
+def batch_generate(lang: str, number: int = 10) -> None:
 
     if lang not in ["en", "fr"]:
-        raise typer.Abort(f"Invalid language: {lang}")
+        typer.secho(f"Invalid language: {lang}", fg="red")
+        raise typer.Abort()
 
     async def _main():
 
@@ -19,7 +20,10 @@ def batch_generate(lang: str, number: int = 100) -> None:
         i = 0
         for i in range(number):
             response = await generate_word_and_save(lang=lang, ip="localhost")
-            typer.secho(f"'{response['string']}' saved to the DB.", fg="blue")
+            if response:
+                typer.secho(f"'{response['string']}' saved to the DB.", fg="blue")
+            else:
+                typer.secho(f"Too many retries.", fg="red")
             i += 1
 
         # if database.is_connected:
