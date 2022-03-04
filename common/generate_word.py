@@ -15,7 +15,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
     retries = 0
     while already_generated and retries < 10:
         try:
-            string: str = await generate_word(lang=lang, not_existing=True)
+            string: str = await generate_word(lang=lang, must_not_be_real=True)
             response: dict = {"string": string}
             if lang == "en":
                 word_classes: dict = await classify_en(word=string)
@@ -49,7 +49,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
     return None
 
 
-async def generate_word(lang: str, not_existing: bool = True) -> str:
+async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     """
     Generate a word, by retrying the algorithm if:
     - the generated word is too long (max 13 chars)
@@ -60,18 +60,20 @@ async def generate_word(lang: str, not_existing: bool = True) -> str:
     json_proba_file = f"{lang}/data/proba_table_2char_{lang.upper()}.json"
 
     generated_word = generate_word_core(json_proba_file=json_proba_file)
-
     real_exists = False
-    if not_existing:
+    if must_not_be_real:
         real_exists = await if_real_exists(lang=lang, string=generated_word)
 
     i = 0
-    while (
-        len(generated_word) < 3 or len(generated_word) > 13 or real_exists
-    ) and i < 5:
+    while ((len(generated_word) < 3) or (len(generated_word) > 13) or real_exists):
         print(f"Generated word '{generated_word}' not acceptable. Retrying...")
         generated_word = generate_word_core(json_proba_file=json_proba_file)
+        real_exists = False
+        if must_not_be_real:
+            real_exists = await if_real_exists(lang=lang, string=generated_word)
         i += 1
+        if i > 5:
+            break
 
     return generated_word
 

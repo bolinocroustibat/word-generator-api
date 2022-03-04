@@ -6,7 +6,7 @@ from common.generate_word import generate_word_and_save
 from models import database
 
 
-def batch_generate(lang: str, number: int = 10) -> None:
+def batch_generate(lang: str, number: int = 100) -> None:
 
     if lang not in ["en", "fr"]:
         typer.secho(f"Invalid language: {lang}", fg="red")
