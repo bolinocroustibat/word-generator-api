@@ -50,7 +50,7 @@ def dictionary_to_db(lang: str) -> None:
                         tense: str = word_classes["tense"]
                         conjug: str = word_classes["conjug"]
                         try:
-                            await RealWordEN.objects.get_or_create(
+                            await RealWordFR.objects.get_or_create(
                                 word=word,
                                 type=type,
                                 gender=gender,

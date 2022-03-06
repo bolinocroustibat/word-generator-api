@@ -47,7 +47,7 @@ def classify(lang: str) -> None:
                         conjug=word_classes["conjug"],
                     )
                 except Exception as e:
-                    typer.secho(f"{word}", fg=typer.colors.RED)
+                    typer.secho(f"{entry.string}", fg=typer.colors.RED)
                     typer.secho(e, fg=typer.colors.RED)
                 else:
                     i += 1

@@ -7,7 +7,8 @@ from pymysql.err import IntegrityError
 
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GenereratedWordEN, GenereratedWordFR, RealWordEN, RealWordFR
+from models import GenereratedWordEN, GenereratedWordFR
+from common.real_word import if_real_exists
 
 
 async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
@@ -65,7 +66,7 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
         real_exists = await if_real_exists(lang=lang, string=generated_word)
 
     i = 0
-    while ((len(generated_word) < 3) or (len(generated_word) > 13) or real_exists):
+    while (len(generated_word) < 3) or (len(generated_word) > 13) or real_exists:
         print(f"Generated word '{generated_word}' not acceptable. Retrying...")
         generated_word = generate_word_core(json_proba_file=json_proba_file)
         real_exists = False
@@ -76,43 +77,6 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
             break
 
     return generated_word
-
-
-async def if_real_exists(lang: str, string: str) -> bool:
-    """
-    Check if the word exists among real dictionary words
-    """
-    if lang == "en":
-        real_words = await RealWordEN.objects.all(string=string.lower())
-        possible_duplicates = set()
-        for w in real_words:
-            possible_duplicates.add(w.string)
-            if w.type == "noun" and w.number == "s":
-                possible_duplicates.add(w.string + "s")
-        if string in possible_duplicates:
-            print(f"Word '{string}' already exists in English dictionnary.")
-            return True
-    if lang == "fr":
-        real_words_common = await RealWordFR.objects.all(string=string.lower())
-        real_words_proper = await RealWordFR.objects.all(string=string.capitalize())
-        real_words = real_words_common + real_words_proper
-        possible_duplicates = set()
-        for w in real_words:
-            possible_duplicates.add(w.string)
-            if w.type == "noun" and w.number == "s":
-                possible_duplicates.add(w.string + "s")
-        if string in possible_duplicates:
-            print(f"Word '{string}' already exists in French dictionnary.")
-            return True
-    else:
-        dictionary = []
-        with open(f"{lang}/data/dictionary_{lang.upper()}.txt", "r") as dictionary_file:
-            for word in dictionary_file:
-                dictionary.append(word)
-        if string in dictionary:
-            print(f"Word '{string}' already exists in {lang} dictionnary.")
-            return True
-    return False
 
 
 def generate_word_core(json_proba_file: str) -> str:
