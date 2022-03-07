@@ -17,10 +17,11 @@ def classify(lang: str) -> None:
         if not database.is_connected:
             await database.connect()
 
+        i = 0
+
         if lang == "en":
             for j, entry in enumerate(await GenereratedWordEN.objects.all()):
-                i = 1
-                word_classes = classify_en(word=entry.string)
+                word_classes = await classify_en(word=entry.string)
                 try:
                     await entry.update(
                         type=word_classes["type"],
@@ -28,16 +29,15 @@ def classify(lang: str) -> None:
                         tense=word_classes["tense"],
                     )
                 except Exception as e:
-                    typer.secho(f"{entry.string}", fg=typer.colors.RED)
-                    typer.secho(e, fg=typer.colors.RED)
+                    typer.secho(f"{entry.string}", fg="red")
+                    typer.secho(e, fg="red")
                 else:
                     i += 1
-                    typer.secho(f'"{entry.string}" saved in DB.', fg=typer.colors.BLUE)
+                    typer.secho(f'"{entry.string}" updated.', fg="cyan")
 
         elif lang == "fr":
             for j, entry in enumerate(await GenereratedWordFR.objects.all()):
-                i = 1
-                word_classes = classify_fr(word=entry.string)
+                word_classes = await classify_fr(word=entry.string)
                 try:
                     await entry.update(
                         type=word_classes["type"],
@@ -47,13 +47,13 @@ def classify(lang: str) -> None:
                         conjug=word_classes["conjug"],
                     )
                 except Exception as e:
-                    typer.secho(f"{entry.string}", fg=typer.colors.RED)
-                    typer.secho(e, fg=typer.colors.RED)
+                    typer.secho(f"{entry.string}", fg="red")
+                    typer.secho(e, fg="red")
                 else:
                     i += 1
-                    typer.secho(f'"{entry.string}" saved in DB.', fg=typer.colors.BLUE)
+                    typer.secho(f'"{entry.string}" updated.', fg="cyan")
 
-        typer.secho(f'"{i}/{j}" words saved in DB.', fg=typer.colors.GREEN)
+        typer.secho(f'"{i}/{j}" generated words updated in DB.', fg="green")
 
         if database.is_connected:
             await database.disconnect()
