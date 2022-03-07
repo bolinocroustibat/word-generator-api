@@ -7,6 +7,7 @@ from models import RealWordFR, database
 
 
 def delete_duplicates_fr() -> None:
+
     async def _main():
 
         if not database.is_connected:

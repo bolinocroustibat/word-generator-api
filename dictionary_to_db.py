@@ -8,7 +8,7 @@ from fr.classify import classify_fr
 from models import RealWordEN, RealWordFR, database
 
 
-def dictionary_to_db(lang: str) -> None:
+def dictionary_to_db(lang: str, classify=True) -> None:
 
     if lang not in ["en", "fr"]:
         raise typer.Abort(f"Invalid language: {lang}")
@@ -24,50 +24,55 @@ def dictionary_to_db(lang: str) -> None:
                 word = word.strip()
                 if word:
                     if lang == "en":
-                        word_classes = classify_en(word=word)
-                        type: str = word_classes["type"]
-                        number: str = word_classes["number"]
-                        tense: str = word_classes["tense"]
-                        try:
-                            await RealWordEN.objects.get_or_create(
-                                word=word, type=type, number=number, tense=tense
-                            )
-                        # except IntegrityError:
-                        #     print(f"Word '{word}' was already in the DB.")
-                        #     continue
-                        except Exception as e:
-                            typer.secho(f"{word}", fg=typer.colors.RED)
-                            typer.secho(e, fg=typer.colors.RED)
-                        else:
-                            i += 1
-                            typer.secho(f'"{word}" saved in DB.', fg=typer.colors.BLUE)
+                        existing = RealWordFR.objects.all(string=word)
+                        if not existing:
+                            try:
+                                if classify:
+                                    word_classes = await classify_en(word=word)
+                                    await RealWordEN.objects.create(
+                                        string=word,
+                                        type=word_classes["type"],
+                                        number=word_classes["number"],
+                                        tense=word_classes["tense"],
+                                    )
+                                else:
+                                    await RealWordEN.objects.create(string=word)
+                            except Exception as e:
+                                typer.secho(f"{word}", fg="red")
+                                typer.secho(e, fg="red")
+                            else:
+                                i += 1
+                                typer.secho(f'"{word}" saved in DB.', fg="cyan")
+                        typer.secho(f'"{word}" was already in the DB.', fg="yellow")
+                        continue
                     elif lang == "fr":
-                        word_classes = classify_fr(word=word)
-                        type: str = word_classes["type"]
-                        gender: str = word_classes["gender"]
-                        number: str = word_classes["number"]
-                        tense: str = word_classes["tense"]
-                        conjug: str = word_classes["conjug"]
-                        try:
-                            await RealWordFR.objects.get_or_create(
-                                word=word,
-                                type=type,
-                                gender=gender,
-                                number=number,
-                                tense=tense,
-                                conjug=conjug,
-                            )
-                        # except IntegrityError:
-                        #     print(f"Word '{word}' was already in the DB.")
-                        #     continue
-                        except Exception as e:
-                            typer.secho(f"{word}", fg=typer.colors.RED)
-                            typer.secho(e, fg=typer.colors.RED)
-                        else:
-                            i += 1
-                            typer.secho(f'"{word}" saved in DB.', fg=typer.colors.BLUE)
+                        existing = RealWordFR.objects.all(string=word)
+                        if not existing:
+                            try:
+                                if classify:
+                                    word_classes = await classify_fr(word=word)
+                                    await RealWordFR.objects.create(
+                                        string=word,
+                                        type=word_classes["type"],
+                                        gender=word_classes["gender"],
+                                        number=word_classes["number"],
+                                        tense=word_classes["tense"],
+                                        proper=False,
+                                    )
+                                else:
+                                    await RealWordFR.objects.create(
+                                        string=word, proper=False
+                                    )
+                            except Exception as e:
+                                typer.secho(f"{word}", fg="red")
+                                typer.secho(e, fg="red")
+                            else:
+                                i += 1
+                                typer.secho(f'"{word}" saved in DB.', fg="cyan")
+                        typer.secho(f'"{word}" was already in the DB.', fg="yellow")
+                        continue
 
-        typer.secho(f'"{i}/{j}" words saved in DB.', fg=typer.colors.GREEN)
+        typer.secho(f'"{i}/{j}" words saved in DB.', fg="green")
 
         if database.is_connected:
             await database.disconnect()

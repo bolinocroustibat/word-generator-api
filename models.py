@@ -19,6 +19,7 @@ class RealWordEN(ormar.Model):
         tablename = "real_words_EN"
         database = database
         metadata = metadata
+        constraints = [ormar.UniqueColumns("string")]
 
 
 class RealWordFR(ormar.Model):
@@ -35,6 +36,7 @@ class RealWordFR(ormar.Model):
         tablename = "real_words_FR"
         database = database
         metadata = metadata
+        constraints = [ormar.UniqueColumns("string", "type")]
 
 
 class GenereratedWordEN(ormar.Model):
