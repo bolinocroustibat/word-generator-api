@@ -73,7 +73,7 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
         if must_not_be_real:
             real_exists = await if_real_exists(lang=lang, string=generated_word)
         i += 1
-        if i > 5:
+        if i > 10:
             break
 
     return generated_word

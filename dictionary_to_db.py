@@ -1,11 +1,7 @@
-import asyncio
-import json
-from operator import ge
-import os
 from asyncio import run as aiorun
-from pathlib import Path
 
 import typer
+from pymysql.err import IntegrityError
 
 from en.classify import classify_en
 from fr.classify import classify_fr
@@ -36,6 +32,9 @@ def dictionary_to_db(lang: str) -> None:
                             await RealWordEN.objects.get_or_create(
                                 word=word, type=type, number=number, tense=tense
                             )
+                        # except IntegrityError:
+                        #     print(f"Word '{word}' was already in the DB.")
+                        #     continue
                         except Exception as e:
                             typer.secho(f"{word}", fg=typer.colors.RED)
                             typer.secho(e, fg=typer.colors.RED)
@@ -58,6 +57,9 @@ def dictionary_to_db(lang: str) -> None:
                                 tense=tense,
                                 conjug=conjug,
                             )
+                        # except IntegrityError:
+                        #     print(f"Word '{word}' was already in the DB.")
+                        #     continue
                         except Exception as e:
                             typer.secho(f"{word}", fg=typer.colors.RED)
                             typer.secho(e, fg=typer.colors.RED)
