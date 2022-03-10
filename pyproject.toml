@@ -1,3 +1,30 @@
+[project]
+name = "word-generator-api"
+version = "1.0.0"
+description = ""
+authors = [{ name = "Adrien Carpentier", email = "moi@adriencarpentier.com" }]
+license-expression = "MIT"
+dependencies = [
+    "aiomysql<1.0.0,>=0.0.22",
+    "fastapi<1.0.0,>=0.74.1",
+    "nltk<4.0,>=3.7",
+    "ormar<1.0.0,>=0.10.25",
+    "requests<3.0.0,>=2.27.1",
+    "typer<1.0.0,>=0.4.0",
+    "uvicorn<1.0.0,>=0.17.5",
+    "tweepy<5.0.0,>=4.6.0",
+    "tqdm<5.0.0,>=4.63.0",
+]
+requires-python = ">=3.9,<4.0"
+
+[project.urls]
+Homepage = ""
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
 [tool.poetry]
 name = "word-generator-api"
 version = "1.0.0"
@@ -22,6 +49,14 @@ ipython = "^8.1.0"
 isort = "^5.10.1"
 mypy = "^0.931"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+
+[tool.pdm]
+includes = []
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "black<23.0.0,>=22.1.0",
+    "ipython<9.0.0,>=8.1.0",
+    "isort<6.0.0,>=5.10.1",
+    "mypy<1.0,>=0.931",
+]
