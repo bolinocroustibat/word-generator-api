@@ -1,7 +1,7 @@
 from typing import Tuple
 
 
-async def classify_en(word: str) -> dict:
+def classify_en(word: str) -> dict:
     """
     Classify English word
     """

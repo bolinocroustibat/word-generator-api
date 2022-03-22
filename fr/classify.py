@@ -1,7 +1,7 @@
-from typing import Tuple
+from typing import Optional
 
 
-async def classify_fr(word: str) -> dict:
+def classify_fr(word: str) -> dict:
     """
     Classify French word
     """
@@ -22,6 +22,11 @@ async def classify_fr(word: str) -> dict:
         type = "adjective"
         gender = "f"
         number = "p"
+    elif (word[-4:] == "ment") and (
+        get_char_from_position(word, -5)
+        in ["a", "e", "i", "î", "ï", "o", "ô", "u", "û"]
+    ):
+        type = "adverb"
     elif word[-4:] == "ique":
         type = "adjective"
         gender = "m"
@@ -125,3 +130,10 @@ async def classify_fr(word: str) -> dict:
         "tense": tense,
         "conjug": conjug,
     }
+
+
+def get_char_from_position(word: str, position: int) -> Optional[str]:
+    try:
+        return word[position]
+    except:
+        return None
