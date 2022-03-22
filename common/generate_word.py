@@ -19,7 +19,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
             string: str = await generate_word(lang=lang, must_not_be_real=True)
             response: dict = {"string": string}
             if lang == "en":
-                word_classes: dict = await classify_en(word=string)
+                word_classes: dict = classify_en(word=string)
                 await GenereratedWordEN.objects.create(
                     string=string,
                     type=word_classes["type"],
@@ -30,7 +30,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
                 )
                 response.update(word_classes)
             if lang == "fr":
-                word_classes: dict = await classify_fr(word=string)
+                word_classes: dict = classify_fr(word=string)
                 await GenereratedWordFR.objects.create(
                     string=string,
                     type=word_classes["type"],

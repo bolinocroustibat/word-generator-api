@@ -14,7 +14,7 @@ from models import database
 
 
 async def generate_tweet():
-    generated: dict = await generate_definition_en()
+    generated: dict = await generate_definition_en(percentage=0.4)
     string: str = generated["string"].capitalize()
     type: str = generated["type"]
     definition: str = generated["definition"]

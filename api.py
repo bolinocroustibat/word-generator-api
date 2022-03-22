@@ -1,16 +1,18 @@
 import random
+from typing import Optional
 
 import nltk
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from common.generate_word import generate_word_and_save
 from config import ALLOW_ORIGINS
-from en.generate_definition import generate_definition_en
+from en import alter_text_en, generate_definition_en
 from models import GenereratedWordEN, database
+
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -57,19 +59,34 @@ async def generate(request: Request, lang: str):
 @app.get("/{lang}/get")
 @limiter.limit("20/minute")
 async def get_word_from_db(request: Request, lang: str):
-    if lang not in ["en", "fr"]:
-        raise HTTPException(status_code=400, detail="Language not supported.")
     if lang == "en":
         words = await GenereratedWordEN.objects.all()
-    if lang == "fr":
+    elif lang == "fr":
         words = await GenereratedWordEN.objects.all()
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported.")
     word = random.choice(list(words))
     return word
 
+
+@app.get("/{lang}/alter")
+@limiter.limit("6/minute")
+async def alter_text(
+    request: Request, lang: str, text: str, percentage: Optional[float] = 0.4
+):
+    """
+    Alter a POSTed text with random non existing words.
+    """
+    if lang == "en":
+        return await alter_text_en(text=text, percentage=percentage)
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+
+
 @app.get("/{lang}/definition")
-@limiter.limit("5/minute")
+@limiter.limit("3/minute")
 async def get_definition(request: Request, lang: str):
     if lang == "en":
-        return await generate_definition_en()
+        return await generate_definition_en(percentage=0.3)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")

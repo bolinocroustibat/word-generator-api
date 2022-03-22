@@ -23,16 +23,18 @@ poetry install
 In `config.py`:
 
 - `ALLOW_ORIGINS`: list
-- `MYSQL_URL`: str
-- `DICTIONNARY_EN_API_URL`: str
-- `ALLOWED_TYPES`: list
-- `TWITTER_API_KEY`: str
-- `TWITTER_API_SECRET`: str
-- `TWITTER_ACCESS_TOKEN`: str
-- `TWITTER_TOKEN_SECRET`: str
+- `MYSQL_URL`: string
+    - local: MYSQL_URL = "mysql://root:root@localhost:8889/words"
+    - production: MYSQL_URL = "mysql://localmysqluser:localpasswd@localhost/words"
+- `DICTIONNARY_EN_API_URL`: string
+- `ALLOWED_TYPES_EN`: list
+- `TWITTER_API_KEY`: string
+- `TWITTER_API_SECRET`: string
+- `TWITTER_ACCESS_TOKEN`: string
+- `TWITTER_TOKEN_SECRET`: string
 
 
-## Run 
+## Run the API
 
 Activate the virtual environement:
 ```sh
@@ -43,6 +45,7 @@ Launch the web server:
 ```sh
 uvicorn api:app --reload
 ```
+
 
 ## Commands
 

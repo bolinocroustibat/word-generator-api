@@ -28,7 +28,7 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                         if not existing:
                             try:
                                 if classify:
-                                    word_classes = await classify_en(word=word)
+                                    word_classes: dict = classify_en(word=word)
                                     await RealWordEN.objects.create(
                                         string=word,
                                         type=word_classes["type"],
@@ -50,7 +50,7 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                         if not existing:
                             try:
                                 if classify:
-                                    word_classes = await classify_fr(word=word)
+                                    word_classes: dict = await classify_fr(word=word)
                                     await RealWordFR.objects.create(
                                         string=word,
                                         type=word_classes["type"],

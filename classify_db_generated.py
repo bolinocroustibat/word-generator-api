@@ -21,7 +21,7 @@ def classify(lang: str) -> None:
 
         if lang == "en":
             for j, entry in enumerate(await GenereratedWordEN.objects.all()):
-                word_classes = classify_en(word=entry.string)
+                word_classes: dict = classify_en(word=entry.string)
                 try:
                     await entry.update(
                         type=word_classes["type"],
@@ -37,7 +37,7 @@ def classify(lang: str) -> None:
 
         elif lang == "fr":
             for j, entry in enumerate(await GenereratedWordFR.objects.all()):
-                word_classes = classify_fr(word=entry.string)
+                word_classes: dict = classify_fr(word=entry.string)
                 try:
                     await entry.update(
                         type=word_classes["type"],
