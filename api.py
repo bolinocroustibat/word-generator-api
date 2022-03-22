@@ -12,7 +12,9 @@ from tortoise.contrib.mysql.functions import Rand
 from common.generate_word import generate_word_and_save
 from config import ALLOW_ORIGINS, APP_NAME, DATABASE_URL, DESCRIPTION, VERSION
 from en import alter_text_en, generate_definition_en
+from fr import alter_text_fr, generate_definition_fr
 from models import GeneratedWordEN, GeneratedWordFR
+
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -85,6 +87,8 @@ async def alter_text(
     """
     if lang == "en":
         return await alter_text_en(text=text, percentage=percentage)
+    elif lang == "fr":
+        return await alter_text_fr(text=text, percentage=percentage)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 
@@ -94,5 +98,7 @@ async def alter_text(
 async def get_definition(request: Request, lang: str):
     if lang == "en":
         return await generate_definition_en(percentage=0.3)
+    elif lang == "fr":
+        return await generate_definition_fr(percentage=0.4)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")

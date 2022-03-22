@@ -17,13 +17,13 @@ def dictionary_to_db(lang: str, classify=True) -> None:
 
         await prepare_db()
 
-        with open(f"{lang}/data/dictionary_{lang.upper()}.txt", "r") as dictionary_file:
+        with open(f"{lang}/data/adverbs_{lang.upper()}.txt", "r") as dictionary_file:
             i = 1
             for j, word in enumerate(dictionary_file):
                 word = word.strip()
                 if word:
                     if lang == "en":
-                        existing = RealWordFR.objects.all(string=word)
+                        existing = await RealWordFR.objects.all(string=word)
                         if not existing:
                             try:
                                 if classify:
@@ -42,10 +42,10 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                             else:
                                 i += 1
                                 typer.secho(f'"{word}" saved in DB.', fg="cyan")
-                        typer.secho(f'"{word}" was already in the DB.', fg="yellow")
-                        continue
+                        else:
+                            typer.secho(f'"{word}" was already in the DB.', fg="yellow")
                     elif lang == "fr":
-                        existing = RealWordFR.objects.all(string=word)
+                        existing = await RealWordFR.objects.all(string=word)
                         if not existing:
                             try:
                                 if classify:
@@ -68,8 +68,8 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                             else:
                                 i += 1
                                 typer.secho(f'"{word}" saved in DB.', fg="cyan")
-                        typer.secho(f'"{word}" was already in the DB.', fg="yellow")
-                        continue
+                        else:
+                            typer.secho(f'"{word}" was already in the DB.', fg="yellow")
 
         typer.secho(f'"{i}/{j}" words saved in DB.', fg="green")
 
