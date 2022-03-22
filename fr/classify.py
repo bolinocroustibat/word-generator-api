@@ -24,7 +24,7 @@ def classify_fr(word: str) -> dict:
         number = "p"
     elif (word[-4:] == "ment") and (
         get_char_from_position(word, -5)
-        in ["a", "e", "i", "î", "ï", "o", "ô", "u", "û"]
+        in ["a", "e", "é", "i", "î", "ï", "o", "ô", "u", "û"]
     ):
         type = "adverb"
     elif word[-4:] == "ique":
@@ -40,7 +40,8 @@ def classify_fr(word: str) -> dict:
         gender = "f"
         number = "p"
     elif word[-3:] == "ées":
-        type = "past-participle"
+        type = "verb"
+        tense = "past-participle"
         gender = "f"
         number = "p"
     elif word[-3:] == "ons":
@@ -53,11 +54,11 @@ def classify_fr(word: str) -> dict:
         conjug = "6"
     elif word[-3:] == "ais":
         type = "verb"
-        tense = "present"
+        tense = "past"
         conjug = "1"
     elif word[-3:] == "ait":
         type = "verb"
-        tense = "present"
+        tense = "past"
         conjug = "3"
     elif word[-3:] == "ras":
         type = "verb"
@@ -79,6 +80,14 @@ def classify_fr(word: str) -> dict:
         type = "verb"
         tense = "future"
         conjug = "1"
+    elif word[-2:] == "ai" and (get_char_from_position(word, -3) == "r"):
+        type = "verb"
+        tense = "future"
+        conjug = "1"
+    elif word[-2:] == "ai" and (get_char_from_position(word, -3) != "r"):
+        type = "verb"
+        tense = "past"
+        conjug = "1"
     elif word[-2:] == "as":
         type = "verb"
         tense = "present"
@@ -96,11 +105,13 @@ def classify_fr(word: str) -> dict:
         gender = "f"
         number = "p"
     elif word[-2:] == "ée":
-        type = "past-participle"
+        type = "verb"
+        tense = "past-participle"
         gender = "f"
         number = "s"
     elif word[-2:] == "és":
-        type = "past-participle"
+        type = "verb"
+        tense = "past-participle"
         gender = "m"
         number = "p"
     elif word[-2:] in ["er", "ir"]:
@@ -111,7 +122,8 @@ def classify_fr(word: str) -> dict:
         gender = "f"
         number = "s"
     elif word[-1:] == "é":
-        type = "past-participle"
+        type = "verb"
+        tense = "past-participle"
         gender = "m"
         number = "s"
     elif word[-1:] == "s":
