@@ -8,12 +8,12 @@ dependencies = [
     "aiomysql<1.0.0,>=0.0.22",
     "fastapi<1.0.0,>=0.74.1",
     "nltk<4.0,>=3.7",
-    "ormar<1.0.0,>=0.10.25",
     "requests<3.0.0,>=2.27.1",
     "typer<1.0.0,>=0.4.0",
     "uvicorn<1.0.0,>=0.17.5",
     "tweepy<5.0.0,>=4.6.0",
     "tqdm<5.0.0,>=4.63.0",
+    "sqlmodel>=0.0.6",
 ]
 requires-python = ">=3.9,<4.0"
 
@@ -36,13 +36,13 @@ python = "^3.9"
 aiomysql = "^0.0.22"
 fastapi = "^0.74.1"
 nltk = "^3.7"
-ormar = "^0.10.25"
 requests = "^2.27.1"
 typer = "^0.4.0"
 uvicorn = "^0.17.5"
 tweepy = "^4.6.0"
 tqdm = "^4.63.0"
 slowapi = "^0.1.5"
+sqlmodel = "^0.0.6"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
