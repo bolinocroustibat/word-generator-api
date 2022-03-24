@@ -4,7 +4,7 @@ from typing import Tuple
 import requests
 
 from config import ALLOWED_TYPES_EN, DICTIONNARY_EN_API_URL
-from models import GenereratedWordEN, RealWordEN
+from models import GeneratedWordEN, RealWordEN
 from .alter_text import alter_text_en
 
 
@@ -12,13 +12,13 @@ async def generate_definition_en(percentage: float) -> str:
     type, definition, example = await get_random_definition_en()
     definition = await alter_text_en(text=definition, percentage=percentage)
     if type == "verb":
-        generated_words = await GenereratedWordEN.objects.all(
+        generated_words = await GeneratedWordEN.objects.all(
             type=type, tense="infinitive"
         )
     elif type == "noun":
-        generated_words = await GenereratedWordEN.objects.all(type=type, number="s")
+        generated_words = await GeneratedWordEN.objects.all(type=type, number="s")
     else:
-        generated_words = await GenereratedWordEN.objects.all(type=type)
+        generated_words = await GeneratedWordEN.objects.all(type=type)
     string = random.choice(list(generated_words)).string
     return {
         "string": string,

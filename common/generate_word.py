@@ -7,7 +7,7 @@ from pymysql.err import IntegrityError
 
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GenereratedWordEN, GenereratedWordFR
+from models import GeneratedWordEN, GeneratedWordFR
 from common.real_word import if_real_exists
 
 
@@ -20,7 +20,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
             response: dict = {"string": string}
             if lang == "en":
                 word_classes: dict = classify_en(word=string)
-                await GenereratedWordEN.objects.create(
+                await GeneratedWordEN.objects.create(
                     string=string,
                     type=word_classes["type"],
                     number=word_classes["number"],
@@ -31,7 +31,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
                 response.update(word_classes)
             if lang == "fr":
                 word_classes: dict = classify_fr(word=string)
-                await GenereratedWordFR.objects.create(
+                await GeneratedWordFR.objects.create(
                     string=string,
                     type=word_classes["type"],
                     gender=word_classes["gender"],

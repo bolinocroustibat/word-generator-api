@@ -3,8 +3,8 @@ from asyncio import run as aiorun
 import typer
 
 from models import (
-    GenereratedWordEN,
-    GenereratedWordFR,
+    GeneratedWordEN,
+    GeneratedWordFR,
     RealWordEN,
     RealWordFR,
     database,
@@ -25,7 +25,7 @@ def clean(lang: str) -> None:
         i = 0
 
         if lang == "en":
-            for j, entry in enumerate(await GenereratedWordEN.objects.all()):
+            for j, entry in enumerate(await GeneratedWordEN.objects.all()):
                 existing = await RealWordEN.objects.all(string=entry.string)
                 if existing:
                     i += 1
@@ -37,7 +37,7 @@ def clean(lang: str) -> None:
                     continue
 
         elif lang == "fr":
-            for j, entry in enumerate(await GenereratedWordFR.objects.all()):
+            for j, entry in enumerate(await GeneratedWordFR.objects.all()):
                 existing = await RealWordFR.objects.all(string=entry.string)
                 if existing:
                     i += 1

@@ -11,7 +11,7 @@ from slowapi.util import get_remote_address
 from common.generate_word import generate_word_and_save
 from config import ALLOW_ORIGINS
 from en import alter_text_en, generate_definition_en
-from models import GenereratedWordEN, database
+from models import GeneratedWordEN, GeneratedWordFR, database
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -60,9 +60,9 @@ async def generate(request: Request, lang: str):
 @limiter.limit("20/minute")
 async def get_word_from_db(request: Request, lang: str):
     if lang == "en":
-        words = await GenereratedWordEN.objects.all()
+        words = await GeneratedWordEN.objects.all()
     elif lang == "fr":
-        words = await GenereratedWordEN.objects.all()
+        words = await GeneratedWordFR.objects.all()
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
     word = random.choice(list(words))

@@ -39,7 +39,7 @@ class RealWordFR(ormar.Model):
         constraints = [ormar.UniqueColumns("string", "type")]
 
 
-class GenereratedWordEN(ormar.Model):
+class GeneratedWordEN(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
     string: str = ormar.String(max_length=100)
     type: str = ormar.String(max_length=16, nullable=True)
@@ -55,7 +55,7 @@ class GenereratedWordEN(ormar.Model):
         constraints = [ormar.UniqueColumns("string")]
 
 
-class GenereratedWordFR(ormar.Model):
+class GeneratedWordFR(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
     string: str = ormar.String(max_length=100)
     type: str = ormar.String(max_length=16, nullable=True)

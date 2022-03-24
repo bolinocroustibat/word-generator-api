@@ -5,7 +5,7 @@ from typing import Tuple
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 
-from models import GenereratedWordEN
+from models import GeneratedWordEN
 
 
 async def alter_text_en(text: str, percentage: float) -> str:
@@ -45,16 +45,16 @@ async def alter_text_en(text: str, percentage: float) -> str:
         type = POS_CORRESPONDANCE_EN[w[1]]["type"]
         if type == "noun":
             number = POS_CORRESPONDANCE_EN[w[1]]["number"]
-            generated_words = await GenereratedWordEN.objects.all(
+            generated_words = await GeneratedWordEN.objects.all(
                 type=type, number=number
             )
         elif type == "verb":
             tense = POS_CORRESPONDANCE_EN[w[1]]["tense"]
-            generated_words = await GenereratedWordEN.objects.all(
+            generated_words = await GeneratedWordEN.objects.all(
                 type=type, tense=tense
             )
         else:
-            generated_words = await GenereratedWordEN.objects.all(type=type)
+            generated_words = await GeneratedWordEN.objects.all(type=type)
         replacement: str = random.choice(list(generated_words)).string
         print(f"Replacing '{w[0]}' with '{replacement}'...")
         if w[0].istitle():
