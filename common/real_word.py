@@ -1,4 +1,4 @@
-from models import RealWordEN, RealWordFR
+from models import RealWordEN, RealWordFR, engine
 
 
 async def if_real_exists(lang: str, string: str) -> bool:

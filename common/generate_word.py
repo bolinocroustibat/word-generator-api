@@ -3,11 +3,9 @@ import random
 from datetime import datetime
 from typing import Optional
 
-from pymysql.err import IntegrityError
-
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GeneratedWordEN, GeneratedWordFR
+from models import GeneratedWordEN, GeneratedWordFR, engine
 from common.real_word import if_real_exists
 
 

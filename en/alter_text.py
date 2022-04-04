@@ -5,7 +5,7 @@ from typing import Tuple
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 
-from models import GeneratedWordEN
+from models import GeneratedWordEN, engine
 
 
 async def alter_text_en(text: str, percentage: float) -> str:

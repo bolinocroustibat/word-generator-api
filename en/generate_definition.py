@@ -1,10 +1,10 @@
 import random
+import requests
+from sqlmodel import Session, select
 from typing import Tuple
 
-import requests
-
 from config import ALLOWED_TYPES_EN, DICTIONNARY_EN_API_URL
-from models import GeneratedWordEN, RealWordEN
+from models import GeneratedWordEN, RealWordEN, engine
 from .alter_text import alter_text_en
 
 

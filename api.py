@@ -7,11 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from sqlmodel import Session, select
 
 from common.generate_word import generate_word_and_save
 from config import ALLOW_ORIGINS
 from en import alter_text_en, generate_definition_en
-from models import GeneratedWordEN, GeneratedWordFR, database
+from models import GeneratedWordEN, GeneratedWordFR, engine
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -25,22 +26,9 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
-app.state.database = database
 
 
 nltk.download("averaged_perceptron_tagger")
-
-
-@app.on_event("startup")
-async def startup() -> None:
-    if not database.is_connected:
-        await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown() -> None:
-    if database.is_connected:
-        await database.disconnect()
 
 
 @app.get("/{lang}/generate")
@@ -60,9 +48,13 @@ async def generate(request: Request, lang: str):
 @limiter.limit("20/minute")
 async def get_word_from_db(request: Request, lang: str):
     if lang == "en":
-        words = await GeneratedWordEN.objects.all()
+        with Session(engine) as session:
+            statement = select(GeneratedWordEN)
+            words = session.exec(statement)
     elif lang == "fr":
-        words = await GeneratedWordFR.objects.all()
+        with Session(engine) as session:
+            statement = select(GeneratedWordFR)
+            words = session.exec(statement)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
     word = random.choice(list(words))

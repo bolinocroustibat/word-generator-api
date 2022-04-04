@@ -1,10 +1,11 @@
 from asyncio import run as aiorun
 
+from sqlmodel import Session, select
 import typer
 
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GeneratedWordEN, GeneratedWordFR, database
+from models import GeneratedWordEN, GeneratedWordFR, engine
 
 
 def classify(lang: str) -> None:
@@ -13,9 +14,6 @@ def classify(lang: str) -> None:
         raise typer.Abort(f"Invalid language: {lang}")
 
     async def _main():
-
-        if not database.is_connected:
-            await database.connect()
 
         i = 0
 
@@ -54,9 +52,6 @@ def classify(lang: str) -> None:
                     typer.secho(f'"{entry.string}" updated.', fg="cyan")
 
         typer.secho(f'"{i}/{j}" generated words updated in DB.', fg="green")
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 

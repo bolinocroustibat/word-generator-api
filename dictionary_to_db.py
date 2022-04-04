@@ -1,11 +1,11 @@
 from asyncio import run as aiorun
 
 import typer
-from pymysql.err import IntegrityError
+from sqlmodel import Session, select
 
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import RealWordEN, RealWordFR, database
+from models import RealWordEN, RealWordFR, engine
 
 
 def dictionary_to_db(lang: str, classify=True) -> None:
@@ -14,9 +14,6 @@ def dictionary_to_db(lang: str, classify=True) -> None:
         raise typer.Abort(f"Invalid language: {lang}")
 
     async def _main():
-
-        if not database.is_connected:
-            await database.connect()
 
         with open(f"{lang}/data/dictionary_{lang.upper()}.txt", "r") as dictionary_file:
             i = 1
@@ -73,9 +70,6 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                         continue
 
         typer.secho(f'"{i}/{j}" words saved in DB.', fg="green")
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 

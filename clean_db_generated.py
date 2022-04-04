@@ -1,14 +1,9 @@
 from asyncio import run as aiorun
 
 import typer
+from sqlmodel import Session, select
 
-from models import (
-    GeneratedWordEN,
-    GeneratedWordFR,
-    RealWordEN,
-    RealWordFR,
-    database,
-)
+from models import GeneratedWordEN, GeneratedWordFR, RealWordEN, RealWordFR, engine
 
 
 def clean(lang: str) -> None:
@@ -18,9 +13,6 @@ def clean(lang: str) -> None:
         raise typer.Abort()
 
     async def _main():
-
-        if not database.is_connected:
-            await database.connect()
 
         i = 0
 
@@ -49,9 +41,6 @@ def clean(lang: str) -> None:
                     continue
 
         typer.secho(f'"{i}/{j}" generated words deleted from DB.', fg="green")
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 

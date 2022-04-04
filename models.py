@@ -1,79 +1,58 @@
-import ormar
+from datetime import datetime
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, create_engine
+
 from config import MYSQL_URL
 
-# metadata = sqlalchemy.MetaData()
-# database = databases.Database(MYSQL_URL)
 
-
-class Hero(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
-    secret_name: str
-    age: Optional[int] = None
-
-class RealWordEN(SQLModel):
+class RealWordEN(SQLModel, table=True):
     id: int = Field(primary_key=True)
-    string: str = Field(max_length=50)
-    type: Optional[str] = Field(max_length=16, nullable=True)
-    number: Optional[str] = Field(max_length=1, nullable=True)
-    tense: Optional[str] = Field(max_length=16, nullable=True)
+    string: str
+    type: Optional[str]
+    number: Optional[str]
+    tense: Optional[str]
 
-    class Meta:
-        tablename = "real_words_EN"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string")]
+    __tablename__ = "real_words_EN"
 
 
-class RealWordFR(SQLModel):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = Field(max_length=100)
-    type: str = Field(max_length=16, nullable=True)
-    gender: str = Field(max_length=1, nullable=True)
-    number: str = Field(max_length=1, nullable=True)
-    tense: str = Field(max_length=16, nullable=True)
-    proper: bool = ormar.Boolean()
-    complex: bool = ormar.Boolean(nullable=True)
+class RealWordFR(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    string: str
+    type: Optional[str]
+    gender: Optional[str]
+    number: Optional[str]
+    tense: Optional[str]
+    proper: bool
+    complex: bool
 
-    class Meta:
-        tablename = "real_words_FR"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string", "type")]
+    __tablename__ = "real_words_FR"
 
 
-class GeneratedWordEN(SQLModel):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = Field(max_length=100)
-    type: str = Field(max_length=16, nullable=True)
-    number: str = Field(max_length=1, nullable=True)
-    tense: str = Field(max_length=16, nullable=True)
-    date = ormar.DateTime()
-    ip: str = Field(max_length=16)
+class GeneratedWordEN(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    string: str
+    type: Optional[str]
+    number: Optional[str]
+    tense: Optional[str]
+    date: datetime
+    ip: str
 
-    class Meta:
-        tablename = "generated_words_EN"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string")]
+    __tablename__ = "generated_words_EN"
 
 
-class GeneratedWordFR(SQLModel):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = Field(max_length=100)
-    type: str = Field(max_length=16, nullable=True)
-    gender: str = Field(max_length=1, nullable=True)
-    number: str = Field(max_length=1, nullable=True)
-    tense: str = Field(max_length=16, nullable=True)
-    conjug: str = Field(max_length=16, nullable=True)
-    date = ormar.DateTime()
-    ip: str = Field(max_length=16)
+class GeneratedWordFR(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    string: str
+    type: Optional[str]
+    gender: Optional[str]
+    number: Optional[str]
+    tense: Optional[str]
+    conjug: Optional[str]
+    date: datetime
+    ip: str
 
-    class Meta:
-        tablename = "generated_words_FR"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string")]
+    __tablename__ = "generated_words_FR"
+
+
+engine = create_engine(MYSQL_URL, echo=True)

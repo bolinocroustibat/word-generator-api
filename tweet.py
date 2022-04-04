@@ -10,7 +10,6 @@ from config import (
     TWITTER_TOKEN_SECRET,
 )
 from en.generate_definition import generate_definition_en
-from models import database
 
 
 async def generate_tweet():
@@ -22,9 +21,6 @@ async def generate_tweet():
 
 
 async def send_tweet() -> None:
-
-    if not database.is_connected:
-        await database.connect()
 
     tweet: str = await generate_tweet()
     tries = 0
@@ -41,9 +37,6 @@ async def send_tweet() -> None:
     api.update_status(tweet)
     typer.secho(f"Tweet posted:", fg="green", bold=True)
     typer.secho(tweet, fg="green")
-
-    if database.is_connected:
-        await database.disconnect()
 
 
 if __name__ == "__main__":

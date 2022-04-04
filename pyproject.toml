@@ -33,7 +33,6 @@ authors = ["Adrien Carpentier <moi@adriencarpentier.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-aiomysql = "^0.0.22"
 fastapi = "^0.74.1"
 nltk = "^3.7"
 requests = "^2.27.1"

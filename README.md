@@ -8,7 +8,7 @@ Python API with a MySQL database, using FastAPI framework.
 - Python 3.9 (also tested successfully with 3.7)
 - [Poetry](https://python-poetry.org/)
 - [FastAPI](https://fastapi.tiangolo.com/)
-- [Ormar](https://collerek.github.io/ormar/) ORM
+- [SQLmodel](https://sqlmodel.tiangolo.com/) ORM
 - MySQL/MariaDB database
 
 ## Install
