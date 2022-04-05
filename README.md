@@ -1,4 +1,4 @@
-# Word Generator in Python
+# Word Generator API in Python
 
 
 ## Main dependencies
