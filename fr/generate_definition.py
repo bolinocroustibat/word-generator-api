@@ -1,4 +1,3 @@
-import random
 from typing import Tuple
 
 import requests
@@ -86,12 +85,12 @@ async def get_definition_fr(word: str) -> Tuple[str, str]:
     )
     try:
         res: dict = response.json()[0]
-        nature: str = res["nature"]
+        type: str = res["nature"].split()[0]
         definition: str = res["definition"].strip()
     except:
         print(f"Dicolink API error: {str(response)}")
         return None, None
     else:
-        print(nature)  # TODO: to remove, it's for debug
-        type = ALLOWED_TYPES_FR.get(nature.split()[0], "unknown")
+        print(res)  # TODO: to remove, it's for debug
+        type = ALLOWED_TYPES_FR.get(type, "unknown")
         return type, definition

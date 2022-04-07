@@ -9,6 +9,7 @@ from tortoise.contrib.mysql.functions import Rand
 
 from common.capitalize import capitalize, decapitalize
 from models import GeneratedWordFR, RealWordFR
+from .correct_text import correct_text_fr
 
 
 # Better tagger than the default Spacy POS tagger
@@ -53,9 +54,9 @@ async def alter_text_fr(text: str, percentage: float) -> str:
     """
     Alter a text randomly using Spacy and Lefff
     """
-    
+
     text = decapitalize(text)
-    
+
     replacable_words: list[dict] = list_replacable_words(text=text)
     # print(replacable_words)  # DEBUG
 
@@ -66,7 +67,7 @@ async def alter_text_fr(text: str, percentage: float) -> str:
 
     altered_text: str = await replace_words(text=text, to_replace=to_replace)
 
-    return capitalize(altered_text)
+    return capitalize(correct_text_fr(altered_text))
 
 
 def list_replacable_words(text: str) -> list[dict]:
@@ -92,7 +93,7 @@ def list_replacable_words(text: str) -> list[dict]:
                 "conjug": None,
                 "must_start_with_wowel": (
                     tokens[(t.i) - 1].text[-1] == "'" if tokens[(t.i) - 1] else False
-                ), # TODO not being used yet
+                ),  # TODO not being used yet
             }
             if t.pos_ in ["NOUN", "PROPN", "ADJ"]:
                 if t.morph.get("Number"):
