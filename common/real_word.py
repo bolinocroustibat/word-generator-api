@@ -6,7 +6,7 @@ async def if_real_exists(lang: str, string: str) -> bool:
     Check if the word exists among real dictionary words
     """
     if lang == "en":
-        real_words = await RealWordEN.objects.all(string=string.lower())
+        real_words = await RealWordEN.filter(string=string.lower())
         possible_duplicates = set()
         for w in real_words:
             possible_duplicates.add(w.string)
@@ -16,7 +16,7 @@ async def if_real_exists(lang: str, string: str) -> bool:
             print(f"Word '{string}' already exists in English dictionnary.")
             return True
     if lang == "fr":
-        real_words = await RealWordFR.objects.all(string=string)
+        real_words = await RealWordFR.filter(string=string)
         possible_duplicates = set()
         if string.lower() in [w.string.lower() for w in real_words]:
             print(f"Word '{string}' already exists in French dictionnary.")

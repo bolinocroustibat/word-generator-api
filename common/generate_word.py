@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 from typing import Optional
 
-from pymysql.err import IntegrityError
+from tortoise.exceptions import IntegrityError
 
 from en.classify import classify_en
 from fr.classify import classify_fr
@@ -20,7 +20,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
             response: dict = {"string": string}
             if lang == "en":
                 word_classes: dict = classify_en(word=string)
-                await GeneratedWordEN.objects.create(
+                await GeneratedWordEN.create(
                     string=string,
                     type=word_classes["type"],
                     number=word_classes["number"],
@@ -31,7 +31,7 @@ async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
                 response.update(word_classes)
             if lang == "fr":
                 word_classes: dict = classify_fr(word=string)
-                await GeneratedWordFR.objects.create(
+                await GeneratedWordFR.create(
                     string=string,
                     type=word_classes["type"],
                     gender=word_classes["gender"],

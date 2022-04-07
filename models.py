@@ -1,73 +1,68 @@
-import databases
-import ormar
-import sqlalchemy
-
-from config import MYSQL_URL
-
-metadata = sqlalchemy.MetaData()
-database = databases.Database(MYSQL_URL)
+from tortoise import fields
+from tortoise.models import Model
 
 
-class RealWordEN(ormar.Model):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = ormar.String(max_length=50)
-    type: str = ormar.String(max_length=16, nullable=True)
-    number: str = ormar.String(max_length=1, nullable=True)
-    tense: str = ormar.String(max_length=16, nullable=True)
+class RealWordEN(Model):
+    # id: int = fields.IntField(primary_key=True)
+    string: str = fields.CharField(max_length=50, unique=True)
+    type: str = fields.CharField(max_length=16, null=True)
+    number: str = fields.CharField(max_length=1, null=True)
+    tense: str = fields.CharField(max_length=16, null=True)
 
     class Meta:
-        tablename = "real_words_EN"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string")]
+        table = "real_words_EN"
+
+    def __str__(self):
+        return f"{self.string} ({self.id})"
 
 
-class RealWordFR(ormar.Model):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16, nullable=True)
-    gender: str = ormar.String(max_length=1, nullable=True)
-    number: str = ormar.String(max_length=1, nullable=True)
-    tense: str = ormar.String(max_length=16, nullable=True)
-    proper: bool = ormar.Boolean()
-    complex: bool = ormar.Boolean(nullable=True)
-
-    class Meta:
-        tablename = "real_words_FR"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string", "type")]
-
-
-class GeneratedWordEN(ormar.Model):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16, nullable=True)
-    number: str = ormar.String(max_length=1, nullable=True)
-    tense: str = ormar.String(max_length=16, nullable=True)
-    date = ormar.DateTime()
-    ip: str = ormar.String(max_length=16)
+class RealWordFR(Model):
+    # id: int = fields.IntField(primary_key=True)
+    string: str = fields.CharField(max_length=100)
+    type: str = fields.CharField(max_length=16, null=True)
+    gender: str = fields.CharField(max_length=1, null=True)
+    number: str = fields.CharField(max_length=1, null=True)
+    tense: str = fields.CharField(max_length=16, null=True)
+    proper: bool = fields.data.BooleanField()
+    complex: bool = fields.data.BooleanField(null=True)
 
     class Meta:
-        tablename = "generated_words_EN"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string")]
+        table = "real_words_FR"
+        unique_together = ("string", "type")
+
+    def __str__(self):
+        return f"{self.string} ({self.id})"
 
 
-class GeneratedWordFR(ormar.Model):
-    id: int = ormar.Integer(primary_key=True)
-    string: str = ormar.String(max_length=100)
-    type: str = ormar.String(max_length=16, nullable=True)
-    gender: str = ormar.String(max_length=1, nullable=True)
-    number: str = ormar.String(max_length=1, nullable=True)
-    tense: str = ormar.String(max_length=16, nullable=True)
-    conjug: str = ormar.String(max_length=16, nullable=True)
-    date = ormar.DateTime()
-    ip: str = ormar.String(max_length=16)
+class GeneratedWordEN(Model):
+    # id: int = fields.IntField(primary_key=True)
+    string: str = fields.CharField(max_length=100, unique=True)
+    type: str = fields.CharField(max_length=16, null=True)
+    number: str = fields.CharField(max_length=1, null=True)
+    tense: str = fields.CharField(max_length=16, null=True)
+    date = fields.DatetimeField()
+    ip: str = fields.CharField(max_length=16)
 
     class Meta:
-        tablename = "generated_words_FR"
-        database = database
-        metadata = metadata
-        constraints = [ormar.UniqueColumns("string")]
+        table = "generated_words_EN"
+
+    def __str__(self):
+        return f"{self.string} ({self.id})"
+
+
+class GeneratedWordFR(Model):
+    # id: int = fields.IntField(primary_key=True)
+    string: str = fields.CharField(max_length=100, unique=True)
+    type: str = fields.CharField(max_length=16, null=True)
+    gender: str = fields.CharField(max_length=1, null=True)
+    number: str = fields.CharField(max_length=1, null=True)
+    tense: str = fields.CharField(max_length=16, null=True)
+    conjug: str = fields.CharField(max_length=16, null=True)
+    date = fields.DatetimeField()
+    ip: str = fields.CharField(max_length=16)
+
+    class Meta:
+        table = "generated_words_FR"
+
+    def __str__(self):
+        return f"{self.string} ({self.id})"

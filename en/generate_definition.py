@@ -2,6 +2,7 @@ import random
 from typing import Tuple
 
 import requests
+from tortoise.contrib.mysql.functions import Rand
 
 from config import ALLOWED_TYPES_EN, DICTIONNARY_EN_API_URL
 from models import GeneratedWordEN, RealWordEN
@@ -12,16 +13,23 @@ async def generate_definition_en(percentage: float) -> str:
     type, definition, example = await get_random_definition_en()
     definition = await alter_text_en(text=definition, percentage=percentage)
     if type == "verb":
-        generated_words = await GeneratedWordEN.objects.all(
-            type=type, tense="infinitive"
-        )
+        generated_word = await GeneratedWordEN.filter(type=type, tense="infinitive")
     elif type == "noun":
-        generated_words = await GeneratedWordEN.objects.all(type=type, number="s")
+        generated_word = (
+            await GeneratedWordEN.filter(type=type, number="s")
+            .annotate(order=Rand())
+            .order_by("order")
+            .limit(1)
+        )
     else:
-        generated_words = await GeneratedWordEN.objects.all(type=type)
-    string = random.choice(list(generated_words)).string
+        generated_word = (
+            await GeneratedWordEN.filter(type=type)
+            .annotate(order=Rand())
+            .order_by("order")
+            .limit(1)
+        )
     return {
-        "string": string,
+        "string": generated_word[0].string,
         "type": type,
         "definition": definition,
     }
@@ -31,16 +39,14 @@ async def get_random_definition_en() -> Tuple[str, str, str]:
     """
     Returns a random real word definition, type and example.
     """
-    words = await RealWordEN.objects.all()
-    word = random.choice(list(words))
-    type, definition, example = await get_definition_en(word=word.string)
+    word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
+    type, definition, example = await get_definition_en(word=word[0].string)
     while (not definition) or (type not in ALLOWED_TYPES_EN):
         print(
             f"Definition for word '{word}' or type '{type}' not supported, trying another word and definition..."
         )
-        words = await RealWordEN.objects.all()
-        word = random.choice(list(words))
-        type, definition, example = await get_definition_en(word=word.string)
+        word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
+        type, definition, example = await get_definition_en(word=word[0].string)
     return type, definition, example
 
 

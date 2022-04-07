@@ -1,4 +1,3 @@
-import random
 from typing import Optional
 
 import nltk
@@ -7,15 +6,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from tortoise.contrib.fastapi import register_tortoise
+from tortoise.contrib.mysql.functions import Rand
 
 from common.generate_word import generate_word_and_save
-from config import ALLOW_ORIGINS
+from config import ALLOW_ORIGINS, APP_NAME, DATABASE_URL, DESCRIPTION, VERSION
 from en import alter_text_en, generate_definition_en
-from models import GeneratedWordEN, GeneratedWordFR, database
+from models import GeneratedWordEN, GeneratedWordFR
 
 
 limiter = Limiter(key_func=get_remote_address)
-app = FastAPI()
+app = FastAPI(title=APP_NAME, description=DESCRIPTION, version=VERSION)
+register_tortoise(
+    app,
+    db_url=DATABASE_URL,
+    modules={"models": ["models"]},
+    generate_schemas=False,
+    add_exception_handlers=True,
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
@@ -25,22 +33,8 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
-app.state.database = database
-
 
 nltk.download("averaged_perceptron_tagger")
-
-
-@app.on_event("startup")
-async def startup() -> None:
-    if not database.is_connected:
-        await database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown() -> None:
-    if database.is_connected:
-        await database.disconnect()
 
 
 @app.get("/{lang}/generate")
@@ -60,13 +54,25 @@ async def generate(request: Request, lang: str):
 @limiter.limit("20/minute")
 async def get_word_from_db(request: Request, lang: str):
     if lang == "en":
-        words = await GeneratedWordEN.objects.all()
+        word = await GeneratedWordEN.annotate(order=Rand()).order_by("order").limit(1)
+        return {
+            "string": word[0].string,
+            "type": word[0].type,
+            "number": word[0].number,
+            "tense": word[0].tense,
+        }
     elif lang == "fr":
-        words = await GeneratedWordFR.objects.all()
+        word = await GeneratedWordFR.annotate(order=Rand()).order_by("order").limit(1)
+        return {
+            "string": word[0].string,
+            "type": word[0].type,
+            "gender": word[0].gender,
+            "number": word[0].number,
+            "tense": word[0].tense,
+            "conjug": word[0].conjug,
+        }
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
-    word = random.choice(list(words))
-    return word
 
 
 @app.get("/{lang}/alter")

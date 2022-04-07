@@ -2,9 +2,10 @@ from asyncio import run as aiorun
 
 import typer
 
+from common.prepare_db import prepare_db
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GeneratedWordEN, GeneratedWordFR, database
+from models import GeneratedWordEN, GeneratedWordFR
 
 
 def classify(lang: str) -> None:
@@ -14,13 +15,12 @@ def classify(lang: str) -> None:
 
     async def _main():
 
-        if not database.is_connected:
-            await database.connect()
+        await prepare_db()
 
         i = 0
 
         if lang == "en":
-            for j, entry in enumerate(await GeneratedWordEN.objects.all()):
+            for j, entry in enumerate(await GeneratedWordEN.all()):
                 word_classes: dict = classify_en(word=entry.string)
                 try:
                     await entry.update(
@@ -36,7 +36,7 @@ def classify(lang: str) -> None:
                     typer.secho(f'"{entry.string}" updated.', fg="cyan")
 
         elif lang == "fr":
-            for j, entry in enumerate(await GeneratedWordFR.objects.all()):
+            for j, entry in enumerate(await GeneratedWordFR.all()):
                 word_classes: dict = classify_fr(word=entry.string)
                 try:
                     await entry.update(
@@ -54,9 +54,6 @@ def classify(lang: str) -> None:
                     typer.secho(f'"{entry.string}" updated.', fg="cyan")
 
         typer.secho(f'"{i}/{j}" generated words updated in DB.', fg="green")
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 

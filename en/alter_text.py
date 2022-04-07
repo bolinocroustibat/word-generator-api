@@ -4,6 +4,7 @@ from typing import Tuple
 
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
+from tortoise.contrib.mysql.functions import Rand
 
 from models import GeneratedWordEN
 
@@ -45,17 +46,28 @@ async def alter_text_en(text: str, percentage: float) -> str:
         type = POS_CORRESPONDANCE_EN[w[1]]["type"]
         if type == "noun":
             number = POS_CORRESPONDANCE_EN[w[1]]["number"]
-            generated_words = await GeneratedWordEN.objects.all(
-                type=type, number=number
+            generated_word = (
+                await GeneratedWordEN.filter(type=type, number=number)
+                .annotate(order=Rand())
+                .order_by("order")
+                .limit(1)
             )
         elif type == "verb":
             tense = POS_CORRESPONDANCE_EN[w[1]]["tense"]
-            generated_words = await GeneratedWordEN.objects.all(
-                type=type, tense=tense
+            generated_word = (
+                await GeneratedWordEN.filter(type=type, tense=tense)
+                .annotate(order=Rand())
+                .order_by("order")
+                .limit(1)
             )
         else:
-            generated_words = await GeneratedWordEN.objects.all(type=type)
-        replacement: str = random.choice(list(generated_words)).string
+            generated_word = (
+                await GeneratedWordEN.filter(type=type)
+                .annotate(order=Rand())
+                .order_by("order")
+                .limit(1)
+            )
+        replacement: str = generated_word[0].string
         print(f"Replacing '{w[0]}' with '{replacement}'...")
         if w[0].istitle():
             text = text.replace(w[0], replacement.title())

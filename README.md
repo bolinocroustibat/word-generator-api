@@ -23,9 +23,9 @@ poetry install
 In `config.py`:
 
 - `ALLOW_ORIGINS`: list
-- `MYSQL_URL`: string
-    - local: MYSQL_URL = "mysql://root:root@localhost:8889/words"
-    - production: MYSQL_URL = "mysql://localmysqluser:localpasswd@localhost/words"
+- `DATABASE_URL`: string
+    - local: DATABASE_URL = "mysql://root:root@localhost:8889/words"
+    - production: DATABASE_URL = "mysql://localmysqluser:localpasswd@localhost/words"
 - `DICTIONNARY_EN_API_URL`: string
 - `ALLOWED_TYPES_EN`: list
 - `TWITTER_API_KEY`: string

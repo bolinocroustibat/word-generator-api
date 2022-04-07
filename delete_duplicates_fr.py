@@ -3,15 +3,15 @@ from asyncio import run as aiorun
 import typer
 from tqdm import tqdm
 
-from models import RealWordFR, database
+from common.prepare_db import prepare_db
+from models import RealWordFR
 
 
 def delete_duplicates_fr() -> None:
 
     async def _main():
 
-        if not database.is_connected:
-            await database.connect()
+        await prepare_db()
 
         entries = await RealWordFR.objects.all()
         for e in tqdm(entries):
@@ -38,9 +38,6 @@ def delete_duplicates_fr() -> None:
                             else:
                                 print(f"4. Deleting {e.string} (id {e.id})\n")
                                 await e.delete()
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 

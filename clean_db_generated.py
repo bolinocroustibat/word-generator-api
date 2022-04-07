@@ -2,12 +2,12 @@ from asyncio import run as aiorun
 
 import typer
 
+from common.prepare_db import prepare_db
 from models import (
     GeneratedWordEN,
     GeneratedWordFR,
     RealWordEN,
     RealWordFR,
-    database,
 )
 
 
@@ -19,14 +19,13 @@ def clean(lang: str) -> None:
 
     async def _main():
 
-        if not database.is_connected:
-            await database.connect()
-
         i = 0
 
+        await prepare_db()
+
         if lang == "en":
-            for j, entry in enumerate(await GeneratedWordEN.objects.all()):
-                existing = await RealWordEN.objects.all(string=entry.string)
+            for j, entry in enumerate(await GeneratedWordEN.all()):
+                existing = await RealWordEN.filter(string=entry.string)
                 if existing:
                     i += 1
                     typer.secho(
@@ -37,8 +36,8 @@ def clean(lang: str) -> None:
                     continue
 
         elif lang == "fr":
-            for j, entry in enumerate(await GeneratedWordFR.objects.all()):
-                existing = await RealWordFR.objects.all(string=entry.string)
+            for j, entry in enumerate(await GeneratedWordFR.all()):
+                existing = await RealWordFR.filter(string=entry.string)
                 if existing:
                     i += 1
                     typer.secho(
@@ -49,9 +48,6 @@ def clean(lang: str) -> None:
                     continue
 
         typer.secho(f'"{i}/{j}" generated words deleted from DB.', fg="green")
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 
