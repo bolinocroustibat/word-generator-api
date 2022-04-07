@@ -10,7 +10,7 @@ from fr.alter_text import alter_text_fr
 
 
 async def generate_definition_fr(percentage: float) -> str:
-    type, definition = await get_random_definition_fr()
+    type, gender, definition = await get_random_definition_fr()
     definition = await alter_text_fr(text=definition, percentage=percentage)
     if type == "verb":
         generated_word = (
@@ -21,14 +21,14 @@ async def generate_definition_fr(percentage: float) -> str:
         )
     elif type == "noun":
         generated_word = (
-            await GeneratedWordFR.filter(type=type, number="s")
+            await GeneratedWordFR.filter(type=type, number="s", gender=gender)
             .annotate(order=Rand())
             .order_by("order")
             .limit(1)
         )
     else:
         generated_word = (
-            await GeneratedWordFR.filter(type=type)
+            await GeneratedWordFR.filter(type=type, number="s", gender=gender)
             .annotate(order=Rand())
             .order_by("order")
             .limit(1)
@@ -36,11 +36,12 @@ async def generate_definition_fr(percentage: float) -> str:
     return {
         "string": generated_word[0].string,
         "type": type,
+        "gender": gender,
         "definition": definition,
     }
 
 
-async def get_random_definition_fr() -> Tuple[str, str]:
+async def get_random_definition_fr() -> Tuple[str, str, str]:
     """
     Returns a random real word definition, and type.
     """
@@ -55,10 +56,11 @@ async def get_random_definition_fr() -> Tuple[str, str]:
         .order_by("order")
         .limit(1)
     )
+    gender = word[0].gender
     type, definition = await get_definition_fr(word=word[0].string)
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):
         print(
-            f"Definition for word '{word}' or type '{type}' not supported, trying another word and definition..."
+            f"Definition for word '{word[0]}' or type '{type}' not supported, trying another word and definition..."
         )
         word = (
             await RealWordFR.filter(
@@ -70,8 +72,9 @@ async def get_random_definition_fr() -> Tuple[str, str]:
             .order_by("order")
             .limit(1)
         )
+        gender = word[0].gender
         type, definition = await get_definition_fr(word=word[0].string)
-    return type, definition
+    return type, gender, definition
 
 
 async def get_definition_fr(word: str) -> Tuple[str, str]:
@@ -86,7 +89,7 @@ async def get_definition_fr(word: str) -> Tuple[str, str]:
         nature: str = res["nature"]
         definition: str = res["definition"].strip()
     except:
-        print(f"Dicolink API error: {response.json()}")
+        print(f"Dicolink API error: {str(response)}")
         return None, None
     else:
         print(nature)  # TODO: to remove, it's for debug

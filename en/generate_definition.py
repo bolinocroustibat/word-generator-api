@@ -43,7 +43,7 @@ async def get_random_definition_en() -> Tuple[str, str, str]:
     type, definition, example = await get_definition_en(word=word[0].string)
     while (not definition) or (type not in ALLOWED_TYPES_EN):
         print(
-            f"Definition for word '{word}' or type '{type}' not supported, trying another word and definition..."
+            f"Definition for word '{word[0]}' or type '{type}' not supported, trying another word and definition..."
         )
         word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
         type, definition, example = await get_definition_en(word=word[0].string)

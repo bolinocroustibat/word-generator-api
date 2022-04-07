@@ -36,27 +36,15 @@ In `config.py`:
 - `TWITTER_TOKEN_SECRET`: string
 
 
-### Configure French tagging with Treetagger
+### Install French tagging data with Spacy
 
-For the French language, you need to download the Treetagger and configure it. We'll follow those intructions:
-https://hugonlp.wordpress.com/2015/10/07/how-to-do-pos-tagging-and-lemmatization-in-languages-other-than-english/
-
-Export env variable (it's one of the two but I don't know which one):
-```bash
-export TREETAGGER_HOME='/Users/bolino/code/perso/word-generator-api/fr/treetagger'
-export TREETAGGER='/Users/bolino/code/perso/word-generator-api/fr/treetagger'
+For the French language, you need to download the Spacy NLP data:
+```sh
+python -m spacy download fr_core_news_sm
 ```
-
-Install Treetagger:
-```bash
-cd fr/treetagger
-./install-tagger-fr-linux.py
-```
-
-Install Treetagger-python:
-```bash
-cd fr/treetagger-python
-python setup.py install
+Install manually spacy-leff with pip and not with poetry in the venv:
+```sh
+pip install spacy-leff
 ```
 
 ## Run the API

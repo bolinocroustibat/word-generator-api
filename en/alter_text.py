@@ -9,69 +9,82 @@ from tortoise.contrib.mysql.functions import Rand
 from models import GeneratedWordEN
 
 
+POS_CORRESPONDANCE_EN = {
+    # See https://www.guru99.com/pos-tagging-chunking-nltk.html
+    "JJ": {"type": "adjective"},
+    "JJR": {"type": "adjective"},
+    "JJS": {"type": "adjective"},
+    "RB": {"type": "adverb"},
+    "RBR": {"type": "adverb"},
+    "RBS": {"type": "adverb"},
+    "NN": {"type": "noun", "number": "s"},
+    "NNS": {"type": "noun", "number": "p"},
+    "VB": {"type": "verb", "tense": "infinitive"},
+    "VBG": {"type": "verb", "tense": "gerund"},
+    "VBN": {"type": "verb", "tense": "past-participle"},
+}
+
+
 async def alter_text_en(text: str, percentage: float) -> str:
     """
     Alter a text randomly using NLTK POS tagging.
     See https://www.guru99.com/pos-tagging-chunking-nltk.html
     """
-    POS_CORRESPONDANCE_EN = {
-        "JJ": {"type": "adjective"},
-        "JJR": {"type": "adjective"},
-        "JJS": {"type": "adjective"},
-        "RB": {"type": "adverb"},
-        "RBR": {"type": "adverb"},
-        "RBS": {"type": "adverb"},
-        "NN": {"type": "noun", "number": "s"},
-        "NNS": {"type": "noun", "number": "p"},
-        "VB": {"type": "verb", "tense": "infinitive"},
-        "VBG": {"type": "verb", "tense": "gerund"},
-        "VBN": {"type": "verb", "tense": "past-participle"},
-    }
-    words = pos_tag(word_tokenize(text))
 
-    # List all the words with allowed types for replacement
-    replacable_words = []
-    for w in words:
-        if w[1] in POS_CORRESPONDANCE_EN.keys():
-            replacable_words.append(w)
+    replacable_words: list[dict] = list_replacable_words(text=text)
 
     # Adjust the number of possible replacements
     k: int = math.ceil(len(replacable_words) * percentage)
-
     # Pick the words to replace
-    to_replace: list[Tuple] = random.sample(replacable_words, k=k)
+    to_replace: list[dict] = random.sample(replacable_words, k=k)
 
+    altered_text: str = await replace_words(text=text, to_replace=to_replace)
+
+    return altered_text
+
+
+def list_replacable_words(text: str) -> list[dict]:
+    """
+    Put all the words that can be replaced in a list with their types
+    """
+    words = pos_tag(word_tokenize(text))
+    replacable_words = []
+    for w in words:
+        if w[1] in POS_CORRESPONDANCE_EN.keys():
+            word_to_replace = POS_CORRESPONDANCE_EN[w[1]]
+            word_to_replace["string"] = w[0]
+            replacable_words.append(word_to_replace)
+    return replacable_words
+
+
+async def replace_words(text: str, to_replace: list[dict]) -> str:
     # Replace the words in the text
     for w in to_replace:
-        type = POS_CORRESPONDANCE_EN[w[1]]["type"]
-        if type == "noun":
-            number = POS_CORRESPONDANCE_EN[w[1]]["number"]
+        if w["type"] == "noun":
             generated_word = (
-                await GeneratedWordEN.filter(type=type, number=number)
+                await GeneratedWordEN.filter(type="noun", number=w["number"])
                 .annotate(order=Rand())
                 .order_by("order")
                 .limit(1)
             )
-        elif type == "verb":
-            tense = POS_CORRESPONDANCE_EN[w[1]]["tense"]
+        elif w["type"] == "verb":
             generated_word = (
-                await GeneratedWordEN.filter(type=type, tense=tense)
+                await GeneratedWordEN.filter(type="verb", tense=w["tense"])
                 .annotate(order=Rand())
                 .order_by("order")
                 .limit(1)
             )
         else:
             generated_word = (
-                await GeneratedWordEN.filter(type=type)
+                await GeneratedWordEN.filter(type=w["type"])
                 .annotate(order=Rand())
                 .order_by("order")
                 .limit(1)
             )
         replacement: str = generated_word[0].string
-        print(f"Replacing '{w[0]}' with '{replacement}'...")
-        if w[0].istitle():
-            text = text.replace(w[0], replacement.title())
+        print("Replacing '{}' with '{}'...".format(w["string"], replacement))
+        if w["string"].istitle():
+            text = text.replace(w["string"], replacement.title())
         else:
-            text = text.replace(w[0], replacement)
-
+            text = text.replace(w["string"], replacement)
     return text

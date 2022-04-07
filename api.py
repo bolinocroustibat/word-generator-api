@@ -99,6 +99,6 @@ async def get_definition(request: Request, lang: str):
     if lang == "en":
         return await generate_definition_en(percentage=0.3)
     elif lang == "fr":
-        return await generate_definition_fr(percentage=0.4)
+        return await generate_definition_fr(percentage=0.6)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
