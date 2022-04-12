@@ -2,6 +2,7 @@ from asyncio import run as aiorun
 
 import typer
 
+from common.prepare_db import prepare_db
 from common.generate_word import generate_word_and_save
 
 
@@ -12,6 +13,8 @@ def batch_generate(lang: str, number: int = 500) -> None:
         raise typer.Abort()
 
     async def _main():
+
+        await prepare_db()
 
         i = 0
         for i in range(number):

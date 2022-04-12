@@ -3,6 +3,7 @@ from pymysql.err import IntegrityError
 
 import typer
 
+from common.prepare_db import prepare_db
 from models import RealWordFR, database
 
 
@@ -14,8 +15,7 @@ def clean(lang: str) -> None:
 
     async def _main():
 
-        if not database.is_connected:
-            await database.connect()
+        await prepare_db()
 
         i = 0
 
@@ -59,9 +59,6 @@ def clean(lang: str) -> None:
             typer.secho(
                 f'"{i}/{j}" real words had .ADV in string and were fixed.', fg="green"
             )
-
-        if database.is_connected:
-            await database.disconnect()
 
     aiorun(_main())
 
