@@ -1,15 +1,16 @@
 import math
 import random
-from typing import Tuple
 
 import spacy
+from models import GeneratedWordFR, RealWordFR
 from spacy.language import Language
+from spacy.matcher import Matcher
+from spacy.tokens import Doc, Token
 from spacy_lefff import LefffLemmatizer, POSTagger
 from tortoise.contrib.mysql.functions import Rand
 
 from common.capitalize import capitalize, decapitalize
-from models import GeneratedWordFR, RealWordFR
-from .correct_text import correct_text_fr
+from .correct_text import add_to_text_fr, correct_text_fr
 
 
 # Better tagger than the default Spacy POS tagger
@@ -27,6 +28,13 @@ def create_melt_tagger(nlp, name):
 nlp = spacy.load("fr_core_news_sm")
 nlp.add_pipe("melt_tagger", after="parser")
 nlp.add_pipe("french_lemmatizer", after="melt_tagger")
+Token.set_extension("replacement", default=None)
+Token.set_extension("type", default=None)
+Token.set_extension("number", default=None)
+Token.set_extension("gender", default=None)
+Token.set_extension("tense", default=None)
+Token.set_extension("conjug", default=None)
+
 
 POS_CORRESPONDANCE_FR = {
     # https://spacy.io/usage/linguistic-features
@@ -54,157 +62,134 @@ async def alter_text_fr(text: str, percentage: float) -> str:
     """
     Alter a text randomly using Spacy and Lefff
     """
-
     text = decapitalize(text)
-
-    replacable_words: list[dict] = list_replacable_words(text=text)
-    # print(replacable_words)  # DEBUG
+    doc: Doc = nlp(text)
 
     # Adjust the number of possible replacements
-    k: int = math.ceil(len(replacable_words) * percentage)
-    # Pick the words to replace
-    to_replace: list[dict] = random.sample(replacable_words, k=k)
+    replaceable_t_ids: list = get_replacable_tokens_ids(doc=doc)
+    k: int = math.ceil(len(replaceable_t_ids) * percentage)
+    # Pick the tokens to replace
+    tokens_ids_to_replace: list = random.sample(replaceable_t_ids, k=k)
+    # Replace the tokens
+    doc = await replace_tokens(doc=doc, tokens_ids_to_replace=tokens_ids_to_replace)
 
-    altered_text: str = await replace_words(text=text, to_replace=to_replace)
+    altered_text = ""
+    for t in doc:
+        if t._.replacement:
+            altered_text = add_to_text_fr(altered_text, t._.replacement)
+        else:
+            altered_text = add_to_text_fr(altered_text, t.text)
 
     return capitalize(correct_text_fr(altered_text))
 
 
-def list_replacable_words(text: str) -> list[dict]:
+def get_replacable_tokens_ids(doc: Doc) -> list[int]:
     """
-    Put all the words that can be replaced in a list with their characteristics
+    Tag all the tokens that can be replaced
     """
-    replacable_words = []
-    tokens = nlp(text)
-    for t in tokens:
-        # print("=======")
-        # print(t.text)
-        # print(t.i)
-        # print(t.pos_)
-        # print(t.morph)
-        # print("\n")
-        if is_replacable(tokens=tokens, token=t):
-            word_to_replace = {
-                "string": t.text,
-                "type": POS_CORRESPONDANCE_FR[t.pos_]["type"],
-                "number": None,
-                "gender": None,
-                "tense": None,
-                "conjug": None,
-                "must_start_with_wowel": (
-                    tokens[(t.i) - 1].text[-1] == "'" if tokens[(t.i) - 1] else False
-                ),  # TODO not being used yet
-            }
-            if t.pos_ in ["NOUN", "PROPN", "ADJ"]:
-                if t.morph.get("Number"):
-                    if t.morph.get("Number")[0] == "Sing":
-                        word_to_replace["number"] = "s"
-                    elif t.morph.get("Number")[0] == "Plur":
-                        word_to_replace["number"] = "p"
-                if t.morph.get("Gender"):
-                    if t.morph.get("Gender")[0] == "Masc":
-                        word_to_replace["gender"] = "m"
-                    elif t.morph.get("Gender")[0] == "Fem":
-                        word_to_replace["gender"] = "f"
-                if t.pos_ == "PROPN":
-                    word_to_replace["proper"] = True
-                elif t.pos_ == "NOUN":
-                    word_to_replace["proper"] = False
-            elif t.pos_ == "VERB":
-                if t.morph.get("Person"):
-                    word_to_replace["conjug"] = int(t.morph.get("Person")[0])
-                if t.morph.get("VerbForm"):
-                    if t.morph.get("VerbForm")[0] == "Inf":
-                        word_to_replace["tense"] = "infinitive"
-                    elif t.morph.get("VerbForm")[0] == "Part":
-                        if t.morph.get("Tense"):
-                            if t.morph.get("Tense")[0] == "Past":
-                                word_to_replace["tense"] = "past-participle"
-                    elif t.morph.get("VerbForm")[0] == "Fin":
-                        if t.morph.get("Tense"):
-                            if t.morph.get("Tense")[0] == "Pres":
-                                word_to_replace["tense"] = "present"
-                            elif t.morph.get("Tense")[0] == "Past":
-                                word_to_replace["tense"] = "past"
-                            elif t.morph.get("Tense")[0] == "Fut":
-                                word_to_replace["tense"] = "future"
-            replacable_words.append(word_to_replace)
-    # print(replacable_words)  # DEBUG
-    return replacable_words
+    replaceable_t_ids = []
+    for t in doc:
+        if (
+            t.pos_ in POS_CORRESPONDANCE_FR.keys()
+            and t.text[-1] not in ["'", "’"]
+            and len(t.text) > 1
+            and t.text not in ["pas"]
+        ):
+            replaceable_t_ids.append(t.i)
+    return replaceable_t_ids
 
 
-def is_replacable(tokens, token) -> bool:
-    if (
-        token.pos_ in POS_CORRESPONDANCE_FR.keys()
-        and token.text[-1] not in ["'", "’"]
-        and len(token.text) > 1
-        and token.text not in ["pas"]
-    ):
-        return True
-    return False
-
-
-async def replace_words(text: str, to_replace: list[dict]) -> str:
+async def replace_tokens(doc: Doc, tokens_ids_to_replace: list) -> Doc:
     """
-    Replace words in a text
+    Replace the tokens in the doc
     """
-    for w in to_replace:
-        if w["type"] == "noun":
-            if not w["proper"]:
-                generated_word = (
-                    await GeneratedWordFR.filter(
-                        type="noun",
-                        number=w["number"],
-                        gender=w["gender"],
-                    )
-                    .annotate(order=Rand())
-                    .order_by("order")
-                    .limit(1)
-                )
-            else:
-                generated_word = (
+    for t in doc:
+        if t.i in tokens_ids_to_replace and not t._.replacement:
+            # Tag the token by adding some extensions need for the DB select
+            t = tag_token(t)
+            if t.pos_ == "PROPN":
+                replacement = (
                     await RealWordFR.filter(
-                        type="noun", number=w["number"], gender=w["gender"], proper=True
+                        type="noun", number=t._.number, gender=t._.gender, proper=True
                     )
                     .annotate(order=Rand())
                     .order_by("order")
                     .limit(1)
                 )
-        elif w["type"] == "adjective":
-            generated_word = (
-                await GeneratedWordFR.filter(
-                    type="adjective",
-                    number=w["number"],
-                    gender=w["gender"],
+            elif t.pos_ in ["NOUN", "ADJ", "VERB", "ADV"]:
+                replacement = (
+                    await GeneratedWordFR.filter(
+                        type=t._.type[0], # This custom extension is set as a tuple instead of a string, no idea why!
+                        number=t._.number,
+                        gender=t._.gender,
+                        tense=t._.tense,
+                        conjug=t._.conjug,
+                    )
+                    .annotate(order=Rand())
+                    .order_by("order")
+                    .limit(1)
                 )
-                .annotate(order=Rand())
-                .order_by("order")
-                .limit(1)
-            )
-        elif w["type"] == "verb":
-            generated_word = (
-                await GeneratedWordFR.filter(
-                    type="verb", tense=w["tense"], conjug=w["conjug"]
-                )
-                .annotate(order=Rand())
-                .order_by("order")
-                .limit(1)
-            )
-        else:
-            generated_word = (
-                await GeneratedWordFR.filter(type=w["type"])
-                .annotate(order=Rand())
-                .order_by("order")
-                .limit(1)
-            )
-        if generated_word:
-            replacement: str = generated_word[0].string
-            print("Replacing '{}' with '{}'...".format(w["string"], replacement))
-            if w["string"].istitle():
-                text = text.replace(w["string"], replacement.title())
+            if replacement:
+                if t.text.istitle():
+                    t._.replacement = replacement[0].string.title()
+                else:
+                    t._.replacement = replacement[0].string
+                print("Replacing '{}' with '{}'...".format(t.text, t._.replacement))
+                matcher = Matcher(nlp.vocab)
+                matcher.add("pattern1", [[{"LOWER": t.text}]])
+                matches = matcher(doc)
+                for _, pos, _ in matches:
+                    doc[pos]._.replacement = t._.replacement
+                    replace_pronoun(doc=doc, pos=pos)
             else:
-                text = text.replace(w["string"], replacement)
-        else:
-            print(f"Couldn't find any replacement for '{w}'.")
+                print("Couldn't find any replacement for '{}'.".format(t.text))
 
-    return text
+    return doc
+
+def tag_token(t: Token) -> Token:
+    """
+    """
+    t._.type = POS_CORRESPONDANCE_FR[t.pos_]["type"],
+    if t.morph.get("Number"):
+        if t.morph.get("Number")[0] == "Sing":
+            t._.number = "s"
+        elif t.morph.get("Number")[0] == "Plur":
+            t._.number = "p"
+    if t.morph.get("Gender"):
+        if t.morph.get("Gender")[0] == "Masc":
+            t._.gender = "m"
+        elif t.morph.get("Gender")[0] == "Fem":
+            t._.gender = "f"
+    if t.morph.get("Person"):
+        t._.conjug = int(t.morph.get("Person")[0])
+    if t.morph.get("VerbForm"):
+        if t.morph.get("VerbForm")[0] == "Inf":
+            t._.tense = "infinitive"
+        elif t.morph.get("VerbForm")[0] == "Part":
+            if t.morph.get("Tense"):
+                if t.morph.get("Tense")[0] == "Past":
+                    t._.tense = "past-participle"
+        elif t.morph.get("VerbForm")[0] == "Fin":
+            if t.morph.get("Tense"):
+                if t.morph.get("Tense")[0] == "Pres":
+                    t._.tense = "present"
+                elif t.morph.get("Tense")[0] == "Past":
+                    t._.tense = "past"
+                elif t.morph.get("Tense")[0] == "Fut":
+                    t._.tense = "future"
+    return t
+
+
+def replace_pronoun(doc: Doc, pos: int):
+    VOWELS = ["a", "à", "e", "é", "è", "ê", "i", "î", "ï", "o", "ô", "u", "ù", "y"]
+    token = doc[pos]
+    previous_token = doc[pos-1]
+    if previous_token.text[-1] in ["'","’"] and token._.replacement[0] not in VOWELS:
+        # print(f"Previous token is '{previous_token}', needs to be replaced")
+        if previous_token.pos_ == "ADP":
+            doc[pos-1]._.replacement = "de"
+        elif previous_token.pos_ == "DET":
+            if doc[pos].morph.get("Gender")[0] == "Fem":
+                doc[pos-1]._.replacement = "la"
+            else:
+                doc[pos-1]._.replacement = "le"
