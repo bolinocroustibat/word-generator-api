@@ -8,7 +8,7 @@ Python API with a MySQL database, using FastAPI framework.
 - Python 3.9 (also tested successfully with 3.7)
 - [Poetry](https://python-poetry.org/)
 - [FastAPI](https://fastapi.tiangolo.com/)
-- [Ormar](https://collerek.github.io/ormar/) ORM
+- [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
 - MySQL/MariaDB database
 
 ## Install
@@ -30,10 +30,6 @@ In `config.py`:
 - `ALLOWED_TYPES_EN`: list
 - `ALLOWED_TYPES_FR`: dict
     example: ALLOWED_TYPES_FR = {"nom": "noun", "verbe": "verb", "adjectif": "adjective", "adverbe": "adverb"}
-- `TWITTER_API_KEY`: string
-- `TWITTER_API_SECRET`: string
-- `TWITTER_ACCESS_TOKEN`: string
-- `TWITTER_TOKEN_SECRET`: string
 
 
 ### Install French tagging data with Spacy
@@ -44,7 +40,7 @@ python -m spacy download fr_core_news_sm
 ```
 Install manually spacy-leff with pip and not with poetry in the venv:
 ```sh
-pip install spacy-leff
+pip install spacy-lefff
 ```
 
 ## Run the API
