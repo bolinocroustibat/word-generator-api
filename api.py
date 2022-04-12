@@ -13,7 +13,7 @@ from slowapi.util import get_remote_address
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.mysql.functions import Rand
 
-from common import authenticate, generate_word_and_save
+from common import authenticate, generate_word_and_save, get_random_wikipedia_article
 from config import ALLOW_ORIGINS, DATABASE_URL
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
@@ -126,6 +126,18 @@ async def get_definition(request: Request, lang: str):
         return await generate_definition_fr(percentage=0.6)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
+
+
+@app.get("/{lang}/wikipedia")
+# @limiter.limit("3/minute")
+async def get_wikipedia(request: Request, lang: str, percentage: Optional[float] = 0.5):
+    if lang not in ["en", "fr"]:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+    text = await get_random_wikipedia_article(lang=lang)
+    if lang == "en":
+        return await alter_text_en(text=text, percentage=percentage)
+    elif lang == "fr":
+        return await alter_text_fr(text=text, percentage=percentage)
 
 
 @app.get("/docs", include_in_schema=False)
