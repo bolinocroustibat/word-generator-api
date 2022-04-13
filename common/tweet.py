@@ -1,7 +1,7 @@
-import typer
 import tweepy
+import typer
 
-from common.prepare_db import prepare_db
+from common import prepare_db
 from config import TWITTER
 from en.generate_definition import generate_definition_en
 from fr.generate_definition import generate_definition_fr

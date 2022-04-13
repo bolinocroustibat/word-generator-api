@@ -20,7 +20,6 @@ def correct_text_fr(text: str) -> str:
     #     string = string[: m.start(1)] + " " + string[m.end(1) :]
     #     return string
 
-
     CORRECTIONS = {  # we could also use "replace(old, new)"
         "( ": "(",
         " )": ")",

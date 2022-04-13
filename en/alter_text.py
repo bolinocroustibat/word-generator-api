@@ -8,7 +8,6 @@ from tortoise.contrib.mysql.functions import Rand
 
 from models import GeneratedWordEN
 
-
 POS_CORRESPONDANCE_EN = {
     # See https://www.guru99.com/pos-tagging-chunking-nltk.html
     "JJ": {"type": "adjective"},

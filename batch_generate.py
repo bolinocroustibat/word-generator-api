@@ -2,8 +2,7 @@ from asyncio import run as aiorun
 
 import typer
 
-from common.prepare_db import prepare_db
-from common.generate_word import generate_word_and_save
+from common import generate_word_and_save, prepare_db
 
 
 def batch_generate(lang: str, number: int = 500) -> None:

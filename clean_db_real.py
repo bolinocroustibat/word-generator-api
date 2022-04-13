@@ -1,9 +1,9 @@
 from asyncio import run as aiorun
-from pymysql.err import IntegrityError
 
 import typer
+from pymysql.err import IntegrityError
 
-from common.prepare_db import prepare_db
+from common import prepare_db
 from models import RealWordFR, database
 
 

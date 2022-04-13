@@ -9,16 +9,26 @@ from slowapi.util import get_remote_address
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.mysql.functions import Rand
 
-from common.generate_word import generate_word_and_save
-from config import ALLOW_ORIGINS, APP_NAME, DATABASE_URL, DESCRIPTION, VERSION
+from common import generate_word_and_save
+from config import ALLOW_ORIGINS, DATABASE_URL
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
 from models import GeneratedWordEN, GeneratedWordFR
 
+from pathlib import Path
 
+import toml
 
+# Load app name, version, commit variables from config file
+# Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
+pyproject_filepath = Path(__file__).parent / "pyproject.toml"
+config: dict = toml.load(pyproject_filepath)
 limiter = Limiter(key_func=get_remote_address)
-app = FastAPI(title=APP_NAME, description=DESCRIPTION, version=VERSION)
+app = FastAPI(
+    title=config["project"]["name"],
+    description=config["project"]["description"],
+    version=config["project"]["version"],
+)
 register_tortoise(
     app,
     db_url=DATABASE_URL,

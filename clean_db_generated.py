@@ -2,13 +2,8 @@ from asyncio import run as aiorun
 
 import typer
 
-from common.prepare_db import prepare_db
-from models import (
-    GeneratedWordEN,
-    GeneratedWordFR,
-    RealWordEN,
-    RealWordFR,
-)
+from common import prepare_db
+from models import GeneratedWordEN, GeneratedWordFR, RealWordEN, RealWordFR
 
 
 def clean(lang: str) -> None:

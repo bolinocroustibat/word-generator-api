@@ -3,12 +3,11 @@ from asyncio import run as aiorun
 import typer
 from tqdm import tqdm
 
-from common.prepare_db import prepare_db
+from common import prepare_db
 from models import RealWordFR
 
 
 def delete_duplicates_fr() -> None:
-
     async def _main():
 
         await prepare_db()

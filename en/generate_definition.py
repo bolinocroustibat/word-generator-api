@@ -6,6 +6,7 @@ from tortoise.contrib.mysql.functions import Rand
 
 from config import ALLOWED_TYPES_EN, DICTIONNARY_EN_API_URL
 from models import GeneratedWordEN, RealWordEN
+
 from .alter_text import alter_text_en
 
 

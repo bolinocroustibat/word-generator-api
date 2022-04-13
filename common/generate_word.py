@@ -5,10 +5,10 @@ from typing import Optional
 
 from tortoise.exceptions import IntegrityError
 
+from common.real_word import if_real_exists
 from en.classify import classify_en
 from fr.classify import classify_fr
 from models import GeneratedWordEN, GeneratedWordFR
-from common.real_word import if_real_exists
 
 
 async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
@@ -60,7 +60,7 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     """
     json_proba_file = f"{lang}/data/proba_table_2char_{lang.upper()}.json"
 
-    generated_word = generate_word_core(json_proba_file=json_proba_file)
+    generated_word = _generate_word_core(json_proba_file=json_proba_file)
     real_exists = False
     if must_not_be_real:
         real_exists = await if_real_exists(lang=lang, string=generated_word)
@@ -68,7 +68,7 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     i = 0
     while (len(generated_word) < 3) or (len(generated_word) > 13) or real_exists:
         print(f"Generated word '{generated_word}' not acceptable. Retrying...")
-        generated_word = generate_word_core(json_proba_file=json_proba_file)
+        generated_word = _generate_word_core(json_proba_file=json_proba_file)
         real_exists = False
         if must_not_be_real:
             real_exists = await if_real_exists(lang=lang, string=generated_word)
@@ -79,7 +79,7 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     return generated_word
 
 
-def generate_word_core(json_proba_file: str) -> str:
+def _generate_word_core(json_proba_file: str) -> str:
     """
     Generate a word that don't exist, based on the characters probability table, depending on each language.
     """

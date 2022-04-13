@@ -1,7 +1,6 @@
 import asyncio
 
-from common.tweet import send_tweet
-
+from common import send_tweet
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

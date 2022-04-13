@@ -4,8 +4,8 @@ import requests
 from tortoise.contrib.mysql.functions import Rand
 
 from config import ALLOWED_TYPES_FR, DICTIONNARY_FR_API_KEY, DICTIONNARY_FR_API_URL
-from models import GeneratedWordFR, RealWordFR
 from fr.alter_text import alter_text_fr
+from models import GeneratedWordFR, RealWordFR
 
 
 async def generate_definition_fr(percentage: float) -> str:
