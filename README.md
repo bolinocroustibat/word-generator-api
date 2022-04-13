@@ -24,12 +24,14 @@ In `config.py`:
 
 - `ALLOW_ORIGINS`: list
 - `DATABASE_URL`: string
-    - local: DATABASE_URL = "mysql://root:root@localhost:8889/words"
-    - production: DATABASE_URL = "mysql://localmysqluser:localpasswd@localhost/words"
+    example: `DATABASE_URL = "mysql://root:root@localhost:8889/words"`
 - `DICTIONNARY_EN_API_URL`: string
 - `ALLOWED_TYPES_EN`: list
 - `ALLOWED_TYPES_FR`: dict
-    example: ALLOWED_TYPES_FR = {"nom": "noun", "verbe": "verb", "adjectif": "adjective", "adverbe": "adverb"}
+    example: `ALLOWED_TYPES_FR = {"nom": "noun", "verbe": "verb", "adjectif": "adjective", "adverbe": "adverb"}`
+- `USERNAME`: string
+- `PASSWORD`: string
+- `TWITTER`: dict
 
 
 ### Install French tagging data with Spacy
