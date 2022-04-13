@@ -1,3 +1,4 @@
+from .authenticate import authenticate
 from .capitalize import capitalize, decapitalize
 from .generate_word import generate_word, generate_word_and_save
 from .prepare_db import prepare_db
