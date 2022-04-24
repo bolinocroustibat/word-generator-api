@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import requests
 from tortoise.contrib.mysql.functions import Rand
@@ -40,7 +40,7 @@ async def generate_definition_fr(percentage: float) -> str:
     }
 
 
-async def get_random_definition_fr() -> Tuple[str, str, str]:
+async def get_random_definition_fr() -> Tuple[str, Optional[str], str]:
     """
     Returns a random real word definition, and type.
     """
