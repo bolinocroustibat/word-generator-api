@@ -81,7 +81,7 @@ async def alter_text_fr(text: str, percentage: float) -> str:
         else:
             altered_text = add_to_text_fr(altered_text, t.text)
 
-    return capitalize(correct_text_fr(altered_text))
+    return correct_text_fr(altered_text)
 
 
 def get_replacable_tokens_ids(doc: Doc) -> list[int]:

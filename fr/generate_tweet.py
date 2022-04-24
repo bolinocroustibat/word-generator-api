@@ -1,5 +1,13 @@
-from config import TRANSLATIONS_FR
 from fr.generate_definition import generate_definition_fr
+
+TRANSLATIONS_FR = {
+    "adjective": "adjectif",
+    "adv": "adverbe",
+    "verb": "verbe",
+    "noun": "nom",
+    "f": "féminin",
+    "m": "masculin",
+}
 
 
 async def generate_tweet_fr() -> str:

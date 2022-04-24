@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 import requests
 from tortoise.contrib.mysql.functions import Rand
 
+from common import decapitalize
 from config import ALLOWED_TYPES_FR, DICTIONNARY_FR_API_KEY, DICTIONNARY_FR_API_URL
 from fr.alter_text import alter_text_fr
 from models import GeneratedWordFR, RealWordFR
@@ -42,7 +43,7 @@ async def generate_definition_fr(percentage: float) -> str:
 
 async def get_random_definition_fr() -> Tuple[str, Optional[str], str]:
     """
-    Returns a random real word definition, and type.
+    Returns a random real word definition with its associated type and gender.
     """
     # word = await RealWordFR.objects.order_by("?").limit(1).all(type__in=ALLOWED_TYPES_FR.values(), conjug__isnull=True, proper=0, complex=0)
     word = (
@@ -93,4 +94,4 @@ async def get_definition_fr(word: str) -> Tuple[str, str]:
     else:
         print(res)  # TODO: to remove, it's for debug
         type = ALLOWED_TYPES_FR.get(type, "unknown")
-        return type, definition
+        return type, decapitalize(definition)

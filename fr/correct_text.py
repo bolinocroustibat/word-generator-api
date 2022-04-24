@@ -4,7 +4,7 @@ from typing import Iterator, Match
 
 def add_to_text_fr(text: str, string: str) -> str:
     try:
-        if text[-1] not in ["'", "’"] and string[0] not in [".", ":"]:
+        if text[-1] not in ["'", "’", "-"] and string[0] not in [".", ",", "-"]:
             return text + " " + string
     except IndexError:
         pass
@@ -12,7 +12,7 @@ def add_to_text_fr(text: str, string: str) -> str:
 
 
 def correct_text_fr(text: str) -> str:
-
+    # TODO: use regexes
     # matches: Iterator[Match] = re.search(
     #     "(l'[bcdfghjklmnpqrstvwxz])+", string
     # )
