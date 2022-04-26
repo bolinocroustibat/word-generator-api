@@ -121,7 +121,7 @@ async def get_definition(request: Request, lang: str):
     Generate a random fake/altered dictionnary definition.
     """
     if lang == "en":
-        return await generate_definition_en(percentage=0.3)
+        return await generate_definition_en(percentage=0.5)
     elif lang == "fr":
         return await generate_definition_fr(percentage=0.6)
     else:

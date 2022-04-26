@@ -1,6 +1,5 @@
 import math
 import random
-from typing import Tuple
 
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
@@ -52,7 +51,8 @@ def list_replacable_words(text: str) -> list[dict]:
         if w[1] in POS_CORRESPONDANCE_EN.keys():
             word_to_replace = POS_CORRESPONDANCE_EN[w[1]]
             word_to_replace["string"] = w[0]
-            replacable_words.append(word_to_replace)
+            if word_to_replace not in replacable_words:
+                replacable_words.append(word_to_replace)
     return replacable_words
 
 
