@@ -14,7 +14,13 @@ async def generate_definition_en(percentage: float) -> str:
     type, definition, example = await get_random_definition_en()
     definition = await alter_text_en(text=definition, percentage=percentage)
     if type == "verb":
-        generated_word = await GeneratedWordEN.filter(type=type, tense="infinitive")
+        generated_word = (
+            await GeneratedWordEN.filter(type=type, tense="infinitive")
+            .annotate(order=Rand())
+            .order_by("order")
+            .limit(1)
+        )
+        print(generated_word[0])
     elif type == "noun":
         generated_word = (
             await GeneratedWordEN.filter(type=type, number="s")
