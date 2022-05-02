@@ -30,18 +30,21 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
         tries += 1
 
     if not dry_run:
-        auth = tweepy.OAuthHandler(
-            TWITTER[lang]["api_key"], TWITTER[lang]["key_secret"]
-        )
-        auth.set_access_token(
-            TWITTER[lang]["access_token"], TWITTER[lang]["token_secret"]
-        )
-        api = tweepy.API(auth)
-        api.update_status(tweet)
-
-    typer.secho(f"Tweet posted:", fg="green", bold=True)
-    typer.secho(tweet, fg="green")
-
+        try:
+            auth = tweepy.OAuthHandler(
+                TWITTER[lang]["api_key"], TWITTER[lang]["key_secret"]
+            )
+            auth.set_access_token(
+                TWITTER[lang]["access_token"], TWITTER[lang]["token_secret"]
+            )
+            api = tweepy.API(auth)
+            api.update_status(tweet)
+        except Exception as e:
+            typer.secho(f"Error:\n{e}", fg="red", bold=True)
+            typer.secho(tweet, fg="red")
+        else:
+            typer.secho(f"Tweet posted:", fg="green", bold=True)
+            typer.secho(tweet, fg="green")
 
 def main(
     lang: str = typer.Argument(..., help="Language ('en' or 'fr')"),
