@@ -13,7 +13,7 @@ from slowapi.util import get_remote_address
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.mysql.functions import Rand
 
-from common import authenticate, generate_word_and_save
+from common import authenticate, generate_word_and_save, summarize
 from config import ALLOW_ORIGINS, DATABASE_URL
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
@@ -110,6 +110,17 @@ async def alter_text(
         return await alter_text_en(text=text, percentage=percentage)
     elif lang == "fr":
         return await alter_text_fr(text=text, percentage=percentage)
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+
+
+@app.post("/{lang}/summarize")
+async def summarize_text(request: Request, lang: str, text: str):
+    """
+    Summarize the provided text.
+    """
+    if lang in ["en", "fr"]:
+        return await summarize(lang=lang, text=text, sentences_nb=1)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 
