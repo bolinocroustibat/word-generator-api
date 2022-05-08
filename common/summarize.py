@@ -2,10 +2,9 @@ import heapq
 from typing import List
 
 import nltk
-from fastapi import HTTPException
 
 
-async def summarize(lang: str, text: str, sentences_nb: int) -> str:
+async def summarize(language: str, text: str, sentences_nb: int) -> str:
     """
     Heavily inspired by https://www.analyticsvidhya.com/blog/2020/12/tired-of-reading-long-articles-text-summarization-will-make-your-task-easier/
     """
@@ -14,12 +13,7 @@ async def summarize(lang: str, text: str, sentences_nb: int) -> str:
     sentence_list = nltk.sent_tokenize(text)
 
     # Find weighted frequencies of occurrences of each word, except the stop words
-    if lang == "en":
-        stopwords = nltk.corpus.stopwords.words("english")
-    elif lang == "fr":
-        stopwords = nltk.corpus.stopwords.words("french")
-    else:
-        raise HTTPException(status_code=400, detail="Language not supported.")
+    stopwords = nltk.corpus.stopwords.words(language)
     word_frequencies: dict = {}
     for word in nltk.word_tokenize(text):
         if word not in stopwords:

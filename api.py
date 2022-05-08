@@ -119,8 +119,16 @@ async def summarize_text(request: Request, lang: str, text: str):
     """
     Summarize the provided text.
     """
-    if lang in ["en", "fr"]:
-        return await summarize(lang=lang, text=text, sentences_nb=1)
+    SUPPORTED_LANGUAGES = {
+        "en": "english",
+        "fr": "french",
+        "it": "italian",
+        "es": "spanish",
+    }
+    if lang in SUPPORTED_LANGUAGES.keys():
+        return await summarize(
+            language=SUPPORTED_LANGUAGES[lang], text=text, sentences_nb=1
+        )
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 
