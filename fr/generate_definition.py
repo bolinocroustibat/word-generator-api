@@ -56,6 +56,19 @@ async def get_random_definition_fr() -> Tuple[str, Optional[str], str]:
         .order_by("order")
         .limit(1)
     )
+    # If it's a feminine adjective, we need to get the corresponding masculine adjective
+    if (word[0].type == "adjective") and (word[0].gender == "f"):
+        word = (
+            await RealWordFR.filter(
+                type="adjective",
+                gender="m",
+                proper=0,
+                complex=0,
+            )
+            .annotate(order=Rand())
+            .order_by("order")
+            .limit(1)
+        )
     gender = word[0].gender
     type, definition = await get_definition_fr(word=word[0].string)
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):

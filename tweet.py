@@ -29,7 +29,10 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
             tweet: str = await generate_tweet_fr()
         tries += 1
 
-    if not dry_run:
+    if dry_run:
+        typer.secho(f"Tweet (not posted):", fg="green", bold=True)
+        typer.secho(tweet, fg="green")
+    else:
         try:
             auth = tweepy.OAuthHandler(
                 TWITTER[lang]["api_key"], TWITTER[lang]["key_secret"]
@@ -45,6 +48,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
         else:
             typer.secho(f"Tweet posted:", fg="green", bold=True)
             typer.secho(tweet, fg="green")
+
 
 def main(
     lang: str = typer.Argument(..., help="Language ('en' or 'fr')"),
