@@ -1,5 +1,6 @@
 import math
 import random
+from typing import Optional
 
 import spacy
 from spacy.language import Language
@@ -59,21 +60,32 @@ POS_CORRESPONDANCE_FR = {
 }
 
 
-async def alter_text_fr(text: str, percentage: float) -> str:
+async def alter_text_fr(
+    text: str, percentage: float, forced_replacements: Optional[dict] = {}
+) -> str:
     """
     Alter a text randomly using Spacy and Lefff
     """
     text = decapitalize(text)
+
+    # Split into tokens/words
     doc: Doc = nlp(text)
 
     # Adjust the number of possible replacements
-    replaceable_t_ids: list = get_replacable_tokens_ids(doc=doc)
+    replaceable_t_ids: list = get_replacable_tokens_ids(
+        doc=doc, not_to_replace=list(forced_replacements.keys())
+    )
     k: int = math.ceil(len(replaceable_t_ids) * percentage)
     # Pick the tokens to replace
     tokens_ids_to_replace: list = random.sample(replaceable_t_ids, k=k)
-    # Replace the tokens
-    doc = await replace_tokens(doc=doc, tokens_ids_to_replace=tokens_ids_to_replace)
+    # Add the replacements to the tokens
+    doc = await replace_tokens(
+        doc=doc,
+        tokens_ids_to_replace=tokens_ids_to_replace,
+        forced_replacements=forced_replacements,
+    )
 
+    # Build back the text from the tokens and their replacements
     altered_text = ""
     for t in doc:
         if t._.replacement:
@@ -84,7 +96,7 @@ async def alter_text_fr(text: str, percentage: float) -> str:
     return correct_text_fr(altered_text)
 
 
-def get_replacable_tokens_ids(doc: Doc) -> list[int]:
+def get_replacable_tokens_ids(doc: Doc, not_to_replace: list[str]) -> list[int]:
     """
     Tag all the tokens that can be replaced
     """
@@ -92,19 +104,25 @@ def get_replacable_tokens_ids(doc: Doc) -> list[int]:
     for t in doc:
         if (
             t.pos_ in POS_CORRESPONDANCE_FR.keys()
-            and t.text[-1] not in ["'", "’"]
             and len(t.text) > 1
+            and t.text not in not_to_replace
+            and t.text[-1] not in ["'", "’"]
             and t.text not in ["pas"]
         ):
             replaceable_t_ids.append(t.i)
     return replaceable_t_ids
 
 
-async def replace_tokens(doc: Doc, tokens_ids_to_replace: list) -> Doc:
+async def replace_tokens(
+    doc: Doc, tokens_ids_to_replace: list, forced_replacements: Optional[dict]
+) -> Doc:
     """
     Replace the tokens in the doc
     """
     for t in doc:
+        if t.text in forced_replacements.keys():
+            t._.replacement = forced_replacements[t.text]
+            print("Force-replacing '{}' with '{}'...".format(t.text, t._.replacement))
         if t.i in tokens_ids_to_replace and not t._.replacement:
             # Tag the token by adding some extensions need for the DB select
             t = tag_token(t)

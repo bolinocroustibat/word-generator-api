@@ -10,8 +10,7 @@ from models import GeneratedWordFR, RealWordFR
 
 
 async def generate_definition_fr(percentage: float) -> str:
-    type, gender, definition = await get_random_definition_fr()
-    definition = await alter_text_fr(text=definition, percentage=percentage)
+    real_string, type, gender, definition = await get_random_definition_fr()
     if type == "verb":
         generated_word = (
             await GeneratedWordFR.filter(type=type, tense="infinitive")
@@ -33,48 +32,32 @@ async def generate_definition_fr(percentage: float) -> str:
             .order_by("order")
             .limit(1)
         )
+    generated_string: str = generated_word[0].string
+    definition = await alter_text_fr(
+        text=definition,
+        percentage=percentage,
+        forced_replacements={real_string: generated_string},
+    )
     return {
-        "string": generated_word[0].string,
+        "string": generated_string,
         "type": type,
         "gender": gender,
         "definition": definition,
     }
 
 
-async def get_random_definition_fr() -> tuple[str, Optional[str], str]:
+async def get_random_definition_fr() -> tuple[str, str, Optional[str], str]:
     """
     Returns a random real word definition with its associated type and gender.
     """
-    # word = await RealWordFR.objects.order_by("?").limit(1).all(type__in=ALLOWED_TYPES_FR.values(), conjug__isnull=True, proper=0, complex=0)
-    word = (
-        await RealWordFR.filter(
-            type__in=ALLOWED_TYPES_FR.values(),
-            proper=0,
-            complex=0,
-        )
-        .annotate(order=Rand())
-        .order_by("order")
-        .limit(1)
-    )
-    # If it's a feminine adjective, we need to get the corresponding masculine adjective
-    if (word[0].type == "adjective") and (word[0].gender == "f"):
-        word = (
-            await RealWordFR.filter(
-                type="adjective",
-                gender="m",
-                proper=0,
-                complex=0,
-            )
-            .annotate(order=Rand())
-            .order_by("order")
-            .limit(1)
-        )
-    gender = word[0].gender
-    type, definition = await get_definition_fr(word=word[0].string)
+    count = 0
+    definition = None
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):
-        print(
-            f"Definition for word '{word[0]}' or type '{type}' not supported, trying another word and definition..."
-        )
+        if count > 0:
+            print(
+                f"Definition for word '{word[0]}' or type '{type}' not supported, trying another word and definition..."
+            )
+        # Get a random real word
         word = (
             await RealWordFR.filter(
                 type__in=ALLOWED_TYPES_FR.values(),
@@ -85,9 +68,25 @@ async def get_random_definition_fr() -> tuple[str, Optional[str], str]:
             .order_by("order")
             .limit(1)
         )
-        gender = word[0].gender
-        type, definition = await get_definition_fr(word=word[0].string)
-    return type, gender, definition
+        # If it's a feminine adjective, we need to get a masculine adjective instead
+        if (word[0].type == "adjective") and (word[0].gender == "f"):
+            word = (
+                await RealWordFR.filter(
+                    type="adjective",
+                    gender="m",
+                    proper=0,
+                    complex=0,
+                )
+                .annotate(order=Rand())
+                .order_by("order")
+                .limit(1)
+            )
+        string: str = word[0].string
+        gender: str = word[0].gender
+        type, definition = await get_definition_fr(string)
+        count += 1
+
+    return string, type, gender, definition
 
 
 async def get_definition_fr(word: str) -> tuple[str, str]:

@@ -1,5 +1,6 @@
 import math
 import random
+from typing import Optional
 
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
@@ -23,32 +24,45 @@ POS_CORRESPONDANCE_EN = {
 }
 
 
-async def alter_text_en(text: str, percentage: float) -> str:
+async def alter_text_en(
+    text: str, percentage: float, forced_replacements: Optional[dict] = {}
+) -> str:
     """
     Alter a text randomly using NLTK POS tagging.
     See https://www.guru99.com/pos-tagging-chunking-nltk.html
     """
 
-    replacable_words: list[dict] = list_replacable_words(text=text)
+    replacable_words: list[dict] = list_replacable_words(
+        text=text, not_to_replace=list(forced_replacements.keys())
+    )
 
     # Adjust the number of possible replacements
     k: int = math.ceil(len(replacable_words) * percentage)
     # Pick the words to replace
     to_replace: list[dict] = random.sample(replacable_words, k=k)
 
+    # Replace the forced replacements
+    if forced_replacements:
+        for k, v in forced_replacements.items():
+            print(f"Force-replacing '{k}' with '{v}'...")
+            if k.istitle():
+                text = text.replace(k, v.title())
+            else:
+                text = text.replace(k, v)
+
     altered_text: str = await replace_words(text=text, to_replace=to_replace)
 
     return altered_text
 
 
-def list_replacable_words(text: str) -> list[dict]:
+def list_replacable_words(text: str, not_to_replace: list[str]) -> list[dict]:
     """
     Put all the words that can be replaced in a list with their types
     """
     words = pos_tag(word_tokenize(text))
     replacable_words = []
     for w in words:
-        if w[1] in POS_CORRESPONDANCE_EN.keys():
+        if w[1] in POS_CORRESPONDANCE_EN.keys() and w[0] not in not_to_replace:
             word_to_replace = POS_CORRESPONDANCE_EN[w[1]]
             word_to_replace["string"] = w[0]
             if word_to_replace not in replacable_words:
