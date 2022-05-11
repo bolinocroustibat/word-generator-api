@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 import requests
 from tortoise.contrib.mysql.functions import Rand
@@ -41,7 +41,7 @@ async def generate_definition_fr(percentage: float) -> str:
     }
 
 
-async def get_random_definition_fr() -> Tuple[str, Optional[str], str]:
+async def get_random_definition_fr() -> tuple[str, Optional[str], str]:
     """
     Returns a random real word definition with its associated type and gender.
     """
@@ -90,7 +90,7 @@ async def get_random_definition_fr() -> Tuple[str, Optional[str], str]:
     return type, gender, definition
 
 
-async def get_definition_fr(word: str) -> Tuple[str, str]:
+async def get_definition_fr(word: str) -> tuple[str, str]:
     """
     Returns the type and definition of a given word using the French Dicolink API.
     """

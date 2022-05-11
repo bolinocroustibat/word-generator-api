@@ -1,5 +1,4 @@
 import random
-from typing import Tuple
 
 import requests
 from tortoise.contrib.mysql.functions import Rand
@@ -42,7 +41,7 @@ async def generate_definition_en(percentage: float) -> str:
     }
 
 
-async def get_random_definition_en() -> Tuple[str, str, str]:
+async def get_random_definition_en() -> tuple[str, str, str]:
     """
     Returns a random real word definition, type and example.
     """
@@ -57,7 +56,7 @@ async def get_random_definition_en() -> Tuple[str, str, str]:
     return type, definition, example
 
 
-async def get_definition_en(word: str) -> Tuple[str, str, str]:
+async def get_definition_en(word: str) -> tuple[str, str, str]:
     """
     Returns the type, definition and example of a given word using the dictionaryapi.
     """
