@@ -62,7 +62,7 @@ async def get_random_definition_fr() -> tuple[str, str, Optional[str], str]:
             await RealWordFR.filter(
                 type__in=ALLOWED_TYPES_FR.values(),
                 proper=0,
-                complex=0,
+                complex__not=1,
             )
             .annotate(order=Rand())
             .order_by("order")
@@ -75,7 +75,7 @@ async def get_random_definition_fr() -> tuple[str, str, Optional[str], str]:
                     type="adjective",
                     gender="m",
                     proper=0,
-                    complex=0,
+                    complex__not=1,
                 )
                 .annotate(order=Rand())
                 .order_by("order")
