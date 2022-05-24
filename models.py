@@ -66,3 +66,33 @@ class GeneratedWordFR(Model):
 
     def __str__(self):
         return f"{self.string} ({self.id})"
+
+
+# class GeneratedDefinitionEN(Model):
+#     # id: int = fields.IntField(primary_key=True)
+#     generated_word_id = fields.ForeignKeyField(GeneratedWordEN)
+#     text: str = fields.TextField()
+#     date = fields.DatetimeField()
+#     ip: str = fields.CharField(max_length=16)
+
+#     class Meta:
+#         table = "generated_definitions_EN"
+#         unique_together = ("generated_word_id", "text")
+
+#     def __str__(self):
+#         return f"{self.text} ({self.id})"
+
+
+# class GeneratedDefinitionFR(Model):
+#     # id: int = fields.IntField(primary_key=True)
+#     generated_word_id = fields.ForeignKeyField(GeneratedWordFR)
+#     text: str = fields.TextField()
+#     date = fields.DatetimeField()
+#     ip: str = fields.CharField(max_length=16)
+
+#     class Meta:
+#         table = "generated_definitions_FR"
+#         unique_together = ("generated_word_id", "text")
+
+#     def __str__(self):
+#         return f"{self.text} ({self.id})"
