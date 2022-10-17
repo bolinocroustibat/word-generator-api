@@ -48,6 +48,7 @@ typer = "^0.4.0"
 tweepy = "^4.6.0"
 uvicorn = "^0.17.5"
 sentry-sdk = {version = "^1.9.10", extras = ["fastapi"]}
+spacy-lefff = "^0.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

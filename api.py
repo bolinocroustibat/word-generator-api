@@ -47,7 +47,6 @@ sentry_sdk.init(
     traces_sample_rate=1.0,
 )
 
-
 register_tortoise(
     app,
     db_url=DATABASE_URL,

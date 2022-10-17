@@ -36,11 +36,12 @@ In `config.py`:
 
 ### Install French tagging data with Spacy
 
+
 For the French language, you need to download the Spacy NLP data:
 ```sh
 python -m spacy download fr_core_news_sm
 ```
-Install manually spacy-leff with pip and not with poetry in the venv:
+If Spacy lefff doesn't work, try to install it manually with pip and not with poetry in the venv:
 ```sh
 pip install spacy-lefff
 ```
