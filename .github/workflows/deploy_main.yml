@@ -1,0 +1,38 @@
+name: Deploy to prod on push to main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-prod:
+    name: Deploy to prod from "${{ github.ref_name }}/${{ github.sha }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          name: id_rsa
+          known_hosts: ${{ secrets.SSH_HOST }}
+
+      - name: Adding known hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
+
+      - name: Copy repository to server with rsync
+        run: rsync -avz --chown=github:www-data --chmod=Dg=rwx,Fg=rwx ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/www/word-generator-api/ # We set directory (D) and files (F) permission for group www-data to rwx so that the same users can overwrite later
+
+      - name: Execute server commands for deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/www/word-generator-api
+            source /root/www/word-generator-api/venv/bin/activate
+            pip install -r /root/www/word-generator-api/requirements.txt
+            sudo systemctl restart word-generator-api.service
