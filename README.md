@@ -11,6 +11,35 @@ Python API with a MySQL database, using FastAPI framework.
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
 - MySQL/MariaDB database
 
+## Endpoints
+
+- `/docs`:
+  Display the documentation of the API, with the availables endpoints, parameters, and provide a testing interface.
+  Method: `GET`
+
+- `/{lang}/generate`:
+  Generate a new word that doesn't exist, and stores it in the DB.
+  Available `lang`: `en`, `fr`, `it`, `es`
+  Method: `GET`
+
+- `/{lang}/get`:
+  Get a random word that doesn't exist form the DB of generated words.
+  Available `lang`: `en`, `fr`, `it`, `es`
+  Method: `GET`
+
+- `/{lang}/alter`:
+  Alter a text with random non existing words.
+  Available `lang`: `en`, `fr`
+  Other parameters:
+    - `text`
+    - `percentage`
+  Method: `GET`
+
+- `/{lang}/definition`:
+  Generate a random fake/altered dictionnary definition.
+  Available `lang`: `en`, `fr`
+  Method: `GET`
+
 ## Install
 
 Create a virtual environnement and install the dependencies in it with Poetry single command:
@@ -22,17 +51,21 @@ poetry install
 
 In `config.py`:
 
-- `ALLOW_ORIGINS`: list
-- `DATABASE_URL`: string
+- `ALLOW_ORIGINS`: `list`
+- `DATABASE_URL`: `string`
+
     example: `DATABASE_URL = "mysql://root:root@localhost:8889/words"`
-- `DICTIONNARY_EN_API_URL`: string
-- `ALLOWED_TYPES_EN`: list
-- `ALLOWED_TYPES_FR`: dict
+
+- `DICTIONNARY_EN_API_URL`: `string`
+- `ALLOWED_TYPES_EN`: `list`
+- `ALLOWED_TYPES_FR`: `dict`
+
     example: `ALLOWED_TYPES_FR = {"nom": "noun", "verbe": "verb", "adjectif": "adjective", "adverbe": "adverb"}`
-- `USERNAME`: string
-- `PASSWORD`: string
-- `TWITTER`: dict
-- `SENTRY_DSN`: string
+
+- `USERNAME`: `string`
+- `PASSWORD`: `string`
+- `TWITTER`: `dict`
+- `SENTRY_DSN`: `string`
 
 
 ### Install French tagging data with Spacy
