@@ -101,6 +101,10 @@ uvicorn api:app --reload
   - `classify_db_real.py` + language (from a dictionary TXT file)
   - `tweet.py` + language + optional: `--dry-run`
 
+To run the commands, use for example:
+```bash
+python3 -m commands.batch_generate.py en
+```
 
 # Usefuls resources
 

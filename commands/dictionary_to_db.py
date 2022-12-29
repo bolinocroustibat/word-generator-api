@@ -23,7 +23,7 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                 word = word.strip()
                 if word:
                     if lang == "en":
-                        existing = await RealWordFR.objects.all(string=word)
+                        existing = await RealWordEN.objects.all(string=word)
                         if not existing:
                             try:
                                 if classify:

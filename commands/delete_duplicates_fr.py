@@ -4,7 +4,7 @@ import typer
 from tqdm import tqdm
 
 from common import prepare_db
-from models import RealWordFR
+from models import RealWordEN, RealWordFR
 
 
 def delete_duplicates_fr() -> None:
