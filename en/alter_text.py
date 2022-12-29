@@ -41,7 +41,7 @@ async def alter_text_en(
     # Pick the words to replace
     to_replace: list[dict] = random.sample(replacable_words, k=k)
 
-    # Replace the forced replacements
+    # Replace the forced replacements
     if forced_replacements:
         for k, v in forced_replacements.items():
             print(f"Force-replacing '{k}' with '{v}'...")

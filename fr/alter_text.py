@@ -155,7 +155,11 @@ async def replace_tokens(
                     t._.replacement = replacement[0].string.title()
                 else:
                     t._.replacement = replacement[0].string
-                print("Replacing '{}' ({} {} {}) with '{}'...".format(t.text, t._.type[0], t._.gender, t._.number, t._.replacement))
+                print(
+                    "Replacing '{}' ({} {} {}) with '{}'...".format(
+                        t.text, t._.type[0], t._.gender, t._.number, t._.replacement
+                    )
+                )
                 matcher = Matcher(nlp.vocab)
                 matcher.add("pattern1", [[{"LOWER": t.text}]])
                 matches = matcher(doc)
