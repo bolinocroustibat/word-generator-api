@@ -32,6 +32,7 @@ In `config.py`:
 - `USERNAME`: string
 - `PASSWORD`: string
 - `TWITTER`: dict
+- `SENTRY_DSN`: string
 
 
 ### Install French tagging data with Spacy

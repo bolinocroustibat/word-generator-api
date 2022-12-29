@@ -1,3 +1,6 @@
+# Projet specific
+config.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -139,7 +142,6 @@ dmypy.json
 # VS Code
 .vscode/
 
+# Direnv
 .direnv/
 .envrc
-
-config.py

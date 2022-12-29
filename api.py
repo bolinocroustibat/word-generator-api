@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional
 
 import nltk
+import os
 import sentry_sdk
 import toml
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -15,7 +16,7 @@ from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.mysql.functions import Rand
 
 from common import authenticate, generate_word_and_save
-from config import ALLOW_ORIGINS, DATABASE_URL
+from config import ALLOW_ORIGINS, DATABASE_URL, SENTRY_DSN
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
 from models import GeneratedWordEN, GeneratedWordFR
@@ -38,9 +39,8 @@ app = FastAPI(
 )
 
 sentry_sdk.init(
-    dsn="https://40c8ccfe2df848aeaa3f3430bf82d4f8@o352691.ingest.sentry.io/4503999857164288",
+    dsn=SENTRY_DSN,
     release=f"{APP_NAME}@{VERSION}",
-
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
