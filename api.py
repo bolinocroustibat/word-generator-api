@@ -45,6 +45,10 @@ sentry_sdk.init(
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
     traces_sample_rate=1.0,
+    # Experimental profiling
+    _experiments={
+        "profiles_sample_rate": 1.0,
+    }
 )
 
 register_tortoise(
