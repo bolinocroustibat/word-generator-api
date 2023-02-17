@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Optional
 
 import nltk
-import os
 import sentry_sdk
 import toml
 from fastapi import Depends, FastAPI, HTTPException, Request
@@ -25,17 +24,14 @@ from models import GeneratedWordEN, GeneratedWordFR
 # Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
 pyproject_filepath = Path(__file__).parent / "pyproject.toml"
 config: dict = toml.load(pyproject_filepath)
-APP_NAME: str = config["tool"]["poetry"]["name"]
-DESCRIPTION: str = config["tool"]["poetry"]["description"]
-VERSION: str = config["tool"]["poetry"]["version"]
+APP_NAME: str = config["project"]["name"]
+DESCRIPTION: str = config["project"]["description"]
+VERSION: str = config["project"]["version"]
 
 app = FastAPI(
     title=APP_NAME,
     description=DESCRIPTION,
     version=VERSION,
-    docs_url=None,
-    redoc_url=None,
-    openapi_url=None,
 )
 
 sentry_sdk.init(
@@ -43,12 +39,12 @@ sentry_sdk.init(
     release=f"{APP_NAME}@{VERSION}",
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
-    # We recommend adjusting this value in production,
+    # Sentry recommend adjusting this value in production,
     traces_sample_rate=1.0,
     # Experimental profiling
     _experiments={
         "profiles_sample_rate": 1.0,
-    }
+    },
 )
 
 register_tortoise(
