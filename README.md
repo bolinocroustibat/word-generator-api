@@ -42,9 +42,9 @@ Python API with a MySQL database, using FastAPI framework.
 
 ## Install
 
-Create a virtual environnement and install the dependencies in it with Poetry single command:
+Create a virtual environnement and install the dependencies in it with [PDM](https://pdm.fming.dev/) single command:
 ```sh
-poetry install
+pdm install
 ```
 
 ### Setup the config file
@@ -75,23 +75,21 @@ For the French language, you need to download the Spacy NLP data:
 ```sh
 python -m spacy download fr_core_news_sm
 ```
-If Spacy lefff doesn't work, try to install it manually with pip and not with poetry in the venv:
+If Spacy lefff doesn't work, try to install it manually with pip and not with PDM in the venv:
 ```sh
 pip install spacy-lefff
 ```
 
 ## Run the API
 
-Activate the virtual environement:
-```sh
-poetry shell
-```
-
-Launch the web server:
+Launch the web server with:
 ```sh
 uvicorn api:app --reload
 ```
-
+Inside the venv:
+```sh
+pdm run uvicorn api:app --reload
+```
 
 ## Commands
 

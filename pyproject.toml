@@ -3,7 +3,6 @@ name = "word-generator-api"
 version = "1.1.4"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
-license-expression = "MIT"
 dependencies = [
     "fastapi<1.0.0,>=0.79.0",
     "gunicorn<21.0.0,>=20.1.0",
@@ -26,39 +25,8 @@ requires-python = ">=3.9,<4.0"
 Homepage = ""
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-
-[tool.poetry]
-name = "word-generator-api"
-version = "1.1.4"
-description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
-authors = ["Adrien Carpentier <me@adriencarpentier.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-fastapi = "^0.79.0"
-gunicorn = "^20.1.0"
-nltk = "^3.7"
-requests = "^2.27.1"
-slowapi = "^0.1.5"
-spacy = "^3.2.4"
-tqdm = "^4.63.0"
-toml = "^0.10.2"
-tortoise-orm = { extras = ["aiomysql"], version = "^0.19.0" }
-typer = "^0.4.0"
-tweepy = "^4.6.0"
-uvicorn = "^0.17.5"
-sentry-sdk = {version = "^1.15.0", extras = ["fastapi"]}
-spacy-lefff = "^0.5.1"
-
-[tool.poetry.dev-dependencies]
-black = "^22.1.0"
-ipython = "^8.1.0"
-isort = "^5.10.1"
-mypy = "^0.931"
-
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
 
 [tool.pdm]
 includes = []
@@ -67,6 +35,6 @@ includes = []
 dev = [
     "black<23.0.0,>=22.1.0",
     "ipython<9.0.0,>=8.1.0",
-    "isort<6.0.0,>=5.10.1",
     "mypy<1.0,>=0.931",
+    "ruff>=0.0.247",
 ]
