@@ -51,7 +51,7 @@ async def generate_definition_fr(percentage: float, ip: str) -> dict:
         generated_word_id=generated_word[0].id,
         text=definition,
         date=datetime.utcnow(),
-        ip=ip
+        ip=ip,
     )
 
     return {
