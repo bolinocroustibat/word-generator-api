@@ -5,7 +5,7 @@
 
 Python API with a MySQL/MariaDB database, using FastAPI framework.
 
-- Python 3.9 (also tested successfully with 3.7)
+- Python 3.11
 - [PDM](https://pdm.fming.dev/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
@@ -83,7 +83,7 @@ pdm run python -m spacy download fr_core_news_sm
 If any issue with the `fr_core_news_sm` model installing, one can install it manually with:
 ```bash
 wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.5.0/fr_core_news_sm-3.5.0-py3-none-any.whl -P ./assets
-unzip assets/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.9/site-packages
+unzip assets/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.11/site-packages
 ```
 
 If any issue with pip in the venv for Spacy:

@@ -13,14 +13,13 @@ dependencies = [
     "sentry-sdk>=1.15.0",
     "spacy<4.0.0,>=3.2.4",
     "tqdm<5.0.0,>=4.63.0",
-    "toml<1.0.0,>=0.10.2",
     "tortoise-orm>=0.19.3",
     "typer<1.0.0,>=0.4.0",
     "tweepy<5.0.0,>=4.6.0",
     "uvicorn<1.0.0,>=0.17.5",
     "spacy-lefff>=0.5.1",
 ]
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.11,<3.12"
 
 [project.urls]
 Homepage = ""

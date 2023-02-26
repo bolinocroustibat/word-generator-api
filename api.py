@@ -1,9 +1,9 @@
+import tomllib
 from pathlib import Path
 from typing import Optional
 
 import nltk
 import sentry_sdk
-import toml
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,7 +29,8 @@ from models import (
 # Load app name, version, commit variables from config file
 # Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)  # noqa: E501
 pyproject_filepath = Path(__file__).parent / "pyproject.toml"
-config: dict = toml.load(pyproject_filepath)
+with open(pyproject_filepath, "rb") as f:
+    config: dict = tomllib.load(f)
 APP_NAME: str = config["project"]["name"]
 DESCRIPTION: str = config["project"]["description"]
 VERSION: str = config["project"]["version"]
