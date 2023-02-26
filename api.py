@@ -137,10 +137,11 @@ async def get_definition(request: Request, lang: str):
     """
     Generate a random fake/altered dictionnary definition.
     """
+    ip: str = request.client.host
     if lang == "en":
-        return await generate_definition_en(percentage=0.5)
+        return await generate_definition_en(percentage=0.5, ip=ip)
     elif lang == "fr":
-        return await generate_definition_fr(percentage=0.6)
+        return await generate_definition_fr(percentage=0.6, ip=ip)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 

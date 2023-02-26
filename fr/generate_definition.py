@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 import requests
@@ -6,10 +7,10 @@ from tortoise.contrib.mysql.functions import Rand
 from common import decapitalize
 from config import ALLOWED_TYPES_FR, DICTIONNARY_FR_API_KEY, DICTIONNARY_FR_API_URL
 from fr.alter_text import alter_text_fr
-from models import GeneratedWordFR, RealWordFR
+from models import GeneratedDefinitionFR, GeneratedWordFR, RealWordFR
 
 
-async def generate_definition_fr(percentage: float) -> dict:
+async def generate_definition_fr(percentage: float, ip: str) -> dict:
 
     random_definition = await get_random_definition_fr()
     real_string = random_definition["real_string"]
@@ -44,6 +45,15 @@ async def generate_definition_fr(percentage: float) -> dict:
         percentage=percentage,
         forced_replacements={real_string: generated_string},
     )
+
+    # Save definition in DB
+    await GeneratedDefinitionFR.create(
+        generated_word_id=generated_word[0].id,
+        text=definition,
+        date=datetime.utcnow(),
+        ip=ip
+    )
+
     return {
         "string": generated_string,
         "type": type,

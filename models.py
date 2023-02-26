@@ -3,7 +3,7 @@ from tortoise.models import Model
 
 
 class RealWordEN(Model):
-    # id = fields.IntField(pk=True)
+    id = fields.IntField(pk=True)
     string = fields.CharField(max_length=50, unique=True)
     type = fields.CharField(max_length=16, null=True)
     number = fields.CharField(max_length=1, null=True)
@@ -17,7 +17,7 @@ class RealWordEN(Model):
 
 
 class RealWordFR(Model):
-    # id: = fields.IntField(pk=True)
+    id = fields.IntField(pk=True)
     string = fields.CharField(max_length=100)
     type = fields.CharField(max_length=16, null=True)
     gender = fields.CharField(max_length=1, null=True)
@@ -35,7 +35,7 @@ class RealWordFR(Model):
 
 
 class GeneratedWordEN(Model):
-    # id = fields.IntField(pk=True)
+    id = fields.IntField(pk=True)
     string = fields.CharField(max_length=100, unique=True)
     type = fields.CharField(max_length=16, null=True)
     number = fields.CharField(max_length=1, null=True)
@@ -51,7 +51,7 @@ class GeneratedWordEN(Model):
 
 
 class GeneratedWordFR(Model):
-    # id = fields.IntField(pk=True)
+    id = fields.IntField(pk=True)
     string = fields.CharField(max_length=100, unique=True)
     type = fields.CharField(max_length=16, null=True)
     gender = fields.CharField(max_length=1, null=True)
@@ -68,31 +68,35 @@ class GeneratedWordFR(Model):
         return f"{self.string} ({self.id})"
 
 
-# class GeneratedDefinitionEN(Model):
-#     # id = fields.IntField(pk=True)
-#     generated_word_id = fields.ForeignKeyField(GeneratedWordEN)
-#     text = fields.TextField()
-#     date = fields.DatetimeField()
-#     ip = fields.CharField(max_length=16)
+class GeneratedDefinitionEN(Model):
+    id = fields.IntField(pk=True)
+    generated_word = fields.ForeignKeyField(
+        "models.GeneratedWordEN", related_name="generated_definitions_en"
+    )
+    text = fields.TextField()
+    date = fields.DatetimeField()
+    ip = fields.CharField(max_length=16)
 
-#     class Meta:
-#         table = "generated_definitions_EN"
-#         unique_together = ("generated_word_id", "text")
+    class Meta:
+        table = "generated_definitions_EN"
+        unique_together = ("generated_word_id", "text")
 
-#     def __str__(self):
-#         return f"{self.text} ({self.id})"
+    def __str__(self):
+        return f"{self.text} ({self.id})"
 
 
-# class GeneratedDefinitionFR(Model):
-#     # id = fields.IntField(pk=True)
-#     generated_word_id = fields.ForeignKeyField(GeneratedWordFR)
-#     text = fields.TextField()
-#     date = fields.DatetimeField()
-#     ip = fields.CharField(max_length=16)
+class GeneratedDefinitionFR(Model):
+    id = fields.IntField(pk=True)
+    generated_word = fields.ForeignKeyField(
+        "models.GeneratedWordFR", related_name="generated_definitions_fr"
+    )
+    text = fields.TextField()
+    date = fields.DatetimeField()
+    ip = fields.CharField(max_length=16)
 
-#     class Meta:
-#         table = "generated_definitions_FR"
-#         unique_together = ("generated_word_id", "text")
+    class Meta:
+        table = "generated_definitions_FR"
+        unique_together = ("generated_word_id", "text")
 
-#     def __str__(self):
-#         return f"{self.text} ({self.id})"
+    def __str__(self):
+        return f"{self.text} ({self.id})"
