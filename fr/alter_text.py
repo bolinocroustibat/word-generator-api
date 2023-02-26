@@ -9,7 +9,7 @@ from spacy.tokens import Doc, Token
 from spacy_lefff import LefffLemmatizer, POSTagger
 from tortoise.contrib.mysql.functions import Rand
 
-from common import capitalize, decapitalize
+from common import decapitalize
 from models import GeneratedWordFR, RealWordFR
 
 from .correct_text import add_to_text_fr, correct_text_fr
@@ -138,9 +138,8 @@ async def replace_tokens(
             elif t.pos_ in ["NOUN", "ADJ", "VERB", "ADV"]:
                 replacement = (
                     await GeneratedWordFR.filter(
-                        type=t._.type[
-                            0
-                        ],  # This custom extension is set as a tuple instead of a string, no idea why!
+                        type=t._.type[0],  # This custom extension is set as a tuple...
+                        # ...instead of a string. No idea why!
                         number=t._.number,
                         gender=t._.gender,
                         tense=t._.tense,

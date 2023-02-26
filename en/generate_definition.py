@@ -1,4 +1,5 @@
 import random
+from typing import Optional
 
 import requests
 from tortoise.contrib.mysql.functions import Rand
@@ -9,7 +10,7 @@ from models import GeneratedWordEN, RealWordEN
 from .alter_text import alter_text_en
 
 
-async def generate_definition_en(percentage: float) -> str:
+async def generate_definition_en(percentage: float) -> dict:
     real_string, type, definition, example = await get_random_definition_en()
     if type == "verb":
         generated_word = (
@@ -51,6 +52,8 @@ async def get_random_definition_en() -> tuple[str, str, str, str]:
     """
     count = 0
     definition = None
+    word = None
+    type = None
     while (not definition) or (type not in ALLOWED_TYPES_EN):
         if count > 0:
             print(
@@ -63,14 +66,16 @@ async def get_random_definition_en() -> tuple[str, str, str, str]:
     return string, type, definition, example
 
 
-async def get_definition_en(word: str) -> tuple[str, str, str]:
+async def get_definition_en(
+    word: str,
+) -> tuple[Optional[str], Optional[str], Optional[str]]:
     """
     Returns the type, definition and example of a given word using the dictionaryapi.
     """
     response = requests.get(f"{DICTIONNARY_EN_API_URL}{word}")
     try:
         meanings: list = response.json()[0]["meanings"]
-    except:
+    except Exception:
         print(f"DictionaryAPI error: {response.json()}")
         return None, None, None
     else:

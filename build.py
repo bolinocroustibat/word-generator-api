@@ -1,13 +1,11 @@
 import json
-import os
-from pathlib import Path
 
 import typer
 
 
 def build_proba_table(lang: str) -> None:
     with open(f"{lang}/data/alphabet_{lang.upper()}.json", "r") as alphabet_file:
-        alphabet = json.load(alphabet_file)
+        json.load(alphabet_file)
 
     # build output structure
     # TODO

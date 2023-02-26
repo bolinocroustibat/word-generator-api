@@ -11,7 +11,7 @@ from fr.classify import classify_fr
 from models import GeneratedWordEN, GeneratedWordFR
 
 
-async def generate_word_and_save(lang: str, ip: str) -> Optional[str]:
+async def generate_word_and_save(lang: str, ip: str) -> Optional[dict]:
     already_generated = True  # assume it has already been generated so we enter the while loop at least once
     retries = 0
     while already_generated and retries < 10:

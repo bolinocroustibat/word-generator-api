@@ -49,10 +49,10 @@ def clean(lang: str) -> None:
                         if w != entry:
                             # typer.secho(w.complex)
                             # typer.secho(entry.complex)
-                            if w.complex == True and entry.complex == False:
+                            if w.complex is True and entry.complex is False:
                                 await w.delete()
                                 typer.secho("duplicate complex deleted.", fg="red")
-                            if entry.complex == True and w.complex == False:
+                            if entry.complex is True and w.complex is False:
                                 await w.delete()
                                 typer.secho("duplicate complex deleted.", fg="red")
                     await entry.update(

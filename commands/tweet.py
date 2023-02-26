@@ -20,7 +20,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
         tweet = await generate_tweet_fr()
     tries = 0
     while (len(tweet) > 275) and (tries < 6):
-        typer.secho(f"Generated tweet is too long, trying again...", fg="cyan")
+        typer.secho("Generated tweet is too long, trying again...", fg="cyan")
         # If tweet os too long, regenerate it.
         # Don't try more than 6 times for security reasons.
         if lang == "en":
@@ -30,7 +30,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
         tries += 1
 
     if dry_run:
-        typer.secho(f"Tweet (not posted):", fg="green", bold=True)
+        typer.secho("Tweet (not posted):", fg="green", bold=True)
         typer.secho(tweet, fg="green")
     else:
         try:
@@ -46,7 +46,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
             typer.secho(f"Error:\n{e}", fg="red", bold=True)
             typer.secho(tweet, fg="red")
         else:
-            typer.secho(f"Tweet posted:", fg="green", bold=True)
+            typer.secho("Tweet posted:", fg="green", bold=True)
             typer.secho(tweet, fg="green")
 
 

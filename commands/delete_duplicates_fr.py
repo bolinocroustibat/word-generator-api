@@ -4,7 +4,7 @@ import typer
 from tqdm import tqdm
 
 from common import prepare_db
-from models import RealWordEN, RealWordFR
+from models import RealWordFR
 
 
 def delete_duplicates_fr() -> None:
@@ -22,12 +22,12 @@ def delete_duplicates_fr() -> None:
                             if s.gender != e.gender:
                                 s.update(gender=None)
                                 e.update(gender=None)
-                        except:
+                        except Exception as e:
                             pass
-                        if s.complex == True and e.complex == False:
+                        if s.complex is True and e.complex is False:
                             print(f"1. Deleting {s.string} (id {s.id})\n")
                             await s.delete()
-                        elif s.complex == False and e.complex == True:
+                        elif s.complex is False and e.complex is True:
                             print(f"2. Deleting {e.string} (id {e.id})\n")
                             await e.delete()
                         else:

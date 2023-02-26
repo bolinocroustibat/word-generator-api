@@ -78,7 +78,7 @@ async def generate(request: Request, lang: str):
     if lang not in ["en", "fr", "it", "es"]:
         raise HTTPException(status_code=400, detail="Language not supported.")
     ip: str = request.client.host
-    response: dict = await generate_word_and_save(lang=lang, ip=ip)
+    response: Optional[dict] = await generate_word_and_save(lang=lang, ip=ip)
     if response:
         return response
     else:
@@ -122,9 +122,9 @@ async def alter_text(
     Alter a text with random non existing words.
     """
     if lang == "en":
-        return await alter_text_en(text=text, percentage=percentage)
+        return await alter_text_en(text, percentage)
     elif lang == "fr":
-        return await alter_text_fr(text=text, percentage=percentage)
+        return await alter_text_fr(text, percentage)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 

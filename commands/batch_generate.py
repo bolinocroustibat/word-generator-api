@@ -21,7 +21,7 @@ def batch_generate(lang: str, number: int = 500) -> None:
             if response:
                 typer.secho(f"'{response['string']}' saved to the DB.", fg="cyan")
             else:
-                typer.secho(f"Too many retries.", fg="red")
+                typer.secho("Too many retries.", fg="red")
             i += 1
 
         typer.secho(f"{i} words generated and saved in the DB.", fg="green")

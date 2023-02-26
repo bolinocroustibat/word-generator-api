@@ -147,5 +147,5 @@ def classify_fr(word: str) -> dict:
 def get_char_from_position(word: str, position: int) -> Optional[str]:
     try:
         return word[position]
-    except:
+    except Exception:
         return None

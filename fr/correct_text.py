@@ -1,7 +1,3 @@
-import re
-from typing import Iterator, Match
-
-
 def add_to_text_fr(text: str, string: str) -> str:
     try:
         if text[-1] not in ["'", "’", "-"] and string[0] not in [".", ",", "-"]:
@@ -157,18 +153,15 @@ def correct_text_fr(text: str) -> str:
         "Le le ": "Le ",
         "Le les ": "Les ",
         " un l'": " un ",
-        " un l'": " un ",
         " un la ": " une ",
         " un le ": " un ",
         " un les ": " des ",
-        "Un l'": "Un ",
         "Un l'": "Un ",
         "Un la ": "Une ",
         "Un le ": "Un ",
         "Un les ": " des ",
         " son la ": " sa ",
         " son le ": " son ",
-        " son l'": " son ",
         " son l'": " son ",
         " son les ": " ses ",
         " que a": " qu'a",

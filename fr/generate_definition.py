@@ -9,7 +9,7 @@ from fr.alter_text import alter_text_fr
 from models import GeneratedWordFR, RealWordFR
 
 
-async def generate_definition_fr(percentage: float) -> str:
+async def generate_definition_fr(percentage: float) -> dict:
     real_string, type, gender, definition = await get_random_definition_fr()
     if type == "verb":
         generated_word = (
@@ -52,10 +52,13 @@ async def get_random_definition_fr() -> tuple[str, str, Optional[str], str]:
     """
     count = 0
     definition = None
+    word = None
+    type = None
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):
         if count > 0:
             print(
-                f"Definition for word '{word[0]}' or type '{type}' not supported, trying another word and definition..."
+                f"Definition for word '{word[0]}' or type '{type}' not "
+                "supported, trying another word and definition..."
             )
         # Get a random real word
         word = (
@@ -100,7 +103,7 @@ async def get_definition_fr(word: str) -> tuple[str, str]:
         res: dict = response.json()[0]
         type: str = res["nature"].split()[0]
         definition: str = res["definition"].strip()
-    except:
+    except Exception:
         print(f"Dicolink API error: {str(response)}")
         return None, None
     else:
