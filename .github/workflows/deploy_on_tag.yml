@@ -1,9 +1,9 @@
-name: Deploy to prod on push to main
+name: Deploy to prod when tag
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*'
 
 jobs:
   deploy-prod:
@@ -36,3 +36,13 @@ jobs:
             source /root/www/word-generator-api/venv/bin/activate
             pip install -r /root/www/word-generator-api/requirements.txt
             sudo systemctl restart word-generator-api.service
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1.2.1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: "adrien-carpentier"
+          SENTRY_PROJECT: "word-generator-api"
+        with:
+          environment: production
+          version: ${{ github.ref_name }}
