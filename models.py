@@ -3,7 +3,7 @@ from tortoise.models import Model
 
 
 class RealWordEN(Model):
-    # id = fields.IntField(primary_key=True)
+    # id = fields.IntField(pk=True)
     string = fields.CharField(max_length=50, unique=True)
     type = fields.CharField(max_length=16, null=True)
     number = fields.CharField(max_length=1, null=True)
@@ -17,7 +17,7 @@ class RealWordEN(Model):
 
 
 class RealWordFR(Model):
-    # id: = fields.IntField(primary_key=True)
+    # id: = fields.IntField(pk=True)
     string = fields.CharField(max_length=100)
     type = fields.CharField(max_length=16, null=True)
     gender = fields.CharField(max_length=1, null=True)
@@ -35,7 +35,7 @@ class RealWordFR(Model):
 
 
 class GeneratedWordEN(Model):
-    # id = fields.IntField(primary_key=True)
+    # id = fields.IntField(pk=True)
     string = fields.CharField(max_length=100, unique=True)
     type = fields.CharField(max_length=16, null=True)
     number = fields.CharField(max_length=1, null=True)
@@ -51,7 +51,7 @@ class GeneratedWordEN(Model):
 
 
 class GeneratedWordFR(Model):
-    # id = fields.IntField(primary_key=True)
+    # id = fields.IntField(pk=True)
     string = fields.CharField(max_length=100, unique=True)
     type = fields.CharField(max_length=16, null=True)
     gender = fields.CharField(max_length=1, null=True)
@@ -69,7 +69,7 @@ class GeneratedWordFR(Model):
 
 
 # class GeneratedDefinitionEN(Model):
-#     # id = fields.IntField(primary_key=True)
+#     # id = fields.IntField(pk=True)
 #     generated_word_id = fields.ForeignKeyField(GeneratedWordEN)
 #     text = fields.TextField()
 #     date = fields.DatetimeField()
@@ -84,7 +84,7 @@ class GeneratedWordFR(Model):
 
 
 # class GeneratedDefinitionFR(Model):
-#     # id = fields.IntField(primary_key=True)
+#     # id = fields.IntField(pk=True)
 #     generated_word_id = fields.ForeignKeyField(GeneratedWordFR)
 #     text = fields.TextField()
 #     date = fields.DatetimeField()
