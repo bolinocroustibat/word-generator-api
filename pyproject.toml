@@ -4,6 +4,7 @@ version = "1.1.5"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
+    "aiomysql>=0.1.1",
     "fastapi<1.0.0,>=0.79.0",
     "gunicorn<21.0.0,>=20.1.0",
     "nltk<4.0,>=3.7",
@@ -13,7 +14,7 @@ dependencies = [
     "spacy<4.0.0,>=3.2.4",
     "tqdm<5.0.0,>=4.63.0",
     "toml<1.0.0,>=0.10.2",
-    "tortoise-orm<1.0.0,>=0.19.0",
+    "tortoise-orm>=0.19.3",
     "typer<1.0.0,>=0.4.0",
     "tweepy<5.0.0,>=4.6.0",
     "uvicorn<1.0.0,>=0.17.5",
