@@ -11,7 +11,12 @@ from .alter_text import alter_text_en
 
 
 async def generate_definition_en(percentage: float) -> dict:
-    real_string, type, definition, example = await get_random_definition_en()
+
+    random_definition = await get_random_definition_en()
+    real_string = random_definition["real_string"]
+    type = random_definition["type"]
+    definition = random_definition["definition"]
+
     if type == "verb":
         generated_word = (
             await GeneratedWordEN.filter(type=type, tense="infinitive")
@@ -46,42 +51,58 @@ async def generate_definition_en(percentage: float) -> dict:
     }
 
 
-async def get_random_definition_en() -> tuple[str, str, str, str]:
+async def get_random_definition_en() -> dict:
     """
     Returns a random real word definition, type and example.
     """
     count = 0
     definition = None
-    word = None
-    type = None
+    real_string: Optional[str] = None
+    type: Optional[str] = None
+    example: Optional[str] = None
+
     while (not definition) or (type not in ALLOWED_TYPES_EN):
         if count > 0:
             print(
-                f"Definition for word '{word[0]}' or type '{type}' not supported, trying another word and definition..."
+                f"Definition for word '{real_string}' or type '{type}' not supported, trying another word and definition..."
             )
         word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
-        string: str = word[0].string
-        type, definition, example = await get_definition_en(word=string)
+        real_string = word[0].string
+
+        definition_dict: dict = await get_definition_en(word=real_string)
+        type = definition_dict["type"]
+        definition = definition_dict["definition"]
+        example = definition_dict["example"]
+
         count += 1
-    return string, type, definition, example
+
+    return {
+        "real_string": real_string,
+        "type": type,
+        "definition": definition,
+        "example": example,
+    }
 
 
-async def get_definition_en(
-    word: str,
-) -> tuple[Optional[str], Optional[str], Optional[str]]:
+async def get_definition_en(word: str) -> dict:
     """
     Returns the type, definition and example of a given word using the dictionaryapi.
     """
+    type: Optional[str] = None
+    definition: Optional[str] = None
+    example: Optional[str] = None
+
     response = requests.get(f"{DICTIONNARY_EN_API_URL}{word}")
+
     try:
         meanings: list = response.json()[0]["meanings"]
     except Exception:
         print(f"DictionaryAPI error: {response.json()}")
-        return None, None, None
     else:
         meaning: dict = random.choice(meanings)
-        type: str = meaning["partOfSpeech"]
+        type = meaning["partOfSpeech"]
         definitions: list = meaning["definitions"]
-        definition: str = random.choice(definitions)["definition"]
-        example: str = random.choice(definitions).get("example", None)
-        return type, definition, example
+        definition = random.choice(definitions)["definition"]
+        example = random.choice(definitions).get("example", None)
+
+    return {"type": type, "definition": definition, "example": example}

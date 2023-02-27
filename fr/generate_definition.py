@@ -10,7 +10,13 @@ from models import GeneratedWordFR, RealWordFR
 
 
 async def generate_definition_fr(percentage: float) -> dict:
-    real_string, type, gender, definition = await get_random_definition_fr()
+
+    random_definition = await get_random_definition_fr()
+    real_string = random_definition["real_string"]
+    type = random_definition["type"]
+    gender = random_definition["gender"]
+    definition = random_definition["definition"]
+
     if type == "verb":
         generated_word = (
             await GeneratedWordFR.filter(type=type, tense="infinitive")
@@ -46,18 +52,20 @@ async def generate_definition_fr(percentage: float) -> dict:
     }
 
 
-async def get_random_definition_fr() -> tuple[str, str, Optional[str], str]:
+async def get_random_definition_fr() -> dict:
     """
     Returns a random real word definition with its associated type and gender.
     """
     count = 0
     definition = None
-    word = None
-    type = None
+    real_string: Optional[str] = None
+    type: Optional[str] = None
+    gender: Optional[str] = None
+
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):
         if count > 0:
             print(
-                f"Definition for word '{word[0]}' or type '{type}' not "
+                f"Definition for word '{real_string}' or type '{type}' not "
                 "supported, trying another word and definition..."
             )
         # Get a random real word
@@ -84,29 +92,45 @@ async def get_random_definition_fr() -> tuple[str, str, Optional[str], str]:
                 .order_by("order")
                 .limit(1)
             )
-        string: str = word[0].string
-        gender: str = word[0].gender
-        type, definition = await get_definition_fr(string)
+        real_string = word[0].string
+        gender = word[0].gender
+
+        definition_dict: dict = await get_definition_fr(word=real_string)
+        type = definition_dict["type"]
+        definition = definition_dict["definition"]
+
         count += 1
 
-    return string, type, gender, definition
+    return {
+        "real_string": real_string,
+        "type": type,
+        "gender": gender,
+        "definition": definition,
+    }
 
 
-async def get_definition_fr(word: str) -> tuple[str, str]:
+async def get_definition_fr(word: str) -> dict:
     """
     Returns the type and definition of a given word using the French Dicolink API.
     """
+    type: Optional[str] = None
+    definition: Optional[str] = None
+
     response = requests.get(
         f"{DICTIONNARY_FR_API_URL}{word}/definitions?limite=1&api_key={DICTIONNARY_FR_API_KEY}"
     )
+
     try:
-        res: dict = response.json()[0]
-        type: str = res["nature"].split()[0]
-        definition: str = res["definition"].strip()
+        res = response.json()[0]
+        type = res["nature"].split()[0]
+        definition = res["definition"].strip()
     except Exception:
         print(f"Dicolink API error: {str(response)}")
-        return None, None
     else:
         print(res)  # TODO: to remove, it's for debug
         type = ALLOWED_TYPES_FR.get(type, "unknown")
-        return type, decapitalize(definition)
+
+    return {
+        "type": type,
+        "definition": decapitalize(definition) if definition else None,
+    }
