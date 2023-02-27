@@ -77,7 +77,18 @@ python -m spacy download fr_core_news_sm
 ```
 or, with PDM:
 ```bash
-pdm run spacy download fr_core_news_sm
+pdm run python -m spacy download fr_core_news_sm
+```
+
+If any issue with the `fr_core_news_sm` model installing, one can install it manually with:
+```bash
+wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.5.0/fr_core_news_sm-3.5.0-py3-none-any.whl -P ./assets
+unzip assets/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.9/site-packages
+```
+
+If any issue with pip in the venv for Spacy:
+```bash
+python -m ensurepip --default-pip
 ```
 
 If Spacy lefff doesn't work, try to install it manually with pip and not with PDM in the venv:
