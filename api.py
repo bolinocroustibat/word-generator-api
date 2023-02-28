@@ -15,7 +15,7 @@ from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.mysql.functions import Rand
 
 from common import authenticate, generate_word_and_save
-from config import ALLOW_ORIGINS, DATABASE_URL, SENTRY_DSN
+from config import ALLOW_ORIGINS, DATABASE_URL, ENVIRONMENT, SENTRY_DSN
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
 from models import GeneratedWordEN, GeneratedWordFR
@@ -34,18 +34,20 @@ app = FastAPI(
     version=VERSION,
 )
 
-sentry_sdk.init(
-    dsn=SENTRY_DSN,
-    release=f"{APP_NAME}@{VERSION}",
-    # Set traces_sample_rate to 1.0 to capture 100%
-    # of transactions for performance monitoring.
-    # Sentry recommend adjusting this value in production,
-    traces_sample_rate=1.0,
-    # Experimental profiling
-    _experiments={
-        "profiles_sample_rate": 1.0,
-    },
-)
+if ENVIRONMENT != "local":
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        release=f"{APP_NAME}@{VERSION}",
+        environment=ENVIRONMENT,
+        # Set traces_sample_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # Sentry recommend adjusting this value in production,
+        traces_sample_rate=1.0,
+        # Experimental profiling
+        _experiments={
+            "profiles_sample_rate": 1.0,
+        },
+    )
 
 register_tortoise(
     app,
