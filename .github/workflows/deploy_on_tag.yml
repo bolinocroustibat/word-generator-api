@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-prod:
-    name: Deploy to prod from "${{ github.ref_name }}/${{ github.sha }}"
+    name: Deploy to prod from ${{ github.ref_name }}/${{ github.sha }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,7 +23,7 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
 
       - name: Copy repository to server with rsync
-        run: rsync -avz --chown=github:www-data --chmod=Dg=rwx,Fg=rwx ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/www/word-generator-api/ # We set directory (D) and files (F) permission for group www-data to rwx so that the same users can overwrite later
+        run: rsync -avz --exclude '.git' --chown=github:www-data --chmod=Dg=rwx,Fg=rwx ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/www/word-generator-api/ # We set directory (D) and files (F) permission for group www-data to rwx so that the same users can overwrite later
 
       - name: Execute server commands for deploy
         uses: appleboy/ssh-action@master
