@@ -1,23 +1,42 @@
 from asyncio import run as aiorun
 from typing import Optional
 
+import requests
 import tweepy
 import typer
 
 from common import prepare_db
-from config import TWITTER
+from config import SENTRY_DSN, TWITTER
 from en import generate_tweet_en
 from fr import generate_tweet_fr
 
 
 async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
+    SENTRY_HEADERS = {
+        "Authorization": "DSN " + SENTRY_DSN,
+        "Content-Type": "application/json",
+    }
+    SENTRY_ORG_SLUG = "adrien-carpentier"  # Write your organization slug here
+
     await prepare_db()
 
     if lang == "en":
         tweet: str = await generate_tweet_en()
+        sentry_monitor_id = "af5d1432-b764-4c57-949a-c6fa8b55a2ce"
     elif lang == "fr":
         tweet = await generate_tweet_fr()
+        sentry_monitor_id = "8f507b23-1765-433a-8ce0-010aec909ac9"
+
+    # SENTRY: Create the check-in
+    json_data = {"status": "in_progress"}
+    response = requests.post(
+        f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/",
+        headers=SENTRY_HEADERS,
+        json=json_data,
+    )
+    checkin_id = response.json()["id"]
+
     tries = 0
     while (len(tweet) > 275) and (tries < 6):
         typer.secho("Generated tweet is too long, trying again...", fg="cyan")
@@ -48,6 +67,14 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
         else:
             typer.secho("Tweet posted:", fg="green", bold=True)
             typer.secho(tweet, fg="green")
+
+    # SENTRY: Update the check-in status (required) and duration (optional)
+    json_data = {"status": "ok"}
+    response = requests.put(
+        f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/{checkin_id}/",
+        headers=SENTRY_HEADERS,
+        json=json_data,
+    )
 
 
 def main(
