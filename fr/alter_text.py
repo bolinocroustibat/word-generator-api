@@ -209,11 +209,17 @@ def replace_pronoun(doc: Doc, pos: int):
     token = doc[pos]
     previous_token = doc[pos - 1]
     if previous_token.text[-1] in ["'", "’"] and token._.replacement[0] not in VOWELS:
-        # print(f"Previous token is '{previous_token}', needs to be replaced")
+        print(
+            'Replacing pronoun "{}" before "{}" (position {}) to match with replacement "{}"...'.format(
+                previous_token, doc[pos].text, pos, token._.replacement
+            )
+        )
         if previous_token.pos_ == "ADP":
             doc[pos - 1]._.replacement = "de"
         elif previous_token.pos_ == "DET":
-            if doc[pos].morph.get("Gender")[0] == "Fem":
-                doc[pos - 1]._.replacement = "la"
-            else:
-                doc[pos - 1]._.replacement = "le"
+            doc[pos - 1]._.replacement = "le"
+            try:
+                if doc[pos].morph.get("Gender")[0] == "Fem":
+                    doc[pos - 1]._.replacement = "la"
+            except IndexError:
+                pass
