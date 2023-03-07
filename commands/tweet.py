@@ -6,7 +6,7 @@ import tweepy
 import typer
 
 from common import prepare_db
-from config import SENTRY_DSN, TWITTER
+from config import SENTRY_DSN, SENTRY_CRON_MONITOR_ID, TWITTER
 from en import generate_tweet_en
 from fr import generate_tweet_fr
 
@@ -23,11 +23,10 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
     if lang == "en":
         tweet: str = await generate_tweet_en()
-        sentry_monitor_id = "af5d1432-b764-4c57-949a-c6fa8b55a2ce"
     elif lang == "fr":
         tweet = await generate_tweet_fr()
-        sentry_monitor_id = "8f507b23-1765-433a-8ce0-010aec909ac9"
 
+    sentry_monitor_id = SENTRY_CRON_MONITOR_ID[lang]
     # SENTRY: Create the check-in
     json_data = {"status": "in_progress"}
     response = requests.post(
