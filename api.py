@@ -4,6 +4,7 @@ from typing import Optional
 import nltk
 import sentry_sdk
 import toml
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
@@ -11,7 +12,7 @@ from fastapi.openapi.utils import get_openapi
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
-from tortoise.contrib.fastapi import register_tortoise
+from tortoise import Tortoise
 from tortoise.contrib.mysql.functions import Rand
 
 from common import authenticate, generate_word_and_save
@@ -33,12 +34,6 @@ APP_NAME: str = config["project"]["name"]
 DESCRIPTION: str = config["project"]["description"]
 VERSION: str = config["project"]["version"]
 
-app = FastAPI(
-    title=APP_NAME,
-    description=DESCRIPTION,
-    version=VERSION,
-)
-
 if ENVIRONMENT != "local":
     sentry_sdk.init(
         dsn=SENTRY_DSN,
@@ -54,12 +49,19 @@ if ENVIRONMENT != "local":
         },
     )
 
-register_tortoise(
-    app,
-    db_url=DATABASE_URL,
-    modules={"models": ["models"]},
-    generate_schemas=False,
-    add_exception_handlers=True,
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    await Tortoise.init(db_url=DATABASE_URL, modules={"models": ["models"]})
+    yield
+    await Tortoise.close_connections()
+
+
+app = FastAPI(
+    lifespan=lifespan,
+    title=APP_NAME,
+    description=DESCRIPTION,
+    version=VERSION,
 )
 
 limiter = Limiter(key_func=get_remote_address)
