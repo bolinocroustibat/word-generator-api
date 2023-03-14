@@ -18,7 +18,12 @@ from common import authenticate, generate_word_and_save
 from config import ALLOW_ORIGINS, DATABASE_URL, ENVIRONMENT, SENTRY_DSN
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
-from models import GeneratedWordEN, GeneratedWordFR
+from models import (
+    GeneratedDefinitionEN,
+    GeneratedDefinitionFR,
+    GeneratedWordEN,
+    GeneratedWordFR,
+)
 
 # Load app name, version, commit variables from config file
 # Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
@@ -71,9 +76,9 @@ app.add_middleware(
 nltk.download("averaged_perceptron_tagger")
 
 
-@app.get("/{lang}/generate")
+@app.get("/{lang}/word/generate")
 @limiter.limit("20/minute")
-async def generate(request: Request, lang: str):
+async def generate_word(request: Request, lang: str):
     """
     Generate a random word and save it in DB.
     """
@@ -87,9 +92,9 @@ async def generate(request: Request, lang: str):
         raise HTTPException(status_code=500, detail="Too many retries.")
 
 
-@app.get("/{lang}/get")
+@app.get("/{lang}/word/get")
 @limiter.limit("20/minute")
-async def get_word_from_db(request: Request, lang: str):
+async def get_random_word_from_db(request: Request, lang: str):
     """
     Get a random generated word from DB.
     """
@@ -115,6 +120,53 @@ async def get_word_from_db(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
+@app.get("/{lang}/definition/generate")
+@limiter.limit("3/minute")
+async def generate_definition(request: Request, lang: str):
+    """
+    Generate a random fake/altered dictionnary definition.
+    """
+    ip: str = request.client.host
+    if lang == "en":
+        return await generate_definition_en(percentage=0.5, ip=ip)
+    elif lang == "fr":
+        return await generate_definition_fr(percentage=0.6, ip=ip)
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+
+
+@app.get("/{lang}/definition/get")
+@limiter.limit("20/minute")
+async def get_random_definition_from_db(request: Request, lang: str):
+    """
+    Get a random generated definition from DB.
+    """
+    if lang == "en":
+        definition = (
+            await GeneratedDefinitionEN.annotate(order=Rand())
+            .order_by("order")
+            .limit(1)
+            .prefetch_related("generated_word")
+        )
+        return {
+            "string": definition[0].generated_word.string,
+            "definition": definition[0].text,
+        }
+    elif lang == "fr":
+        definition = (
+            await GeneratedDefinitionFR.annotate(order=Rand())
+            .order_by("order")
+            .limit(1)
+            .prefetch_related("generated_word")
+        )
+        return {
+            "string": definition[0].generated_word.string,
+            "definition": definition[0].text,
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+
+
 @app.get("/{lang}/alter")
 @limiter.limit("6/minute")
 async def alter_text(
@@ -127,21 +179,6 @@ async def alter_text(
         return await alter_text_en(text, percentage)
     elif lang == "fr":
         return await alter_text_fr(text, percentage)
-    else:
-        raise HTTPException(status_code=400, detail="Language not supported.")
-
-
-@app.get("/{lang}/definition")
-@limiter.limit("3/minute")
-async def get_definition(request: Request, lang: str):
-    """
-    Generate a random fake/altered dictionnary definition.
-    """
-    ip: str = request.client.host
-    if lang == "en":
-        return await generate_definition_en(percentage=0.5, ip=ip)
-    elif lang == "fr":
-        return await generate_definition_fr(percentage=0.6, ip=ip)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 

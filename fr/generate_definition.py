@@ -105,7 +105,7 @@ async def get_random_definition_fr() -> dict:
         real_string = word[0].string
         gender = word[0].gender
 
-        definition_dict: dict = await get_definition_fr(word=real_string)
+        definition_dict: dict = await get_definition_from_word_fr(word=real_string)
         type = definition_dict["type"]
         definition = definition_dict["definition"]
 
@@ -119,7 +119,7 @@ async def get_random_definition_fr() -> dict:
     }
 
 
-async def get_definition_fr(word: str) -> dict:
+async def get_definition_from_word_fr(word: str) -> dict:
     """
     Returns the type and definition of a given word using the French Dicolink API.
     """

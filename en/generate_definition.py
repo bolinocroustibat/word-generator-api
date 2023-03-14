@@ -79,7 +79,7 @@ async def get_random_definition_en() -> dict:
         word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
         real_string = word[0].string
 
-        definition_dict: dict = await get_definition_en(word=real_string)
+        definition_dict: dict = await get_definition_from_word_en(word=real_string)
         type = definition_dict["type"]
         definition = definition_dict["definition"]
         example = definition_dict["example"]
@@ -94,7 +94,7 @@ async def get_random_definition_en() -> dict:
     }
 
 
-async def get_definition_en(word: str) -> dict:
+async def get_definition_from_word_en(word: str) -> dict:
     """
     Returns the type, definition and example of a given word using the dictionaryapi.
     """
