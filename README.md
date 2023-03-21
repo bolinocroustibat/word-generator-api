@@ -3,10 +3,10 @@
 
 ## Main dependencies
 
-Python API with a MySQL database, using FastAPI framework.
+Python API with a MySQL/MariaDB database, using FastAPI framework.
 
 - Python 3.9 (also tested successfully with 3.7)
-- [Poetry](https://python-poetry.org/)
+- [PDM](https://pdm.fming.dev/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
 - MySQL/MariaDB database
