@@ -10,7 +10,7 @@ from fr.alter_text import alter_text_fr
 from models import GeneratedDefinitionFR, GeneratedWordFR, RealWordFR
 
 
-async def generate_definition_fr(percentage: float, ip: str) -> dict:
+async def generate_definition_fr(percentage: float, ip: Optional[str] = None) -> dict:
 
     random_definition = await get_random_definition_fr()
     real_string = random_definition["real_string"]
@@ -47,6 +47,8 @@ async def generate_definition_fr(percentage: float, ip: str) -> dict:
     )
 
     # Save definition in DB
+    if not ip:
+        ip = "localhost"
     await GeneratedDefinitionFR.create(
         generated_word_id=generated_word[0].id,
         text=definition,
