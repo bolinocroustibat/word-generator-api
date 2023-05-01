@@ -76,7 +76,7 @@ async def get_random_definition_en() -> dict:
     while (not definition) or (type not in ALLOWED_TYPES_EN):
         if count > 0:
             print(
-                f"Definition for word '{real_string}' or type '{type}' not supported, trying another word and definition..."
+                f"Definition for word '{real_string}' or type '{type}' not supported, trying another word and definition..."  # noqa: E501
             )
         word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
         real_string = word[0].string

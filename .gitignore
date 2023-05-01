@@ -30,7 +30,7 @@ share/python-wheels/
 *.egg
 poetry.lock
 MANIFEST
-.pdm.toml
+.pdm-python
 pdm.lock
 
 # PyInstaller

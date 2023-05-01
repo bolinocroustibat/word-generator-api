@@ -26,7 +26,7 @@ from models import (
 )
 
 # Load app name, version, commit variables from config file
-# Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
+# Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)  # noqa: E501
 pyproject_filepath = Path(__file__).parent / "pyproject.toml"
 config: dict = toml.load(pyproject_filepath)
 APP_NAME: str = config["project"]["name"]

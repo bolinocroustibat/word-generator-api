@@ -12,7 +12,7 @@ from models import GeneratedWordEN, GeneratedWordFR
 
 
 async def generate_word_and_save(lang: str, ip: str) -> Optional[dict]:
-    already_generated = True  # assume it has already been generated so we enter the while loop at least once
+    already_generated = True  # assume it has already been generated so we enter the while loop at least once  # noqa: E501
     retries = 0
     while already_generated and retries < 10:
         try:
@@ -81,7 +81,8 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
 
 def _generate_word_core(json_proba_file: str) -> str:
     """
-    Generate a word that don't exist, based on the characters probability table, depending on each language.
+    Generate a word that don't exist, based on the characters probability table,
+    depending on each language.
     """
     with open(json_proba_file, "r") as file:
         probas: dict = json.load(file)
