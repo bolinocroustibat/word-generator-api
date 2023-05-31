@@ -23,8 +23,8 @@ class RealWordFR(Model):
     gender = fields.CharField(max_length=1, null=True)
     number = fields.CharField(max_length=1, null=True)
     tense = fields.CharField(max_length=16, null=True)
-    proper = fields.data.BooleanField()
-    complex = fields.data.BooleanField(null=True)
+    proper = fields.BooleanField()
+    complex = fields.BooleanField(null=True)
 
     class Meta:
         table = "real_words_FR"
