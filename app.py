@@ -4,18 +4,17 @@ from typing import Optional
 import nltk
 import sentry_sdk
 import toml
-from contextlib import asynccontextmanager
-from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
-from fastapi.openapi.utils import get_openapi
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+from litestar import Litestar, get, Request
+from litestar.config.cors import CORSConfig
+from litestar.middleware.rate_limit import RateLimitConfig
+from litestar.exceptions import HTTPException
+from litestar.openapi import OpenAPIConfig
+from litestar.plugins.tortoise_orm import TortoiseORMPlugin
 from tortoise import Tortoise
+from tortoise.connection import connections
 from tortoise.contrib.mysql.functions import Rand
 
-from common import authenticate, generate_word_and_save
+from common import generate_word_and_save
 from config import ALLOW_ORIGINS, DATABASE_URL, ENVIRONMENT, SENTRY_DSN
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
@@ -49,37 +48,10 @@ if ENVIRONMENT != "local":
         },
     )
 
-
-@asynccontextmanager
-async def lifespan(application: FastAPI):
-    await Tortoise.init(db_url=DATABASE_URL, modules={"models": ["models"]})
-    yield
-    await Tortoise.close_connections()
-
-
-app = FastAPI(
-    lifespan=lifespan,
-    title=APP_NAME,
-    description=DESCRIPTION,
-    version=VERSION,
-)
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=ALLOW_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["GET"],
-    allow_headers=["*"],
-)
-
 nltk.download("averaged_perceptron_tagger")
 
 
-@app.get("/{lang}/word/generate", tags=["word"])
-@limiter.limit("20/minute")
+@get("/{lang}/word/generate", tags=["word"])
 async def generate_word(request: Request, lang: str):
     """
     Generate a random word and save it in DB.
@@ -94,8 +66,7 @@ async def generate_word(request: Request, lang: str):
         raise HTTPException(status_code=500, detail="Too many retries.")
 
 
-@app.get("/{lang}/word/get", tags=["word"])
-@limiter.limit("20/minute")
+@get("/{lang}/word/get", tags=["word"])
 async def get_random_word_from_db(request: Request, lang: str):
     """
     Get a random generated word from DB.
@@ -122,8 +93,7 @@ async def get_random_word_from_db(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/{lang}/definition/generate", tags=["definition"])
-@limiter.limit("3/minute")
+@get("/{lang}/definition/generate", tags=["definition"])
 async def generate_definition(request: Request, lang: str):
     """
     Generate a random fake/altered dictionnary definition.
@@ -137,8 +107,7 @@ async def generate_definition(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/{lang}/definition/get", tags=["definition"])
-@limiter.limit("20/minute")
+@get("/{lang}/definition/get", tags=["definition"])
 async def get_random_definition_from_db(request: Request, lang: str):
     """
     Get a random generated definition from DB.
@@ -169,8 +138,7 @@ async def get_random_definition_from_db(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/{lang}/alter", tags=["alter"])
-@limiter.limit("6/minute")
+@get("/{lang}/alter", tags=["alter"])
 async def alter_text(
     request: Request, lang: str, text: str, percentage: Optional[float] = 0.4
 ):
@@ -185,16 +153,36 @@ async def alter_text(
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/docs", include_in_schema=False)
-async def get_swagger_documentation(username: str = Depends(authenticate)):
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
+cors_config = CORSConfig(allow_origins=ALLOW_ORIGINS)
+
+rate_limit_config = RateLimitConfig(
+    rate_limit=("minute", 5), exclude=["/schema", "/docs", "/redoc", "/openapi.json"]
+)
 
 
-@app.get("/redoc", include_in_schema=False)
-async def get_redoc_documentation(username: str = Depends(authenticate)):
-    return get_redoc_html(openapi_url="/openapi.json", title="docs")
+async def init_tortoise() -> None:
+    await Tortoise.init(db_url=DATABASE_URL, modules={"models": ["models"]})
+    await Tortoise.generate_schemas()
 
 
-@app.get("/openapi.json", include_in_schema=False)
-async def openapi(username: str = Depends(authenticate)):
-    return get_openapi(title=app.title, version=app.version, routes=app.routes)
+async def shutdown_tortoise() -> None:
+    await connections.close_all()
+
+
+app = Litestar(
+    route_handlers=[
+        generate_word,
+        get_random_word_from_db,
+        generate_definition,
+        get_random_definition_from_db,
+        alter_text,
+    ],
+    openapi_config=OpenAPIConfig(
+        title=APP_NAME, version=VERSION, description=DESCRIPTION
+    ),
+    cors_config=cors_config,
+    middleware=[rate_limit_config.middleware],
+    on_startup=[init_tortoise],
+    on_shutdown=[shutdown_tortoise],
+    plugins=[TortoiseORMPlugin()],
+)

@@ -5,8 +5,8 @@ description = "Generates words that don't exist but sound English, French, Spani
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
     "aiomysql>=0.1.1",
-    "fastapi<1.0.0,>=0.93.0",
     "gunicorn<21.0.0,>=20.1.0",
+    "litestar>=2.0.0a7",
     "nltk<4.0,>=3.7",
     "requests<3.0.0,>=2.27.1",
     "slowapi<1.0.0,>=0.1.5",

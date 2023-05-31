@@ -16,4 +16,4 @@ check-types:
 	@poetry run mypy
 
 run:
-	@poetry run uvicorn api:app --reload
+	@poetry run uvicorn app:app --reload

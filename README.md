@@ -3,11 +3,11 @@
 
 ## Main dependencies
 
-Python API with a MySQL/MariaDB database, using FastAPI framework.
+Python API with a MySQL/MariaDB database, using Litestar framework.
 
 - Python 3.9 (also tested successfully with 3.7)
 - [PDM](https://pdm.fming.dev/)
-- [FastAPI](https://fastapi.tiangolo.com/)
+- [Litestar](https://github.com/litestar-org/litestar)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
 - MySQL/MariaDB database
 
@@ -104,11 +104,11 @@ pdm run pip install spacy-lefff
 
 Launch the web server with:
 ```bash
-uvicorn api:app --reload
+uvicorn app:app --reload
 ```
 Inside the venv:
 ```bash
-pdm run uvicorn api:app --reload
+pdm run uvicorn app:app --reload
 ```
 
 ## Commands
