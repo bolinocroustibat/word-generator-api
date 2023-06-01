@@ -78,7 +78,7 @@ app.add_middleware(
 nltk.download("averaged_perceptron_tagger")
 
 
-@app.get("/{lang}/word/generate")
+@app.get("/{lang}/word/generate", tags=["word"])
 @limiter.limit("20/minute")
 async def generate_word(request: Request, lang: str):
     """
@@ -94,7 +94,7 @@ async def generate_word(request: Request, lang: str):
         raise HTTPException(status_code=500, detail="Too many retries.")
 
 
-@app.get("/{lang}/word/get")
+@app.get("/{lang}/word/get", tags=["word"])
 @limiter.limit("20/minute")
 async def get_random_word_from_db(request: Request, lang: str):
     """
@@ -122,7 +122,7 @@ async def get_random_word_from_db(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/{lang}/definition/generate")
+@app.get("/{lang}/definition/generate", tags=["definition"])
 @limiter.limit("3/minute")
 async def generate_definition(request: Request, lang: str):
     """
@@ -137,7 +137,7 @@ async def generate_definition(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/{lang}/definition/get")
+@app.get("/{lang}/definition/get", tags=["definition"])
 @limiter.limit("20/minute")
 async def get_random_definition_from_db(request: Request, lang: str):
     """
@@ -169,7 +169,7 @@ async def get_random_definition_from_db(request: Request, lang: str):
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
-@app.get("/{lang}/alter")
+@app.get("/{lang}/alter", tags=["alter"])
 @limiter.limit("6/minute")
 async def alter_text(
     request: Request, lang: str, text: str, percentage: Optional[float] = 0.4

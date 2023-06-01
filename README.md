@@ -73,7 +73,7 @@ In `config.py`:
 
 For the French language, you need to download the Spacy NLP data:
 ```bash
-python -m spacy download fr_core_news_sm
+python3 -m spacy download fr_core_news_sm
 ```
 or, with PDM:
 ```bash
@@ -88,7 +88,7 @@ unzip assets/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.9/sit
 
 If any issue with pip in the venv for Spacy:
 ```bash
-python -m ensurepip --default-pip
+python3 -m ensurepip --default-pip
 ```
 
 If Spacy lefff doesn't work, try to install it manually with pip and not with PDM in the venv:
