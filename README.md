@@ -9,7 +9,7 @@ Python API with a MySQL/MariaDB database, using FastAPI framework.
 - [PDM](https://pdm.fming.dev/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
-- MySQL/MariaDB database
+- PostgreSQL database
 
 ## Endpoints
 

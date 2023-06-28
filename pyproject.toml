@@ -4,7 +4,7 @@ version = "1.4.0"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
-    "aiomysql>=0.1.1",
+    "asyncpg>=0.27.0",
     "fastapi<1.0.0,>=0.93.0",
     "gunicorn<21.0.0,>=20.1.0",
     "nltk<4.0,>=3.7",
