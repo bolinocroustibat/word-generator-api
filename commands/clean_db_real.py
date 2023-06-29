@@ -39,7 +39,7 @@ def clean(lang: str) -> None:
                         string=replacement,
                         type="adverb",
                     )
-                except IntegrityConstraintViolationError: # not sure
+                except IntegrityConstraintViolationError:  # not sure
                     existing = await real_word_class.objects.all(string=replacement)
                     typer.secho(
                         f'Cannot replace there are already {len(existing)} "{entry.string}" in the DB!',  # noqa: E501
