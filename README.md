@@ -3,7 +3,7 @@
 
 ## Main dependencies
 
-Python API with a MySQL/MariaDB database, using FastAPI framework.
+Python API with a PostgreSQL database, using FastAPI framework.
 
 - Python 3.11
 - [PDM](https://pdm.fming.dev/)
