@@ -7,7 +7,7 @@ from spacy.language import Language
 from spacy.matcher import Matcher
 from spacy.tokens import Doc, Token
 from spacy_lefff import LefffLemmatizer, POSTagger
-from tortoise.contrib.mysql.functions import Rand
+from tortoise.contrib.postgres.functions import Random
 
 from common import decapitalize
 from models import GeneratedWordFR, RealWordFR
@@ -131,7 +131,7 @@ async def replace_tokens(
                     await RealWordFR.filter(
                         type="noun", number=t._.number, gender=t._.gender, proper=True
                     )
-                    .annotate(order=Rand())
+                    .annotate(order=Random())
                     .order_by("order")
                     .limit(1)
                 )
@@ -145,7 +145,7 @@ async def replace_tokens(
                         tense=t._.tense,
                         conjug=t._.conjug,
                     )
-                    .annotate(order=Rand())
+                    .annotate(order=Random())
                     .order_by("order")
                     .limit(1)
                 )

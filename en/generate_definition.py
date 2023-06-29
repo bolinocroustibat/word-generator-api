@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 import requests
-from tortoise.contrib.mysql.functions import Rand
+from tortoise.contrib.postgres.functions import Random
 
 from config import ALLOWED_TYPES_EN, DICTIONNARY_EN_API_URL
 from models import GeneratedDefinitionEN, GeneratedWordEN, RealWordEN
@@ -21,21 +21,21 @@ async def generate_definition_en(percentage: float, ip: Optional[str] = None) ->
     if type == "verb":
         generated_word = (
             await GeneratedWordEN.filter(type=type, tense="infinitive")
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
     elif type == "noun":
         generated_word = (
             await GeneratedWordEN.filter(type=type, number="s")
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
     else:
         generated_word = (
             await GeneratedWordEN.filter(type=type)
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
@@ -78,7 +78,7 @@ async def get_random_definition_en() -> dict:
             print(
                 f"Definition for word '{real_string}' or type '{type}' not supported, trying another word and definition..."  # noqa: E501
             )
-        word = await RealWordEN.annotate(order=Rand()).order_by("order").limit(1)
+        word = await RealWordEN.annotate(order=Random()).order_by("order").limit(1)
         real_string = word[0].string
 
         definition_dict: dict = await get_definition_from_word_en(word=real_string)

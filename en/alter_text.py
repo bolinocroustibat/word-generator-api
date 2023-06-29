@@ -4,7 +4,7 @@ from typing import Optional
 
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
-from tortoise.contrib.mysql.functions import Rand
+from tortoise.contrib.postgres.functions import Random
 
 from models import GeneratedWordEN
 
@@ -76,21 +76,21 @@ async def replace_words(text: str, to_replace: list[dict]) -> str:
         if w["type"] == "noun":
             generated_word = (
                 await GeneratedWordEN.filter(type="noun", number=w["number"])
-                .annotate(order=Rand())
+                .annotate(order=Random())
                 .order_by("order")
                 .limit(1)
             )
         elif w["type"] == "verb":
             generated_word = (
                 await GeneratedWordEN.filter(type="verb", tense=w["tense"])
-                .annotate(order=Rand())
+                .annotate(order=Random())
                 .order_by("order")
                 .limit(1)
             )
         else:
             generated_word = (
                 await GeneratedWordEN.filter(type=w["type"])
-                .annotate(order=Rand())
+                .annotate(order=Random())
                 .order_by("order")
                 .limit(1)
             )

@@ -1,7 +1,7 @@
 from asyncio import run as aiorun
 
 import typer
-from pymysql.err import IntegrityError
+from asyncpg.exceptions import IntegrityConstraintViolationError
 
 from common import prepare_db
 from models import RealWordEN, RealWordFR
@@ -39,7 +39,7 @@ def clean(lang: str) -> None:
                         string=replacement,
                         type="adverb",
                     )
-                except IntegrityError:
+                except IntegrityConstraintViolationError: # not sure
                     existing = await real_word_class.objects.all(string=replacement)
                     typer.secho(
                         f'Cannot replace there are already {len(existing)} "{entry.string}" in the DB!',  # noqa: E501

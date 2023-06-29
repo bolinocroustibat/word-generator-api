@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import requests
-from tortoise.contrib.mysql.functions import Rand
+from tortoise.contrib.postgres.functions import Random
 
 from common import decapitalize
 from config import ALLOWED_TYPES_FR, DICTIONNARY_FR_API_KEY, DICTIONNARY_FR_API_URL
@@ -21,21 +21,21 @@ async def generate_definition_fr(percentage: float, ip: Optional[str] = None) ->
     if type == "verb":
         generated_word = (
             await GeneratedWordFR.filter(type=type, tense="infinitive")
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
     elif type == "noun":
         generated_word = (
             await GeneratedWordFR.filter(type=type, number="s", gender=gender)
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
     else:
         generated_word = (
             await GeneratedWordFR.filter(type=type, number="s", gender=gender)
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
@@ -87,7 +87,7 @@ async def get_random_definition_fr() -> dict:
                 proper=0,
                 complex__not=1,
             )
-            .annotate(order=Rand())
+            .annotate(order=Random())
             .order_by("order")
             .limit(1)
         )
@@ -100,7 +100,7 @@ async def get_random_definition_fr() -> dict:
                     proper=0,
                     complex__not=1,
                 )
-                .annotate(order=Rand())
+                .annotate(order=Random())
                 .order_by("order")
                 .limit(1)
             )

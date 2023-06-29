@@ -13,7 +13,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from tortoise import Tortoise
-from tortoise.contrib.mysql.functions import Rand
+from tortoise.contrib.postgres.functions import Random
 
 from common import authenticate, generate_word_and_save
 from config import ALLOW_ORIGINS, DATABASE_URL, ENVIRONMENT, SENTRY_DSN
@@ -102,7 +102,7 @@ async def get_random_word_from_db(request: Request, lang: str):
     Get a random generated word from DB.
     """
     if lang == "en":
-        word = await GeneratedWordEN.annotate(order=Rand()).order_by("order").limit(1)
+        word = await GeneratedWordEN.annotate(order=Random()).order_by("order").limit(1)
         return {
             "string": word[0].string,
             "type": word[0].type,
@@ -110,7 +110,7 @@ async def get_random_word_from_db(request: Request, lang: str):
             "tense": word[0].tense,
         }
     elif lang == "fr":
-        word = await GeneratedWordFR.annotate(order=Rand()).order_by("order").limit(1)
+        word = await GeneratedWordFR.annotate(order=Random()).order_by("order").limit(1)
         return {
             "string": word[0].string,
             "type": word[0].type,
@@ -146,7 +146,7 @@ async def get_random_definition_from_db(request: Request, lang: str):
     """
     if lang == "en":
         definition = (
-            await GeneratedDefinitionEN.annotate(order=Rand())
+            await GeneratedDefinitionEN.annotate(order=Random())
             .order_by("order")
             .limit(1)
             .prefetch_related("generated_word")
@@ -157,7 +157,7 @@ async def get_random_definition_from_db(request: Request, lang: str):
         }
     elif lang == "fr":
         definition = (
-            await GeneratedDefinitionFR.annotate(order=Rand())
+            await GeneratedDefinitionFR.annotate(order=Random())
             .order_by("order")
             .limit(1)
             .prefetch_related("generated_word")
