@@ -121,7 +121,7 @@ pdm run uvicorn api:app --reload
 
 To run the commands, use for example:
 ```bash
-python3 -m commands.batch_generate.py en
+python3 -m commands.batch_generate en
 ```
 
 # Usefuls resources
