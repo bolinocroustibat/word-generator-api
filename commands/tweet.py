@@ -12,7 +12,6 @@ from fr import generate_tweet_fr
 
 
 async def _send_tweet(lang: str, dry_run: bool = False) -> None:
-
     SENTRY_HEADERS = {
         "Authorization": "DSN " + SENTRY_DSN,
         "Content-Type": "application/json",
@@ -21,8 +20,9 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
     await prepare_db()
 
+    tweet: Optional[str] = None
     if lang == "en":
-        tweet: str = await generate_tweet_en()
+        tweet = await generate_tweet_en()
     elif lang == "fr":
         tweet = await generate_tweet_fr()
 
@@ -36,36 +36,36 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
     )
     checkin_id = response.json()["id"]
 
-    tries = 0
-    while (len(tweet) > 275) and (tries < 6):
-        typer.secho("Generated tweet is too long, trying again...", fg="cyan")
-        # If tweet os too long, regenerate it.
-        # Don't try more than 6 times for security reasons.
-        if lang == "en":
-            tweet: str = await generate_tweet_en()
-        if lang == "fr":
-            tweet: str = await generate_tweet_fr()
-        tries += 1
+    if tweet:
+        tries = 0
+        while (len(tweet) > 275) and (tries < 6):
+            typer.secho("Generated tweet is too long, trying again...", fg="cyan")
+            # If tweet os too long, regenerate it.
+            # Don't try more than 6 times for security reasons.
+            if lang == "en":
+                tweet: str = await generate_tweet_en()
+            if lang == "fr":
+                tweet: str = await generate_tweet_fr()
+            tries += 1
 
-    if dry_run:
-        typer.secho("Tweet (not posted):", fg="green", bold=True)
-        typer.secho(tweet, fg="green")
-    else:
-        try:
-            auth = tweepy.OAuthHandler(
-                TWITTER[lang]["api_key"], TWITTER[lang]["key_secret"]
-            )
-            auth.set_access_token(
-                TWITTER[lang]["access_token"], TWITTER[lang]["token_secret"]
-            )
-            api = tweepy.API(auth)
-            api.update_status(tweet)
-        except Exception as e:
-            typer.secho(f"Error:\n{e}", fg="red", bold=True)
-            typer.secho(tweet, fg="red")
-        else:
-            typer.secho("Tweet posted:", fg="green", bold=True)
+        if dry_run:
+            typer.secho("Tweet (not posted):", fg="green", bold=True)
             typer.secho(tweet, fg="green")
+        else:
+            try:
+                client = tweepy.Client(
+                    consumer_key=TWITTER[lang]["api_key"],
+                    consumer_secret=TWITTER[lang]["key_secret"],
+                    access_token=TWITTER[lang]["access_token"],
+                    access_token_secret=TWITTER[lang]["token_secret"],
+                )
+                response = client.create_tweet(text=tweet)
+            except Exception as e:
+                typer.secho(f"Error:\n{e}", fg="red", bold=True)
+                typer.secho(tweet, fg="red")
+            else:
+                typer.secho("Tweet posted:", fg="green", bold=True)
+                typer.secho(tweet, fg="green")
 
     # SENTRY: Update the check-in status (required) and duration (optional)
     json_data = {"status": "ok"}
