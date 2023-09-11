@@ -1,6 +1,3 @@
-from typing import Optional
-
-
 def classify_fr(word: str) -> dict:
     """
     Classify French word
@@ -144,7 +141,7 @@ def classify_fr(word: str) -> dict:
     }
 
 
-def get_char_from_position(word: str, position: int) -> Optional[str]:
+def get_char_from_position(word: str, position: int) -> str | None:
     try:
         return word[position]
     except Exception:

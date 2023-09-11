@@ -1,6 +1,5 @@
 import tomllib
 from pathlib import Path
-from typing import Optional
 
 import nltk
 import sentry_sdk
@@ -88,7 +87,7 @@ async def generate_word(request: Request, lang: str):
     if lang not in ["en", "fr", "it", "es"]:
         raise HTTPException(status_code=400, detail="Language not supported.")
     ip: str = request.client.host
-    response: Optional[dict] = await generate_word_and_save(lang=lang, ip=ip)
+    response: dict | None = await generate_word_and_save(lang=lang, ip=ip)
     if response:
         return response
     else:
@@ -173,7 +172,7 @@ async def get_random_definition_from_db(request: Request, lang: str):
 @app.get("/{lang}/alter", tags=["alter"])
 @limiter.limit("6/minute")
 async def alter_text(
-    request: Request, lang: str, text: str, percentage: Optional[float] = 0.4
+    request: Request, lang: str, text: str, percentage: float | None = 0.4
 ):
     """
     Alter a text with random non existing words.

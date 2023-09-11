@@ -1,6 +1,5 @@
 import math
 import random
-from typing import Optional
 
 import spacy
 from spacy.language import Language
@@ -61,7 +60,7 @@ POS_CORRESPONDANCE_FR = {
 
 
 async def alter_text_fr(
-    text: str, percentage: float, forced_replacements: Optional[dict] = {}
+    text: str, percentage: float, forced_replacements: dict | None = {}
 ) -> str:
     """
     Alter a text randomly using Spacy and Lefff
@@ -114,7 +113,7 @@ def get_replacable_tokens_ids(doc: Doc, not_to_replace: list[str]) -> list[int]:
 
 
 async def replace_tokens(
-    doc: Doc, tokens_ids_to_replace: list, forced_replacements: Optional[dict]
+    doc: Doc, tokens_ids_to_replace: list, forced_replacements: dict | None
 ) -> Doc:
     """
     Replace the tokens in the doc

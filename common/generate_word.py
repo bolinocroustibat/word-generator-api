@@ -1,7 +1,6 @@
 import json
 import random
 from datetime import datetime
-from typing import Optional
 
 from tortoise.exceptions import IntegrityError
 
@@ -11,7 +10,7 @@ from fr.classify import classify_fr
 from models import GeneratedWordEN, GeneratedWordFR
 
 
-async def generate_word_and_save(lang: str, ip: str) -> Optional[dict]:
+async def generate_word_and_save(lang: str, ip: str) -> dict | None:
     already_generated = True  # assume it has already been generated so we enter the while loop at least once  # noqa: E501
     retries = 0
     while already_generated and retries < 10:

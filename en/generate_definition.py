@@ -1,6 +1,5 @@
 import random
 from datetime import datetime
-from typing import Optional
 
 import requests
 from tortoise.contrib.postgres.functions import Random
@@ -11,7 +10,7 @@ from models import GeneratedDefinitionEN, GeneratedWordEN, RealWordEN
 from .alter_text import alter_text_en
 
 
-async def generate_definition_en(percentage: float, ip: Optional[str] = None) -> dict:
+async def generate_definition_en(percentage: float, ip: str | None = None) -> dict:
 
     random_definition = await get_random_definition_en()
     real_string = random_definition["real_string"]
@@ -69,9 +68,9 @@ async def get_random_definition_en() -> dict:
     """
     count = 0
     definition = None
-    real_string: Optional[str] = None
-    type: Optional[str] = None
-    example: Optional[str] = None
+    real_string: str | None = None
+    type: str | None = None
+    example: str | None = None
 
     while (not definition) or (type not in ALLOWED_TYPES_EN):
         if count > 0:
@@ -100,9 +99,9 @@ async def get_definition_from_word_en(word: str) -> dict:
     """
     Returns the type, definition and example of a given word using the dictionaryapi.
     """
-    type: Optional[str] = None
-    definition: Optional[str] = None
-    example: Optional[str] = None
+    type: str | None = None
+    definition: str | None = None
+    example: str | None = None
 
     response = requests.get(f"{DICTIONNARY_EN_API_URL}{word}")
 

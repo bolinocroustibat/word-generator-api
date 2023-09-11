@@ -1,6 +1,5 @@
 import math
 import random
-from typing import Optional
 
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
@@ -25,7 +24,7 @@ POS_CORRESPONDANCE_EN = {
 
 
 async def alter_text_en(
-    text: str, percentage: float, forced_replacements: Optional[dict] = {}
+    text: str, percentage: float, forced_replacements: dict | None = {}
 ) -> str:
     """
     Alter a text randomly using NLTK POS tagging.

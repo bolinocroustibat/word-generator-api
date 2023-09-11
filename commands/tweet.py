@@ -1,5 +1,4 @@
 from asyncio import run as aiorun
-from typing import Optional
 
 import requests
 import tweepy
@@ -20,7 +19,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
     await prepare_db()
 
-    tweet: Optional[str] = None
+    tweet: str | None = None
     if lang == "en":
         tweet = await generate_tweet_en()
     elif lang == "fr":
@@ -43,9 +42,9 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
             # If tweet os too long, regenerate it.
             # Don't try more than 6 times for security reasons.
             if lang == "en":
-                tweet: str = await generate_tweet_en()
+                tweet = await generate_tweet_en()
             if lang == "fr":
-                tweet: str = await generate_tweet_fr()
+                tweet = await generate_tweet_fr()
             tries += 1
 
         if dry_run:
@@ -78,7 +77,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
 def main(
     lang: str = typer.Argument(..., help="Language ('en' or 'fr')"),
-    dry_run: Optional[bool] = typer.Option(False, help="Dry run"),
+    dry_run: bool | None = typer.Option(False, help="Dry run"),
 ):
     aiorun(_send_tweet(lang, dry_run))
 

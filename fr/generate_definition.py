@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import requests
 from tortoise.contrib.postgres.functions import Random
@@ -10,7 +9,7 @@ from fr.alter_text import alter_text_fr
 from models import GeneratedDefinitionFR, GeneratedWordFR, RealWordFR
 
 
-async def generate_definition_fr(percentage: float, ip: Optional[str] = None) -> dict:
+async def generate_definition_fr(percentage: float, ip: str | None = None) -> dict:
 
     random_definition = await get_random_definition_fr()
     real_string = random_definition["real_string"]
@@ -70,9 +69,9 @@ async def get_random_definition_fr() -> dict:
     """
     count = 0
     definition = None
-    real_string: Optional[str] = None
-    type: Optional[str] = None
-    gender: Optional[str] = None
+    real_string: str | None = None
+    type: str | None = None
+    gender: str | None = None
 
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):
         if count > 0:
@@ -125,8 +124,8 @@ async def get_definition_from_word_fr(word: str) -> dict:
     """
     Returns the type and definition of a given word using the French Dicolink API.
     """
-    type: Optional[str] = None
-    definition: Optional[str] = None
+    type: str | None = None
+    definition: str | None = None
 
     response = requests.get(
         f"{DICTIONNARY_FR_API_URL}{word}/definitions?limite=1&api_key={DICTIONNARY_FR_API_KEY}"
