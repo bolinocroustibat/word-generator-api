@@ -113,15 +113,15 @@ pdm run uvicorn api:app --reload
 
 ## Commands
 
-  - `batch_generate.py` + language
-  - `build.py`
-  - `classify_db_generated.py` + language
-  - `classify_db_real.py` + language (from a dictionary TXT file)
+  - `build_proba_file.py` + language: Create the probability file for the Markov chain
+  - `batch_generate.py` + language: Generate a batch of words (500 by default) and save them in DB
+  - `classify_db_generated.py` + language: Update the generated words in DB with their tense, conjugation, genre, number, etc.
+  - `classify_db_real.py` + language (from a dictionary TXT file): Update the real words in DB with their tense, conjugation, genre, number, etc.
   - `tweet.py` + language + optional: `--dry-run`
 
 To run the commands, use for example:
 ```bash
-python3 -m commands.batch_generate en
+python3 -m commands.build_proba_file en
 ```
 
 # Usefuls resources
