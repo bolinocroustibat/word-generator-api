@@ -8,6 +8,7 @@ import typer
 def build_1char_probabilities(
     alphabet: list[str], dictionary_filepath: Path, json_filepath: Path
 ) -> dict[str, dict[str, int]]:
+
     # Initialize the nested dictionary structure
     temp: dict[str, int] = {char: 0 for char in alphabet}
     temp["last_letter"] = 0
@@ -50,7 +51,7 @@ def build_2char_probabilities(
     temp2: dict = alphabet_dict | temp
     temp3: dict = alphabet_dict | {"last_letter": 0}
 
-    probabilities: dict = {"first_letter": alphabet_dict.copy()} | {
+    probabilities: dict = {"first_letter": alphabet_dict} | {
         chars: temp3.copy() for chars in temp2
     }
 
