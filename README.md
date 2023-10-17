@@ -11,6 +11,7 @@ Python API with a PostgreSQL database, using FastAPI framework.
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
 - PostgreSQL database
 
+
 ## Endpoints
 
 - `/docs`:
@@ -40,6 +41,7 @@ Python API with a PostgreSQL database, using FastAPI framework.
   Available `lang`: `en`, `fr`
   Method: `GET`
 
+
 ## Install
 
 Create a virtual environnement and install the dependencies in it with [PDM](https://pdm.fming.dev/) single command:
@@ -67,9 +69,7 @@ In `config.py`:
 - `TWITTER`: `dict`
 - `SENTRY_DSN`: `string`
 
-
 ### Install French tagging data with Spacy
-
 
 For the French language, you need to download the Spacy NLP data:
 ```bash
@@ -100,6 +100,7 @@ or, with PDM:
 pdm run pip install spacy-lefff
 ```
 
+
 ## Run the API
 
 Launch the web server with:
@@ -110,6 +111,7 @@ Inside the venv:
 ```bash
 pdm run uvicorn api:app --reload
 ```
+
 
 ## Commands
 
@@ -124,6 +126,7 @@ To run the commands, use for example:
 python3 -m commands.build_proba_file en
 ```
 
-# Usefuls resources
+
+## Usefuls resources
 
 http://www.nurykabe.com/dump/text/lists/

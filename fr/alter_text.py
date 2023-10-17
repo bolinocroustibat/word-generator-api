@@ -209,7 +209,7 @@ def replace_pronoun(doc: Doc, pos: int):
     previous_token = doc[pos - 1]
     if previous_token.text[-1] in ["'", "’"] and token._.replacement[0] not in VOWELS:
         print(
-            'Replacing pronoun "{}" before "{}" (position {}) to match with replacement "{}"...'.format(  # noqa: E501
+            'Replacing pronoun "{}" before "{}" (position {}) to match with replacement "{}"...'.format(
                 previous_token, doc[pos].text, pos, token._.replacement
             )
         )

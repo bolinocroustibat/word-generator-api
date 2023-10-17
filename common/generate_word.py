@@ -11,7 +11,7 @@ from models import GeneratedWordEN, GeneratedWordFR
 
 
 async def generate_word_and_save(lang: str, ip: str) -> dict | None:
-    already_generated = True  # assume it has already been generated so we enter the while loop at least once  # noqa: E501
+    already_generated = True  # assume it has already been generated so we enter the while loop at least once
     retries = 0
     while already_generated and retries < 10:
         try:
@@ -28,7 +28,7 @@ async def generate_word_and_save(lang: str, ip: str) -> dict | None:
                     ip=ip,
                 )
                 response.update(word_classes)
-            if lang == "fr":
+            elif lang == "fr":
                 word_classes: dict = classify_fr(word=string)
                 await GeneratedWordFR.create(
                     string=string,

@@ -1,9 +1,9 @@
 import tomllib
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 import nltk
 import sentry_sdk
-from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
