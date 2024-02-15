@@ -8,7 +8,6 @@ import typer
 def build_1char_probabilities(
     alphabet: list[str], dictionary_filepath: Path, json_filepath: Path
 ) -> dict[str, dict[str, int]]:
-
     # Initialize the nested dictionary structure
     temp: dict[str, int] = {char: 0 for char in alphabet}
     temp["last_letter"] = 0
@@ -39,7 +38,6 @@ def build_1char_probabilities(
 def build_2char_probabilities(
     alphabet: list[str], dictionary_filepath: Path, json_filepath: Path
 ) -> dict:
-
     # Initialize the nested dictionary structure
     temp: dict = {}
     for letter1 in alphabet:
@@ -88,7 +86,6 @@ def build_2char_probabilities(
 
 
 def build_chars_probability_file(lang: str, chars_nb: int = 2) -> None:
-
     if lang not in ["en", "es", "fr", "it"]:
         typer.secho(f"Invalid language: {lang}", fg="red")
         raise typer.Abort()
@@ -98,7 +95,6 @@ def build_chars_probability_file(lang: str, chars_nb: int = 2) -> None:
         raise typer.Abort()
 
     async def _main():
-
         current_path = Path(__file__).parent.absolute()
 
         with open(

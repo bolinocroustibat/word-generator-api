@@ -7,13 +7,11 @@ from models import GeneratedWordEN, GeneratedWordFR, RealWordEN, RealWordFR
 
 
 def clean(lang: str) -> None:
-
     if lang not in ["en", "fr"]:
         typer.secho(f"Invalid language: {lang}", fg="red")
         raise typer.Abort()
 
     async def _main():
-
         i = 0
 
         await prepare_db()

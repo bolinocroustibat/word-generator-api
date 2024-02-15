@@ -9,7 +9,6 @@ from models import RealWordFR
 
 def delete_duplicates_fr() -> None:
     async def _main():
-
         await prepare_db()
 
         entries = await RealWordFR.objects.all()

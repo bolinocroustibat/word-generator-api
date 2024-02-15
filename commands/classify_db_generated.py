@@ -9,12 +9,10 @@ from models import GeneratedWordEN, GeneratedWordFR
 
 
 def classify(lang: str) -> None:
-
     if lang not in ["en", "fr"]:
         raise typer.Abort(f"Invalid language: {lang}")
 
     async def _main():
-
         await prepare_db()
 
         i = 0

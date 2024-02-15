@@ -1,5 +1,4 @@
 def style_text(input_text: str, style: str) -> str:
-
     if style not in ["bold", "italic"]:
         print("Error: Invalid style type.")
         return input_text

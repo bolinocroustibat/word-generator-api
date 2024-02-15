@@ -9,12 +9,10 @@ from models import RealWordEN, RealWordFR
 
 
 def dictionary_to_db(lang: str, classify=True) -> None:
-
     if lang not in ["en", "fr"]:
         raise typer.Abort(f"Invalid language: {lang}")
 
     async def _main():
-
         await prepare_db()
 
         with open(f"{lang}/data/adverbs_{lang.upper()}.txt", "r") as dictionary_file:

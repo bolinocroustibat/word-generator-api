@@ -6,13 +6,11 @@ from common import generate_word_and_save, prepare_db
 
 
 def batch_generate(lang: str, number: int = 500) -> None:
-
     if lang not in ["en", "fr"]:
         typer.secho(f"Invalid language: {lang}", fg="red")
         raise typer.Abort()
 
     async def _main():
-
         await prepare_db()
 
         i = 0

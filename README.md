@@ -6,7 +6,7 @@
 Python API with a PostgreSQL database, using FastAPI framework.
 
 - Python 3.11
-- [PDM](https://pdm.fming.dev/)
+- [Rye](https://rye-up.com/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
 - PostgreSQL database
@@ -44,9 +44,9 @@ Python API with a PostgreSQL database, using FastAPI framework.
 
 ## Install
 
-Create a virtual environnement and install the dependencies in it with [PDM](https://pdm.fming.dev/) single command:
+Create a virtual environnement and install the dependencies in it with [Rye](https://rye-up.com/) (or with [PDM](https://pdm.fming.dev/)) single command:
 ```bash
-pdm install
+rye sync
 ```
 
 ### Setup the config file
@@ -75,9 +75,9 @@ For the French language, you need to download the Spacy NLP data:
 ```bash
 python3 -m spacy download fr_core_news_sm
 ```
-or, with PDM:
+or, with Rye:
 ```bash
-pdm run python -m spacy download fr_core_news_sm
+rye run python -m spacy download fr_core_news_sm
 ```
 
 If any issue with the `fr_core_news_sm` model installing, one can install it manually with:
@@ -91,13 +91,13 @@ If any issue with pip in the venv for Spacy:
 python3 -m ensurepip --default-pip
 ```
 
-If Spacy lefff doesn't work, try to install it manually with pip and not with PDM in the venv:
+If Spacy lefff doesn't work, try to install it manually with pip and not with Rye/PDM in the venv:
 ```bash
 pip install spacy-lefff
 ```
-or, with PDM:
+or, with Rye:
 ```bash
-pdm run pip install spacy-lefff
+rye run pip install spacy-lefff
 ```
 
 
@@ -105,13 +105,25 @@ pdm run pip install spacy-lefff
 
 Launch the web server with:
 ```bash
-uvicorn api:app --reload
-```
-Inside the venv:
-```bash
-pdm run uvicorn api:app --reload
+rye run uvicorn api:app --reload
 ```
 
+Inside the venv:
+```bash
+uvicorn api:app --reload
+```
+
+## Lint and format the code
+
+Lint with:
+```bash
+rye lint --fix
+```
+
+Format with:
+```bash
+rye fmt
+```
 
 ## Commands
 

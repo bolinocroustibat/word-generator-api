@@ -10,7 +10,6 @@ from models import GeneratedDefinitionFR, GeneratedWordFR, RealWordFR
 
 
 async def generate_definition_fr(percentage: float, ip: str | None = None) -> dict:
-
     random_definition = await get_random_definition_fr()
     real_string = random_definition["real_string"]
     type = random_definition["type"]

@@ -11,7 +11,6 @@ from .alter_text import alter_text_en
 
 
 async def generate_definition_en(percentage: float, ip: str | None = None) -> dict:
-
     random_definition = await get_random_definition_en()
     real_string = random_definition["real_string"]
     type = random_definition["type"]

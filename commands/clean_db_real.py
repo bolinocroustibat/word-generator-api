@@ -8,13 +8,11 @@ from models import RealWordEN, RealWordFR
 
 
 def clean(lang: str) -> None:
-
     if lang not in ["en", "fr"]:
         typer.secho(f"Invalid language: {lang}", fg="red")
         raise typer.Abort()
 
     async def _main():
-
         if lang == "en":
             real_word_class = RealWordEN
         elif lang == "fr":
