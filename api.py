@@ -80,7 +80,7 @@ nltk.download("averaged_perceptron_tagger")
 
 @app.get("/{lang}/word/generate", tags=["word"])
 @limiter.limit("20/minute")
-async def generate_word(request: Request, lang: str) -> dict[str, str] | None:
+async def generate_word(request: Request, lang: str) -> dict[str, str | None] | None:
     """
     Generate a random word and save it in DB.
     """
@@ -96,7 +96,9 @@ async def generate_word(request: Request, lang: str) -> dict[str, str] | None:
 
 @app.get("/{lang}/word/get", tags=["word"])
 @limiter.limit("20/minute")
-async def get_random_word_from_db(request: Request, lang: str) -> dict[str, str]:
+async def get_random_word_from_db(
+    request: Request, lang: str
+) -> dict[str, str | None] | None:
     """
     Get a random generated word from DB.
     """
@@ -124,7 +126,7 @@ async def get_random_word_from_db(request: Request, lang: str) -> dict[str, str]
 
 @app.get("/{lang}/definition/generate", tags=["definition"])
 @limiter.limit("3/minute")
-async def generate_definition(request: Request, lang: str) -> dict[str, str]:
+async def generate_definition(request: Request, lang: str) -> dict[str, str] | None:
     """
     Generate a random fake/altered dictionnary definition.
     """
@@ -139,7 +141,9 @@ async def generate_definition(request: Request, lang: str) -> dict[str, str]:
 
 @app.get("/{lang}/definition/get", tags=["definition"])
 @limiter.limit("20/minute")
-async def get_random_definition_from_db(request: Request, lang: str) -> dict[str, str]:
+async def get_random_definition_from_db(
+    request: Request, lang: str
+) -> dict[str, str] | None:
     """
     Get a random generated definition from DB.
     """
