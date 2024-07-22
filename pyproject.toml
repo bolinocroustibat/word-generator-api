@@ -1,6 +1,6 @@
 [project]
 name = "word-generator-api"
-version = "1.5.6"
+version = "1.5.7"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
@@ -10,7 +10,7 @@ dependencies = [
     "nltk<4.0,>=3.7",
     "requests<3.0.0,>=2.27.1",
     "slowapi<1.0.0,>=0.1.5",
-    "sentry-sdk>=1.15.0",
+    "sentry-sdk>=2.10.0",
     "spacy<4.0.0,>=3.2.4",
     "tqdm<5.0.0,>=4.63.0",
     "tortoise-orm>=0.19.3",
@@ -29,19 +29,14 @@ requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
 
 [tool]
-rye = { dev-dependencies = [
-    "pre-commit>=3.6.0",
-    "ruff>=0.2.0",
-] }
+rye = { dev-dependencies = ["pre-commit>=3.7.1", "ruff>=0.5.4"] }
 
 [tool.pdm]
 includes = []
 
 [tool.pdm.dev-dependencies]
-dev = [
-    "ruff>=0.1.0",
-    "pre-commit>=3.5.0",
-]
+dev = ["pre-commit>=3.7.1", "ruff>=0.5.4"]
 
 [tool.ruff]
-ignore = ["E501"]
+lint = { select = ["I"] }
+line-length = 100

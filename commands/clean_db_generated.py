@@ -21,9 +21,7 @@ def clean(lang: str) -> None:
                 existing = await RealWordEN.filter(string=entry.string)
                 if existing:
                     i += 1
-                    typer.secho(
-                        f'"{entry.string}" exists as a real word. Deleting.', fg="cyan"
-                    )
+                    typer.secho(f'"{entry.string}" exists as a real word. Deleting.', fg="cyan")
                     await entry.delete()
                 else:
                     continue
@@ -33,9 +31,7 @@ def clean(lang: str) -> None:
                 existing = await RealWordFR.filter(string=entry.string)
                 if existing:
                     i += 1
-                    typer.secho(
-                        f'"{entry.string}" exists as a real word. Deleting.', fg="cyan"
-                    )
+                    typer.secho(f'"{entry.string}" exists as a real word. Deleting.', fg="cyan")
                     await entry.delete()
                 else:
                     continue

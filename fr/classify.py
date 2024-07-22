@@ -20,8 +20,7 @@ def classify_fr(word: str) -> dict:
         gender = "f"
         number = "p"
     elif (word[-4:] == "ment") and (
-        get_char_from_position(word, -5)
-        in ["a", "e", "é", "i", "î", "ï", "o", "ô", "u", "û"]
+        get_char_from_position(word, -5) in ["a", "e", "é", "i", "î", "ï", "o", "ô", "u", "û"]
     ):
         type = "adverb"
     elif word[-4:] == "ique":

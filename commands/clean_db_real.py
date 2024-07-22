@@ -28,9 +28,7 @@ def clean(lang: str) -> None:
         for j, entry in enumerate(await real_word_class.objects.all()):
             if ".ADV" in entry.string:
                 i += 1
-                typer.secho(
-                    f'"{entry.string}" have .ADV in string, fixing...', fg="cyan"
-                )
+                typer.secho(f'"{entry.string}" have .ADV in string, fixing...', fg="cyan")
                 replacement = entry.string.replace(".ADV", "")
                 try:
                     await entry.update(
@@ -61,9 +59,7 @@ def clean(lang: str) -> None:
             else:
                 continue
 
-        typer.secho(
-            f'"{i}/{j}" real words had .ADV in string and were fixed.', fg="green"
-        )
+        typer.secho(f'"{i}/{j}" real words had .ADV in string and were fixed.', fg="green")
 
     aiorun(_main())
 

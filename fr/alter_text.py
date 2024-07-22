@@ -59,9 +59,7 @@ POS_CORRESPONDANCE_FR = {
 }
 
 
-async def alter_text_fr(
-    text: str, percentage: float, forced_replacements: dict | None = {}
-) -> str:
+async def alter_text_fr(text: str, percentage: float, forced_replacements: dict | None = {}) -> str:
     """
     Alter a text randomly using Spacy and Lefff
     """

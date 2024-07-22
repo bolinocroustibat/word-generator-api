@@ -57,9 +57,7 @@ def dictionary_to_db(lang: str, classify=True) -> None:
                                         proper=False,
                                     )
                                 else:
-                                    await RealWordFR.objects.create(
-                                        string=word, proper=False
-                                    )
+                                    await RealWordFR.objects.create(string=word, proper=False)
                             except Exception as e:
                                 typer.secho(f"{word}", fg="red")
                                 typer.secho(e, fg="red")

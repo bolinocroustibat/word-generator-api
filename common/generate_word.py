@@ -11,7 +11,9 @@ from models import GeneratedWordEN, GeneratedWordFR
 
 
 async def generate_word_and_save(lang: str, ip: str) -> dict | None:
-    already_generated = True  # assume it has already been generated so we enter the while loop at least once
+    already_generated = (
+        True  # assume it has already been generated so we enter the while loop at least once
+    )
     retries = 0
     while already_generated and retries < 10:
         try:
@@ -93,9 +95,7 @@ def _generate_word_core(json_proba_file: str) -> str:
     word = char1
     # for _ in probas[char1]:
     # choose second char
-    char2 = random.choices(
-        list(probas[char1].keys()), weights=list(probas[char1].values()), k=1
-    )[0]
+    char2 = random.choices(list(probas[char1].keys()), weights=list(probas[char1].values()), k=1)[0]
     if char2 == "last_letter":
         # it's a 1-letter word
         return word

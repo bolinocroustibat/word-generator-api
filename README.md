@@ -115,6 +115,12 @@ uvicorn api:app --reload
 
 ## Lint and format the code
 
+Before contributing to the repository, it is necessary to initialize the pre-commit hooks:
+```bash
+pre-commit install
+```
+Once this is done, code formatting and linting, as well as import sorting, will be automatically checked before each commit.
+
 Lint with:
 ```bash
 rye lint --fix

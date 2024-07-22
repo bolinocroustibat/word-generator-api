@@ -34,7 +34,7 @@ APP_NAME: str = config["project"]["name"]
 DESCRIPTION: str = config["project"]["description"]
 VERSION: str = config["project"]["version"]
 
-if ENVIRONMENT != "local":
+if ENVIRONMENT not in ["local", "test"]:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         release=f"{APP_NAME}@{VERSION}",
@@ -43,10 +43,7 @@ if ENVIRONMENT != "local":
         # of transactions for performance monitoring.
         # Sentry recommend adjusting this value in production,
         traces_sample_rate=1.0,
-        # Experimental profiling
-        _experiments={
-            "profiles_sample_rate": 1.0,
-        },
+        profiles_sample_rate=1.0,
     )
 
 
@@ -96,9 +93,7 @@ async def generate_word(request: Request, lang: str) -> dict[str, str | None] | 
 
 @app.get("/{lang}/word/get", tags=["word"])
 @limiter.limit("20/minute")
-async def get_random_word_from_db(
-    request: Request, lang: str
-) -> dict[str, str | None] | None:
+async def get_random_word_from_db(request: Request, lang: str) -> dict[str, str | None] | None:
     """
     Get a random generated word from DB.
     """
@@ -141,9 +136,7 @@ async def generate_definition(request: Request, lang: str) -> dict[str, str] | N
 
 @app.get("/{lang}/definition/get", tags=["definition"])
 @limiter.limit("20/minute")
-async def get_random_definition_from_db(
-    request: Request, lang: str
-) -> dict[str, str] | None:
+async def get_random_definition_from_db(request: Request, lang: str) -> dict[str, str] | None:
     """
     Get a random generated definition from DB.
     """
@@ -175,9 +168,7 @@ async def get_random_definition_from_db(
 
 @app.get("/{lang}/alter", tags=["alter"])
 @limiter.limit("6/minute")
-async def alter_text(
-    request: Request, lang: str, text: str, percentage: float | None = 0.4
-) -> str:
+async def alter_text(request: Request, lang: str, text: str, percentage: float | None = 0.4) -> str:
     """
     Alter a text with random non existing words.
     """

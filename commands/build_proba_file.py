@@ -49,9 +49,7 @@ def build_2char_probabilities(
     temp2: dict = alphabet_dict | temp
     temp3: dict = alphabet_dict | {"last_letter": 0}
 
-    probabilities: dict = {"first_letter": alphabet_dict} | {
-        chars: temp3.copy() for chars in temp2
-    }
+    probabilities: dict = {"first_letter": alphabet_dict} | {chars: temp3.copy() for chars in temp2}
 
     # Populate the dictionary with probabilities
     with open(dictionary_filepath, "r", encoding="utf-8") as dictionary:
@@ -97,17 +95,12 @@ def build_chars_probability_file(lang: str, chars_nb: int = 2) -> None:
     async def _main():
         current_path = Path(__file__).parent.absolute()
 
-        with open(
-            current_path / f"../{lang}/data/alphabet_{lang.upper()}.json"
-        ) as infile:
+        with open(current_path / f"../{lang}/data/alphabet_{lang.upper()}.json") as infile:
             alphabet: list[str] = json.load(infile)
 
-        dictionary_filepath: Path = (
-            current_path / f"../{lang}/data/dictionary_{lang.upper()}.txt"
-        )
+        dictionary_filepath: Path = current_path / f"../{lang}/data/dictionary_{lang.upper()}.txt"
         json_filepath: Path = (
-            current_path
-            / f"../{lang}/data/proba_table_{chars_nb}char_{lang.upper()}.json"
+            current_path / f"../{lang}/data/proba_table_{chars_nb}char_{lang.upper()}.json"
         )
 
         if chars_nb == 1:

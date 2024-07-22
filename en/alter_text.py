@@ -23,9 +23,7 @@ POS_CORRESPONDANCE_EN = {
 }
 
 
-async def alter_text_en(
-    text: str, percentage: float, forced_replacements: dict | None = {}
-) -> str:
+async def alter_text_en(text: str, percentage: float, forced_replacements: dict | None = {}) -> str:
     """
     Alter a text randomly using NLTK POS tagging.
     See https://www.guru99.com/pos-tagging-chunking-nltk.html

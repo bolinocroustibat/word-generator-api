@@ -5,7 +5,7 @@ import tweepy
 import typer
 
 from common import prepare_db
-from config import SENTRY_DSN, SENTRY_CRON_MONITOR_ID, TWITTER
+from config import SENTRY_CRON_MONITOR_ID, SENTRY_DSN, TWITTER
 from en import generate_tweet_en
 from fr import generate_tweet_fr
 
