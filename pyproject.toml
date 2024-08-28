@@ -28,15 +28,12 @@ Homepage = ""
 requires = ["pdm-pep517>=1.0.0"]
 build-backend = "pdm.pep517.api"
 
-[tool]
-rye = { dev-dependencies = ["pre-commit>=3.7.1", "ruff>=0.5.4"] }
-
 [tool.pdm]
-includes = []
-
-[tool.pdm.dev-dependencies]
-dev = ["pre-commit>=3.7.1", "ruff>=0.5.4"]
+dev-dependencies = { dev = ["ruff>=0.6.2"] }
 
 [tool.ruff]
 lint = { select = ["I"] }
 line-length = 100
+
+[tool.rye]
+dev-dependencies = ["ruff>=0.6.2"]
