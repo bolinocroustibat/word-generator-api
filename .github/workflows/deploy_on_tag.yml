@@ -12,6 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Bump version in pyproject.toml to ${{ github.ref_name }}
+        run: sed -i 's/^ *version.*=.*"\([^"]*\)".*/version = "${{ github.ref_name }}"/' ./pyproject.toml
+
+      - name: Commit and push updated pyproject.toml
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: main
+          commit_message: "chore: bump version to ${{ github.ref_name }}"
+          commit_user_name: Adrien Carpentier
+          commit_user_email: me@adriencarpentier.com
+          commit_author: Adrien Carpentier <me@adriencarpentier.com>
+
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
