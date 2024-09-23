@@ -5,11 +5,11 @@
 
 Python API with a PostgreSQL database, using FastAPI framework.
 
-- Python 3.11
-- [Rye](https://rye-up.com/)
+- Python >=3.11
+- [uv](https://docs.astral.sh/uv/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
-- PostgreSQL database
+- A PostgreSQL 15 database (not tested with other PostgreSQL versions)
 
 
 ## Endpoints
@@ -44,9 +44,9 @@ Python API with a PostgreSQL database, using FastAPI framework.
 
 ## Install
 
-Create a virtual environnement and install the dependencies in it with [Rye](https://rye-up.com/) (or with [PDM](https://pdm.fming.dev/)) single command:
+Create a virtual environnement and install the dependencies in it with [uv](https://docs.astral.sh/uv/) single command:
 ```bash
-rye sync
+uv sync
 ```
 
 ### Setup the config file
@@ -75,9 +75,9 @@ For the French language, you need to download the Spacy NLP data:
 ```bash
 python3 -m spacy download fr_core_news_sm
 ```
-or, with Rye:
+or, with uv:
 ```bash
-rye run python -m spacy download fr_core_news_sm
+uv run python -m spacy download fr_core_news_sm
 ```
 
 If any issue with the `fr_core_news_sm` model installing, one can install it manually with:
@@ -91,13 +91,13 @@ If any issue with pip in the venv for Spacy:
 python3 -m ensurepip --default-pip
 ```
 
-If Spacy lefff doesn't work, try to install it manually with pip and not with Rye/PDM in the venv:
+If Spacy lefff doesn't work, try to install it manually with pip and not with uv in the venv:
 ```bash
 pip install spacy-lefff
 ```
-or, with Rye:
+or, with uv:
 ```bash
-rye run pip install spacy-lefff
+uv run pip install spacy-lefff
 ```
 
 
@@ -105,7 +105,7 @@ rye run pip install spacy-lefff
 
 Launch the web server with:
 ```bash
-rye run uvicorn api:app --reload
+uv run uvicorn api:app --reload
 ```
 
 Inside the venv:
@@ -121,14 +121,9 @@ pre-commit install
 ```
 Once this is done, code formatting and linting, as well as import sorting, will be automatically checked before each commit.
 
-Lint with:
+Lint and format with:
 ```bash
-rye lint --fix
-```
-
-Format with:
-```bash
-rye fmt
+uv run ruff check --fix && rye format
 ```
 
 ## Commands

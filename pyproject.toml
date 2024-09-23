@@ -1,6 +1,6 @@
 [project]
 name = "word-generator-api"
-version = "1.5.8"
+version = "1.5.9"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
@@ -19,21 +19,14 @@ dependencies = [
     "uvicorn<1.0.0,>=0.17.5",
     "spacy-lefff>=0.5.1",
 ]
-requires-python = ">=3.11,<3.12"
+requires-python = ">=3.12,<3.13"
 
 [project.urls]
 homepage = ""
-
-[build-system]
-requires = ["pdm-pep517>=1.0.0"]
-build-backend = "pdm.pep517.api"
-
-[tool.pdm]
-dev-dependencies = { dev = ["ruff>=0.6.2"] }
 
 [tool.ruff]
 lint = { select = ["I"] }
 line-length = 100
 
-[tool.rye]
-dev-dependencies = ["ruff>=0.6.2"]
+[tool.uv]
+dev-dependencies = ["ruff>=0.6.5"]
