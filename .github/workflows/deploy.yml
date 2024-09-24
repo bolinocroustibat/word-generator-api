@@ -18,7 +18,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
-      - name: Bump version in pyproject.toml to ${{ github.ref_name }}
+      - name: Bump version in pyproject.toml and uv.lock to ${{ github.ref_name }}
         run: |
           sed -i 's/^ *version.*=.*"\([^"]*\)".*/version = "${{ github.ref_name }}"/' ./pyproject.toml
           uv lock
