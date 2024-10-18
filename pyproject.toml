@@ -1,6 +1,6 @@
 [project]
 name = "word-generator-api"
-version = "1.5.9"
+version = "1.5.10"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
@@ -11,7 +11,7 @@ dependencies = [
     "requests<3.0.0,>=2.27.1",
     "slowapi<1.0.0,>=0.1.5",
     "sentry-sdk>=2.10.0",
-    "spacy<4.0.0,>=3.2.4",
+    "spacy<4.0.0,>=3.8.2",
     "tqdm<5.0.0,>=4.63.0",
     "tortoise-orm>=0.19.3",
     "typer<1.0.0,>=0.4.0",
@@ -20,9 +20,6 @@ dependencies = [
     "spacy-lefff>=0.5.1",
 ]
 requires-python = ">=3.12,<3.13"
-
-[project.urls]
-homepage = ""
 
 [tool.ruff]
 lint = { select = ["I"] }
