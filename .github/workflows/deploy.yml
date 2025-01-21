@@ -50,7 +50,8 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/www/word-generator-api
-            git pull
+            git fetch
+            git reset --hard origin/main
             /usr/local/bin/uv/bin/uv sync
             wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.5.0/fr_core_news_sm-3.5.0-py3-none-any.whl -P ./assets
             unzip assets/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.12/site-packages && chmod -R 777 ./.venv/lib/python3.12/site-packages/fr_core_news_sm-3.5.0.dist-info
