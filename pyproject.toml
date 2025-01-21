@@ -19,7 +19,7 @@ dependencies = [
     "uvicorn<1.0.0,>=0.17.5",
     "spacy-lefff>=0.5.1",
 ]
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.10,<3.13"
 
 [tool.ruff]
 lint = { select = ["I"] }

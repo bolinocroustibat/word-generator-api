@@ -5,7 +5,7 @@
 
 Python API with a PostgreSQL database, using FastAPI framework.
 
-- Python >=3.11
+- Python >=3.10
 - [uv](https://docs.astral.sh/uv/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
