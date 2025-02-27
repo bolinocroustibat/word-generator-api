@@ -1,6 +1,6 @@
 [project]
 name = "word-generator-api"
-version = "1.5.13"
+version = "1.6.0"
 description = "Generates words that don't exist but sound English, French, Spanish or Italian, along with their altered dictionary definitions."
 authors = [{ name = "Adrien Carpentier", email = "me@adriencarpentier.com" }]
 dependencies = [
