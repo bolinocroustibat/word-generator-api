@@ -1,6 +1,6 @@
 import json
 import random
-from datetime import datetime
+from datetime import UTC, datetime
 
 from tortoise.exceptions import IntegrityError
 
@@ -31,7 +31,7 @@ async def generate_word_and_save(lang: str, ip: str) -> dict | None:
                     type=word_classes["type"],
                     number=word_classes["number"],
                     tense=word_classes["tense"],
-                    date=datetime.utcnow(),
+                    date=datetime.now(UTC),
                     ip=ip,
                 )
                 response.update(word_classes)
@@ -45,7 +45,7 @@ async def generate_word_and_save(lang: str, ip: str) -> dict | None:
                     number=word_classes["number"],
                     tense=word_classes["tense"],
                     conjug=word_classes["conjug"],
-                    date=datetime.utcnow(),
+                    date=datetime.now(UTC),
                     ip=ip,
                 )
                 response.update(word_classes)

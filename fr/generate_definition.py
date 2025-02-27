@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import requests
 from tortoise.contrib.postgres.functions import Random
@@ -57,7 +57,7 @@ async def generate_definition_fr(percentage: float, ip: str | None = None) -> di
     await GeneratedDefinition.create(
         generated_word_id=generated_word[0].id,
         text=definition,
-        date=datetime.utcnow(),
+        date=datetime.now(UTC),
         ip=ip,
     )
 
