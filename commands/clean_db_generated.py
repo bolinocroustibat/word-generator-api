@@ -3,7 +3,7 @@ from asyncio import run as aiorun
 import typer
 
 from common import prepare_db
-from models import GeneratedWordEN, GeneratedWordFR, RealWordEN, RealWordFR
+from models import GeneratedWord, Language, RealWord
 
 
 def clean(lang: str) -> None:
@@ -16,25 +16,19 @@ def clean(lang: str) -> None:
 
         await prepare_db()
 
-        if lang == "en":
-            for j, entry in enumerate(await GeneratedWordEN.all()):
-                existing = await RealWordEN.filter(string=entry.string)
-                if existing:
-                    i += 1
-                    typer.secho(f'"{entry.string}" exists as a real word. Deleting.', fg="cyan")
-                    await entry.delete()
-                else:
-                    continue
+        # Get language ID
+        language = await Language.get(code=lang)
 
-        elif lang == "fr":
-            for j, entry in enumerate(await GeneratedWordFR.all()):
-                existing = await RealWordFR.filter(string=entry.string)
-                if existing:
-                    i += 1
-                    typer.secho(f'"{entry.string}" exists as a real word. Deleting.', fg="cyan")
-                    await entry.delete()
-                else:
-                    continue
+        # Get all generated words for this language
+        generated_words = await GeneratedWord.filter(language=language)
+        for j, entry in enumerate(generated_words):
+            existing = await RealWord.filter(language=language, string=entry.string)
+            if existing:
+                i += 1
+                typer.secho(f'"{entry.string}" exists as a real word. Deleting.', fg="cyan")
+                await entry.delete()
+            else:
+                continue
 
         typer.secho(f'"{i}/{j}" generated words deleted from DB.', fg="green")
 

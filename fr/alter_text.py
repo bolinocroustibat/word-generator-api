@@ -9,7 +9,8 @@ from spacy_lefff import LefffLemmatizer, POSTagger
 from tortoise.contrib.postgres.functions import Random
 
 from common import decapitalize
-from models import GeneratedWordFR, RealWordFR
+from models import GeneratedWord, RealWord
+from models import Language as LanguageModel
 
 from .correct_text import add_to_text_fr, correct_text_fr
 
@@ -59,14 +60,20 @@ POS_CORRESPONDANCE_FR = {
 }
 
 
-async def alter_text_fr(text: str, percentage: float, forced_replacements: dict | None = {}) -> str:
+async def alter_text_fr(
+    text: str, percentage: float, forced_replacements: dict | None = None
+) -> str:
     """
     Alter a text randomly using Spacy and Lefff
     """
     text = decapitalize(text)
+    forced_replacements = forced_replacements or {}
 
     # Split into tokens/words
     doc: Doc = nlp(text)
+
+    # Get French language ID
+    french = await LanguageModel.get(code="fr")
 
     # Adjust the number of possible replacements
     replaceable_t_ids: list = get_replacable_tokens_ids(
@@ -80,6 +87,7 @@ async def alter_text_fr(text: str, percentage: float, forced_replacements: dict 
         doc=doc,
         tokens_ids_to_replace=tokens_ids_to_replace,
         forced_replacements=forced_replacements,
+        language=french,
     )
 
     # Build back the text from the tokens and their replacements
@@ -111,11 +119,12 @@ def get_replacable_tokens_ids(doc: Doc, not_to_replace: list[str]) -> list[int]:
 
 
 async def replace_tokens(
-    doc: Doc, tokens_ids_to_replace: list, forced_replacements: dict | None
+    doc: Doc, tokens_ids_to_replace: list, forced_replacements: dict | None, language
 ) -> Doc:
     """
     Replace the tokens in the doc
     """
+    forced_replacements = forced_replacements or {}
     for t in doc:
         if t.text in forced_replacements.keys():
             t._.replacement = forced_replacements[t.text]
@@ -125,8 +134,12 @@ async def replace_tokens(
             t = tag_token(t)
             if t.pos_ == "PROPN":
                 replacement = (
-                    await RealWordFR.filter(
-                        type="noun", number=t._.number, gender=t._.gender, proper=True
+                    await RealWord.filter(
+                        language=language,
+                        type="noun",
+                        number=t._.number,
+                        gender=t._.gender,
+                        proper=True,
                     )
                     .annotate(order=Random())
                     .order_by("order")
@@ -134,7 +147,8 @@ async def replace_tokens(
                 )
             elif t.pos_ in ["NOUN", "ADJ", "VERB", "ADV"]:
                 replacement = (
-                    await GeneratedWordFR.filter(
+                    await GeneratedWord.filter(
+                        language=language,
                         type=t._.type[0],  # This custom extension is set as a tuple...
                         # ...instead of a string. No idea why!
                         number=t._.number,
@@ -171,32 +185,32 @@ async def replace_tokens(
 def tag_token(t: Token) -> Token:
     """ """
     t._.type = (POS_CORRESPONDANCE_FR[t.pos_]["type"],)
-    if t.morph.get("Number"):
-        if t.morph.get("Number")[0] == "Sing":
+    if t.morph.get("Number", None):
+        if t.morph.get("Number", None)[0] == "Sing":
             t._.number = "s"
-        elif t.morph.get("Number")[0] == "Plur":
+        elif t.morph.get("Number", None)[0] == "Plur":
             t._.number = "p"
-    if t.morph.get("Gender"):
-        if t.morph.get("Gender")[0] == "Masc":
+    if t.morph.get("Gender", None):
+        if t.morph.get("Gender", None)[0] == "Masc":
             t._.gender = "m"
-        elif t.morph.get("Gender")[0] == "Fem":
+        elif t.morph.get("Gender", None)[0] == "Fem":
             t._.gender = "f"
-    if t.morph.get("Person"):
-        t._.conjug = int(t.morph.get("Person")[0])
-    if t.morph.get("VerbForm"):
-        if t.morph.get("VerbForm")[0] == "Inf":
+    if t.morph.get("Person", None):
+        t._.conjug = int(t.morph.get("Person", None)[0])
+    if t.morph.get("VerbForm", None):
+        if t.morph.get("VerbForm", None)[0] == "Inf":
             t._.tense = "infinitive"
-        elif t.morph.get("VerbForm")[0] == "Part":
-            if t.morph.get("Tense"):
-                if t.morph.get("Tense")[0] == "Past":
+        elif t.morph.get("VerbForm", None)[0] == "Part":
+            if t.morph.get("Tense", None):
+                if t.morph.get("Tense", None)[0] == "Past":
                     t._.tense = "past-participle"
-        elif t.morph.get("VerbForm")[0] == "Fin":
-            if t.morph.get("Tense"):
-                if t.morph.get("Tense")[0] == "Pres":
+        elif t.morph.get("VerbForm", None)[0] == "Fin":
+            if t.morph.get("Tense", None):
+                if t.morph.get("Tense", None)[0] == "Pres":
                     t._.tense = "present"
-                elif t.morph.get("Tense")[0] == "Past":
+                elif t.morph.get("Tense", None)[0] == "Past":
                     t._.tense = "past"
-                elif t.morph.get("Tense")[0] == "Fut":
+                elif t.morph.get("Tense", None)[0] == "Fut":
                     t._.tense = "future"
     return t
 
@@ -216,7 +230,7 @@ def replace_pronoun(doc: Doc, pos: int):
         elif previous_token.pos_ == "DET":
             doc[pos - 1]._.replacement = "le"
             try:
-                if doc[pos].morph.get("Gender")[0] == "Fem":
+                if doc[pos].morph.get("Gender", None)[0] == "Fem":
                     doc[pos - 1]._.replacement = "la"
             except IndexError:
                 pass

@@ -4,16 +4,20 @@ import typer
 from tqdm import tqdm
 
 from common import prepare_db
-from models import RealWordFR
+from models import Language, RealWord
 
 
 def delete_duplicates_fr() -> None:
     async def _main():
         await prepare_db()
 
-        entries = await RealWordFR.objects.all()
+        # Get French language ID
+        french = await Language.get(code="fr")
+
+        # Get all real words for French
+        entries = await RealWord.filter(language=french)
         for e in tqdm(entries):
-            similar_entries = await RealWordFR.objects.all(string=e.string, type=e.type)
+            similar_entries = await RealWord.filter(language=french, string=e.string, type=e.type)
             if len(similar_entries) > 1:
                 for s in similar_entries:
                     if s.id != e.id:

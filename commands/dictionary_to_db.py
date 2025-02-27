@@ -5,7 +5,7 @@ import typer
 from common import prepare_db
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import RealWordEN, RealWordFR
+from models import Language, RealWord
 
 
 def dictionary_to_db(lang: str, classify=True) -> None:
@@ -15,57 +15,52 @@ def dictionary_to_db(lang: str, classify=True) -> None:
     async def _main():
         await prepare_db()
 
+        # Get language ID
+        language = await Language.get(code=lang)
+
         with open(f"{lang}/data/adverbs_{lang.upper()}.txt", "r") as dictionary_file:
             i = 1
             for j, word in enumerate(dictionary_file):
                 word = word.strip()
                 if word:
-                    if lang == "en":
-                        existing = await RealWordEN.objects.all(string=word)
-                        if not existing:
-                            try:
-                                if classify:
+                    existing = await RealWord.filter(language=language, string=word)
+                    if not existing:
+                        try:
+                            if classify:
+                                if lang == "en":
                                     word_classes: dict = classify_en(word=word)
-                                    await RealWordEN.objects.create(
+                                    await RealWord.create(
                                         string=word,
+                                        language=language,
                                         type=word_classes["type"],
                                         number=word_classes["number"],
                                         tense=word_classes["tense"],
                                     )
-                                else:
-                                    await RealWordEN.objects.create(string=word)
-                            except Exception as e:
-                                typer.secho(f"{word}", fg="red")
-                                typer.secho(e, fg="red")
-                            else:
-                                i += 1
-                                typer.secho(f'"{word}" saved in DB.', fg="cyan")
-                        else:
-                            typer.secho(f'"{word}" was already in the DB.', fg="yellow")
-                    elif lang == "fr":
-                        existing = await RealWordFR.objects.all(string=word)
-                        if not existing:
-                            try:
-                                if classify:
-                                    word_classes: dict = await classify_fr(word=word)
-                                    await RealWordFR.objects.create(
+                                elif lang == "fr":
+                                    word_classes: dict = classify_fr(word=word)
+                                    await RealWord.create(
                                         string=word,
+                                        language=language,
                                         type=word_classes["type"],
                                         gender=word_classes["gender"],
                                         number=word_classes["number"],
                                         tense=word_classes["tense"],
                                         proper=False,
                                     )
-                                else:
-                                    await RealWordFR.objects.create(string=word, proper=False)
-                            except Exception as e:
-                                typer.secho(f"{word}", fg="red")
-                                typer.secho(e, fg="red")
                             else:
-                                i += 1
-                                typer.secho(f'"{word}" saved in DB.', fg="cyan")
+                                await RealWord.create(
+                                    string=word,
+                                    language=language,
+                                    proper=False if lang == "fr" else None,
+                                )
+                        except Exception as e:
+                            typer.secho(f"{word}", fg="red")
+                            typer.secho(e, fg="red")
                         else:
-                            typer.secho(f'"{word}" was already in the DB.', fg="yellow")
+                            i += 1
+                            typer.secho(f'"{word}" saved in DB.', fg="cyan")
+                    else:
+                        typer.secho(f'"{word}" was already in the DB.', fg="yellow")
 
         typer.secho(f'"{i}/{j}" words saved in DB.', fg="green")
 

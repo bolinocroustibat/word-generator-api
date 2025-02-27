@@ -5,7 +5,7 @@ from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 from tortoise.contrib.postgres.functions import Random
 
-from models import GeneratedWordEN
+from models import GeneratedWord, Language
 
 POS_CORRESPONDANCE_EN = {
     # See https://www.guru99.com/pos-tagging-chunking-nltk.html
@@ -23,12 +23,14 @@ POS_CORRESPONDANCE_EN = {
 }
 
 
-async def alter_text_en(text: str, percentage: float, forced_replacements: dict | None = {}) -> str:
+async def alter_text_en(
+    text: str, percentage: float, forced_replacements: dict | None = None
+) -> str:
     """
     Alter a text randomly using NLTK POS tagging.
     See https://www.guru99.com/pos-tagging-chunking-nltk.html
     """
-
+    forced_replacements = forced_replacements or {}
     replacable_words: list[dict] = list_replacable_words(
         text=text, not_to_replace=list(forced_replacements.keys())
     )
@@ -68,25 +70,28 @@ def list_replacable_words(text: str, not_to_replace: list[str]) -> list[dict]:
 
 
 async def replace_words(text: str, to_replace: list[dict]) -> str:
+    # Get English language ID
+    english = await Language.get(code="en")
+
     # Replace the words in the text
     for w in to_replace:
         if w["type"] == "noun":
             generated_word = (
-                await GeneratedWordEN.filter(type="noun", number=w["number"])
+                await GeneratedWord.filter(language=english, type="noun", number=w["number"])
                 .annotate(order=Random())
                 .order_by("order")
                 .limit(1)
             )
         elif w["type"] == "verb":
             generated_word = (
-                await GeneratedWordEN.filter(type="verb", tense=w["tense"])
+                await GeneratedWord.filter(language=english, type="verb", tense=w["tense"])
                 .annotate(order=Random())
                 .order_by("order")
                 .limit(1)
             )
         else:
             generated_word = (
-                await GeneratedWordEN.filter(type=w["type"])
+                await GeneratedWord.filter(language=english, type=w["type"])
                 .annotate(order=Random())
                 .order_by("order")
                 .limit(1)

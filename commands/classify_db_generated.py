@@ -5,7 +5,7 @@ import typer
 from common import prepare_db
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GeneratedWordEN, GeneratedWordFR
+from models import GeneratedWord, Language
 
 
 def classify(lang: str) -> None:
@@ -17,8 +17,14 @@ def classify(lang: str) -> None:
 
         i = 0
 
+        # Get language ID
+        language = await Language.get(code=lang)
+
+        # Get all generated words for this language
+        generated_words = await GeneratedWord.filter(language=language)
+
         if lang == "en":
-            for j, entry in enumerate(await GeneratedWordEN.all()):
+            for j, entry in enumerate(generated_words):
                 word_classes: dict = classify_en(word=entry.string)
                 try:
                     await entry.update(
@@ -34,7 +40,7 @@ def classify(lang: str) -> None:
                     typer.secho(f'"{entry.string}" updated.', fg="cyan")
 
         elif lang == "fr":
-            for j, entry in enumerate(await GeneratedWordFR.all()):
+            for j, entry in enumerate(generated_words):
                 word_classes: dict = classify_fr(word=entry.string)
                 try:
                     await entry.update(

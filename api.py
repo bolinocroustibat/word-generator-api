@@ -1,9 +1,9 @@
-import tomllib
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import nltk
 import sentry_sdk
+import tomllib
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
@@ -18,12 +18,7 @@ from common import authenticate, generate_word_and_save
 from config import ALLOW_ORIGINS, DATABASE_URL, ENVIRONMENT, SENTRY_DSN
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
-from models import (
-    GeneratedDefinitionEN,
-    GeneratedDefinitionFR,
-    GeneratedWordEN,
-    GeneratedWordFR,
-)
+from models import GeneratedDefinition, GeneratedWord, Language
 
 # Load app name, version, commit variables from config file
 # Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
@@ -97,8 +92,23 @@ async def get_random_word_from_db(request: Request, lang: str) -> dict[str, str 
     """
     Get a random generated word from DB.
     """
+    if lang not in ["en", "fr"]:
+        raise HTTPException(status_code=400, detail="Language not supported.")
+
+    # Get language ID
+    language = await Language.get(code=lang)
+
+    word = (
+        await GeneratedWord.filter(language=language)
+        .annotate(order=Random())
+        .order_by("order")
+        .limit(1)
+    )
+
+    if not word:
+        raise HTTPException(status_code=404, detail="No words found.")
+
     if lang == "en":
-        word = await GeneratedWordEN.annotate(order=Random()).order_by("order").limit(1)
         return {
             "string": word[0].string,
             "type": word[0].type,
@@ -106,7 +116,6 @@ async def get_random_word_from_db(request: Request, lang: str) -> dict[str, str 
             "tense": word[0].tense,
         }
     elif lang == "fr":
-        word = await GeneratedWordFR.annotate(order=Random()).order_by("order").limit(1)
         return {
             "string": word[0].string,
             "type": word[0].type,
@@ -115,8 +124,6 @@ async def get_random_word_from_db(request: Request, lang: str) -> dict[str, str 
             "tense": word[0].tense,
             "conjug": word[0].conjug,
         }
-    else:
-        raise HTTPException(status_code=400, detail="Language not supported.")
 
 
 @app.get("/{lang}/definition/generate", tags=["definition"])
@@ -140,30 +147,27 @@ async def get_random_definition_from_db(request: Request, lang: str) -> dict[str
     """
     Get a random generated definition from DB.
     """
-    if lang == "en":
-        definition = (
-            await GeneratedDefinitionEN.annotate(order=Random())
-            .order_by("order")
-            .limit(1)
-            .prefetch_related("generated_word")
-        )
-        return {
-            "string": definition[0].generated_word.string,
-            "definition": definition[0].text,
-        }
-    elif lang == "fr":
-        definition = (
-            await GeneratedDefinitionFR.annotate(order=Random())
-            .order_by("order")
-            .limit(1)
-            .prefetch_related("generated_word")
-        )
-        return {
-            "string": definition[0].generated_word.string,
-            "definition": definition[0].text,
-        }
-    else:
+    if lang not in ["en", "fr"]:
         raise HTTPException(status_code=400, detail="Language not supported.")
+
+    # Get language ID
+    language = await Language.get(code=lang)
+
+    definition = (
+        await GeneratedDefinition.filter(generated_word__language=language)
+        .annotate(order=Random())
+        .order_by("order")
+        .limit(1)
+        .prefetch_related("generated_word")
+    )
+
+    if not definition:
+        raise HTTPException(status_code=404, detail="No definitions found.")
+
+    return {
+        "string": definition[0].generated_word.string,
+        "definition": definition[0].text,
+    }
 
 
 @app.get("/{lang}/alter", tags=["alter"])

@@ -69,6 +69,14 @@ In `config.py`:
 - `TWITTER`: `dict`
 - `SENTRY_DSN`: `string`
 
+### Database Migrations
+
+The project uses a simple migration system in the `migrations` directory. To run a migration:
+
+```bash
+python migrations/YYYYMMDD_migration_name.py
+```
+
 ### Install French tagging data with Spacy
 
 For the French language, you need to download the Spacy NLP data:
@@ -123,7 +131,7 @@ Once this is done, code formatting and linting, as well as import sorting, will 
 
 Lint and format with:
 ```bash
-uv run ruff check --fix && rye format
+uv run ruff check --fix && ruff format
 ```
 
 ## Commands

@@ -7,7 +7,7 @@ from tortoise.exceptions import IntegrityError
 from common.real_word import if_real_exists
 from en.classify import classify_en
 from fr.classify import classify_fr
-from models import GeneratedWordEN, GeneratedWordFR
+from models import GeneratedWord, Language
 
 
 async def generate_word_and_save(lang: str, ip: str) -> dict | None:
@@ -15,14 +15,19 @@ async def generate_word_and_save(lang: str, ip: str) -> dict | None:
         True  # assume it has already been generated so we enter the while loop at least once
     )
     retries = 0
+
+    # Get language
+    language = await Language.get(code=lang)
+
     while already_generated and retries < 10:
         try:
             string: str = await generate_word(lang=lang, must_not_be_real=True)
             response: dict = {"string": string}
             if lang == "en":
                 word_classes: dict = classify_en(word=string)
-                await GeneratedWordEN.create(
+                await GeneratedWord.create(
                     string=string,
+                    language=language,
                     type=word_classes["type"],
                     number=word_classes["number"],
                     tense=word_classes["tense"],
@@ -32,8 +37,9 @@ async def generate_word_and_save(lang: str, ip: str) -> dict | None:
                 response.update(word_classes)
             elif lang == "fr":
                 word_classes: dict = classify_fr(word=string)
-                await GeneratedWordFR.create(
+                await GeneratedWord.create(
                     string=string,
+                    language=language,
                     type=word_classes["type"],
                     gender=word_classes["gender"],
                     number=word_classes["number"],
