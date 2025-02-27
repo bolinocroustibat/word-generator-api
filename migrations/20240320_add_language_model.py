@@ -1,5 +1,4 @@
 import asyncio
-from datetime import datetime
 
 from tortoise import Tortoise
 
@@ -142,13 +141,13 @@ async def migrate_data():
         )
 
         print("Dropping old tables...")
-        # Drop old tables
-        await connection.execute_query('DROP TABLE "real_words_EN"')
-        await connection.execute_query('DROP TABLE "real_words_FR"')
-        await connection.execute_query('DROP TABLE "generated_words_EN"')
-        await connection.execute_query('DROP TABLE "generated_words_FR"')
-        await connection.execute_query('DROP TABLE "generated_definitions_EN"')
-        await connection.execute_query('DROP TABLE "generated_definitions_FR"')
+        # Drop tables in correct order (definitions first, then words)
+        await connection.execute_query('DROP TABLE IF EXISTS "generated_definitions_EN"')
+        await connection.execute_query('DROP TABLE IF EXISTS "generated_definitions_FR"')
+        await connection.execute_query('DROP TABLE IF EXISTS "generated_words_EN"')
+        await connection.execute_query('DROP TABLE IF EXISTS "generated_words_FR"')
+        await connection.execute_query('DROP TABLE IF EXISTS "real_words_EN"')
+        await connection.execute_query('DROP TABLE IF EXISTS "real_words_FR"')
 
         # Commit transaction
         await connection.execute_query("COMMIT")
