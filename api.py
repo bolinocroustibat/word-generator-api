@@ -67,7 +67,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-nltk.download("averaged_perceptron_tagger")
+nltk.download("averaged_perceptron_tagger_eng")
+nltk.download("punkt_tab")
 
 
 @app.get("/{lang}/word/generate", tags=["word"])
