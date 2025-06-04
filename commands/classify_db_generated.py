@@ -1,8 +1,9 @@
 from asyncio import run as aiorun
+from datetime import UTC, datetime
 
 import typer
 
-from common import prepare_db
+from common.db import prepare_db
 from en.classify import classify_en
 from fr.classify import classify_fr
 from models import GeneratedWord, Language

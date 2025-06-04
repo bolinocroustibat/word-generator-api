@@ -1,8 +1,12 @@
 import asyncio
+import os
 
+from dotenv import load_dotenv
 from tortoise import Tortoise
 
-from config import DATABASE_URL
+from common.db import get_database_url
+
+load_dotenv()
 
 
 # Old models (for reference during migration)
@@ -37,7 +41,7 @@ class GeneratedDefinitionFR:
 
 
 async def init_tortoise():
-    await Tortoise.init(db_url=DATABASE_URL, modules={"models": ["models"]})
+    await Tortoise.init(db_url=get_database_url(), modules={"models": ["models"]})
     await Tortoise.generate_schemas()
 
 

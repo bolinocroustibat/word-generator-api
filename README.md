@@ -1,16 +1,24 @@
 # Word Generator API in Python
 
-
 ## Main dependencies
 
 Python API with a PostgreSQL database, using FastAPI framework.
 
-- Python >=3.10
-- [uv](https://docs.astral.sh/uv/)
-- [FastAPI](https://fastapi.tiangolo.com/)
-- [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
-- A PostgreSQL 15 database (not tested with other PostgreSQL versions)
+Core requirement:
+- [Docker](https://www.docker.com/)
+- [uv](https://docs.astral.sh/uv/) (for Python dependency management)
 
+Main Python packages (managed by Docker):
+- Python 3.12
+- [FastAPI](https://fastapi.tiangolo.com/) <1.0.0
+- [Tortoise ORM](https://tortoise-orm.readthedocs.io/) >=0.19.3
+- [Gunicorn](https://gunicorn.org/) <21.0.0
+- [uvicorn](https://www.uvicorn.org/) <1.0.0
+- [NLTK](https://www.nltk.org/) <4.0
+- [spaCy](https://spacy.io/) <4.0.0
+- [spacy-lefff](https://pypi.org/project/spacy-lefff/) >=0.5.1
+
+For the complete list of dependencies and their versions, see `pyproject.toml`.
 
 ## Endpoints
 
@@ -41,40 +49,79 @@ Python API with a PostgreSQL database, using FastAPI framework.
   Available `lang`: `en`, `fr`
   Method: `GET`
 
+## Running with Docker (recommended)
 
-## Install
+The easiest way to run the application is using Docker:
 
-Create a virtual environnement and install the dependencies in it with [uv](https://docs.astral.sh/uv/) single command:
 ```bash
-uv sync
+# Build and start all services
+docker compose up --build
+
+# Run in background
+docker compose up -d
+
+# Stop services
+docker compose down
+
+# View logs
+docker compose logs -f
 ```
 
-### Setup the config file
+The API will be available at `http://localhost:8000`.
 
-In `config.py`:
+### Environment Variables
 
-- `ALLOW_ORIGINS`: `list`
-- `DATABASE_URL`: `string`
+Create a `.env` file in the root directory with the following variables:
 
-    example: `DATABASE_URL = "mysql://root:root@localhost:8889/words"`
+```env
+# Environment
+ENVIRONMENT=local
+PORT=8000  # Optional, defaults to 8000
 
-- `DICTIONNARY_EN_API_URL`: `string`
-- `ALLOWED_TYPES_EN`: `list`
-- `ALLOWED_TYPES_FR`: `dict`
+# CORS Origins
+ALLOW_ORIGINS=http://localhost
 
-    example: `ALLOWED_TYPES_FR = {"nom": "noun", "verbe": "verb", "adjectif": "adjective", "adverbe": "adverb"}`
+# Database Configuration
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=
+POSTGRES_DB=words
+POSTGRES_PORT=5432
 
-- `USERNAME`: `string`
-- `PASSWORD`: `string`
-- `TWITTER`: `dict`
-- `SENTRY_DSN`: `string`
+# Dictionary API Key (only needed for French)
+DICTIONNARY_FR_API_KEY=your_api_key
 
-### Database Migrations
+# API Authentication
+API_USERNAME=your_username
+API_PASSWORD=your_password
 
-The project uses a simple migration system in the `migrations` directory. To run a migration:
+# Sentry Configuration (optional)
+SENTRY_DSN=your_sentry_dsn
+SENTRY_CRON_MONITOR_ID_EN=your_monitor_id
+SENTRY_CRON_MONITOR_ID_FR=your_monitor_id
 
+# Twitter Configuration (optional)
+# English Bot
+TWITTER_EN_API_KEY=your_api_key
+TWITTER_EN_KEY_SECRET=your_key_secret
+TWITTER_EN_ACCESS_TOKEN=your_access_token
+TWITTER_EN_TOKEN_SECRET=your_token_secret
+
+# French Bot
+TWITTER_FR_API_KEY=your_api_key
+TWITTER_FR_KEY_SECRET=your_key_secret
+TWITTER_FR_ACCESS_TOKEN=your_access_token
+TWITTER_FR_TOKEN_SECRET=your_token_secret
+```
+
+## Local Development Setup
+
+If you prefer to run the application locally without Docker:
+
+### Install Dependencies
+
+Create a virtual environment and install the dependencies with [uv](https://docs.astral.sh/uv/):
 ```bash
-python migrations/YYYYMMDD_migration_name.py
+uv sync
 ```
 
 ### Install French tagging data with Spacy
@@ -108,8 +155,7 @@ or, with uv:
 uv run pip install spacy-lefff
 ```
 
-
-## Run the API
+### Run the API
 
 Launch the web server with:
 ```bash
@@ -119,6 +165,18 @@ uv run uvicorn api:app --reload
 Inside the venv:
 ```bash
 uvicorn api:app --reload
+```
+
+## Database Migrations
+
+The project uses a simple migration system in the `migrations` directory. To run a migration:
+
+```bash
+# In Docker:
+docker compose exec api uv run python migrations/YYYYMMDD_migration_name.py
+
+# Locally:
+python migrations/YYYYMMDD_migration_name.py
 ```
 
 ## Lint and format the code
@@ -144,9 +202,12 @@ uv run ruff check --fix && ruff format
 
 To run the commands, use for example:
 ```bash
+# In Docker:
+docker compose exec api python -m commands.build_proba_file en
+
+# Locally:
 python3 -m commands.build_proba_file en
 ```
-
 
 ## Usefuls resources
 
