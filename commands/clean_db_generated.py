@@ -2,7 +2,7 @@ from asyncio import run as aiorun
 
 import typer
 
-from common import prepare_db
+from common.db import prepare_db
 from models import GeneratedWord, Language, RealWord
 
 

@@ -1,12 +1,20 @@
+import os
 from datetime import UTC, datetime
 
 import requests
+from dotenv import load_dotenv
 from tortoise.contrib.postgres.functions import Random
 
 from common import decapitalize
-from config import ALLOWED_TYPES_FR, DICTIONNARY_FR_API_KEY, DICTIONNARY_FR_API_URL
-from fr.alter_text import alter_text_fr
 from models import GeneratedDefinition, GeneratedWord, Language, RealWord
+
+from .alter_text import alter_text_fr
+
+load_dotenv()
+
+ALLOWED_TYPES_FR = {"nom": "noun", "ver": "verb", "adj": "adjective", "adv": "adverb"}
+DICTIONNARY_FR_API_URL = "https://api.dicolink.com/v1/mot/"
+DICTIONNARY_FR_API_KEY = os.getenv("DICTIONNARY_FR_API_KEY")
 
 
 async def generate_definition_fr(percentage: float, ip: str | None = None) -> dict:
@@ -92,7 +100,7 @@ async def get_random_definition_fr() -> dict:
         word = (
             await RealWord.filter(
                 language=french,
-                type__in=ALLOWED_TYPES_FR.values(),
+                type__in=list(ALLOWED_TYPES_FR.values()),
                 proper=False,
                 complex__not=True,
             )

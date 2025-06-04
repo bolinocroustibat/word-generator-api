@@ -1,10 +1,12 @@
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import nltk
 import sentry_sdk
 import tomllib
-from fastapi import Depends, FastAPI, HTTPException, Request
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
@@ -15,10 +17,12 @@ from tortoise import Tortoise
 from tortoise.contrib.postgres.functions import Random
 
 from common import authenticate, generate_word_and_save
-from config import ALLOW_ORIGINS, DATABASE_URL, ENVIRONMENT, SENTRY_DSN
+from common.db import get_database_url
 from en import alter_text_en, generate_definition_en
 from fr import alter_text_fr, generate_definition_fr
 from models import GeneratedDefinition, GeneratedWord, Language
+
+load_dotenv()
 
 # Load app name, version, commit variables from config file
 # Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
@@ -28,6 +32,10 @@ with open(pyproject_filepath, "rb") as f:
 APP_NAME: str = config["project"]["name"]
 DESCRIPTION: str = config["project"]["description"]
 VERSION: str = config["project"]["version"]
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+ALLOW_ORIGINS = os.getenv("ALLOW_ORIGINS", "http://localhost").split(",")
 
 if ENVIRONMENT not in ["local", "test"]:
     sentry_sdk.init(
@@ -44,7 +52,7 @@ if ENVIRONMENT not in ["local", "test"]:
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    await Tortoise.init(db_url=DATABASE_URL, modules={"models": ["models"]})
+    await Tortoise.init(db_url=get_database_url(), modules={"models": ["models"]})
     yield
     await Tortoise.close_connections()
 
@@ -58,7 +66,7 @@ app = FastAPI(
 
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOW_ORIGINS,
@@ -79,7 +87,7 @@ async def generate_word(request: Request, lang: str) -> dict[str, str | None] | 
     """
     if lang not in ["en", "fr", "it", "es"]:
         raise HTTPException(status_code=400, detail="Language not supported.")
-    ip: str = request.client.host
+    ip: str = request.client.host if request.client else "localhost"
     response: dict | None = await generate_word_and_save(lang=lang, ip=ip)
     if response:
         return response
@@ -133,7 +141,7 @@ async def generate_definition(request: Request, lang: str) -> dict[str, str] | N
     """
     Generate a random fake/altered dictionnary definition.
     """
-    ip: str = request.client.host
+    ip: str = request.client.host if request.client else "localhost"
     if lang == "en":
         return await generate_definition_en(percentage=0.5, ip=ip)
     elif lang == "fr":
@@ -178,9 +186,9 @@ async def alter_text(request: Request, lang: str, text: str, percentage: float |
     Alter a text with random non existing words.
     """
     if lang == "en":
-        return await alter_text_en(text, percentage)
+        return await alter_text_en(text, percentage or 0.4)
     elif lang == "fr":
-        return await alter_text_fr(text, percentage)
+        return await alter_text_fr(text, percentage or 0.4)
     else:
         raise HTTPException(status_code=400, detail="Language not supported.")
 

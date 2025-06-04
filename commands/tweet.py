@@ -1,16 +1,20 @@
+import os
 from asyncio import run as aiorun
 
 import requests
 import tweepy
 import typer
+from dotenv import load_dotenv
 
-from common import prepare_db
-from config import SENTRY_CRON_MONITOR_ID, SENTRY_DSN, TWITTER
+from common.db import prepare_db
 from en import generate_tweet_en
 from fr import generate_tweet_fr
 
+load_dotenv()
+
 
 async def _send_tweet(lang: str, dry_run: bool = False) -> None:
+    SENTRY_DSN = os.getenv("SENTRY_DSN")
     SENTRY_HEADERS = {
         "Authorization": "DSN " + SENTRY_DSN,
         "Content-Type": "application/json",
@@ -25,7 +29,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
     elif lang == "fr":
         tweet = await generate_tweet_fr()
 
-    sentry_monitor_id = SENTRY_CRON_MONITOR_ID[lang]
+    sentry_monitor_id = os.getenv(f"SENTRY_CRON_MONITOR_ID_{lang.upper()}")
     # SENTRY: Create the check-in
     json_data = {"status": "in_progress"}
     response = requests.post(
@@ -53,10 +57,10 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
         else:
             try:
                 client = tweepy.Client(
-                    consumer_key=TWITTER[lang]["api_key"],
-                    consumer_secret=TWITTER[lang]["key_secret"],
-                    access_token=TWITTER[lang]["access_token"],
-                    access_token_secret=TWITTER[lang]["token_secret"],
+                    consumer_key=os.getenv(f"TWITTER_{lang.upper()}_API_KEY"),
+                    consumer_secret=os.getenv(f"TWITTER_{lang.upper()}_KEY_SECRET"),
+                    access_token=os.getenv(f"TWITTER_{lang.upper()}_ACCESS_TOKEN"),
+                    access_token_secret=os.getenv(f"TWITTER_{lang.upper()}_TOKEN_SECRET"),
                 )
                 response = client.create_tweet(text=tweet)
             except Exception as e:
@@ -77,7 +81,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
 def main(
     lang: str = typer.Argument(..., help="Language ('en' or 'fr')"),
-    dry_run: bool | None = typer.Option(False, help="Dry run"),
+    dry_run: bool = typer.Option(False, help="Dry run"),
 ):
     aiorun(_send_tweet(lang, dry_run))
 

@@ -3,7 +3,7 @@ from asyncio import run as aiorun
 import typer
 from asyncpg.exceptions import IntegrityConstraintViolationError
 
-from common import prepare_db
+from common.db import prepare_db
 from models import Language, RealWord
 
 

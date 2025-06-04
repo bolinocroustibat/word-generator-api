@@ -1,13 +1,19 @@
+import os
 import random
 from datetime import UTC, datetime
 
 import requests
+from dotenv import load_dotenv
 from tortoise.contrib.postgres.functions import Random
 
-from config import ALLOWED_TYPES_EN, DICTIONNARY_EN_API_URL
 from models import GeneratedDefinition, GeneratedWord, Language, RealWord
 
 from .alter_text import alter_text_en
+
+load_dotenv()
+
+ALLOWED_TYPES_EN = ["noun", "verb", "adjective", "adverb"]
+DICTIONNARY_EN_API_URL = "https://api.dictionaryapi.dev/api/v2/entries/en/"
 
 
 async def generate_definition_en(percentage: float, ip: str | None = None) -> dict:
