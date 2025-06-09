@@ -33,12 +33,40 @@ jobs:
           commit_user_email: me@adriencarpentier.com
           commit_author: Adrien Carpentier <me@adriencarpentier.com>
 
-  deploy-prod:
-    name: Deploy ${{ github.ref_name }} to prod
+  build-and-push:
+    name: Build and push Docker image to ghcr.io/${{ github.repository }}
     needs: bump-version
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image to ghcr.io/${{ github.repository }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+
+      - name: Verify image exists in registry
+        run: |
+          docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          docker image inspect ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+
+  deploy:
+    name: Deploy ${{ github.ref_name }} on prod
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
       - name: Execute server commands for deploy
         uses: appleboy/ssh-action@v1
         with:
@@ -46,14 +74,31 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -e  # Exit on any error
+
+            # Ensure directory exists
+            mkdir -p /home/www/word-generator-api
             cd /home/www/word-generator-api
-            git fetch
-            git reset --hard origin/main
-            /usr/local/bin/uv sync
-            wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.5.0/fr_core_news_sm-3.5.0-py3-none-any.whl -P ./assets
-            unzip assets/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.12/site-packages && chmod -R 777 ./.venv/lib/python3.12/site-packages/fr_core_news_sm-3.5.0.dist-info
-            rm -f assets/fr_core_news_sm-3.5.0-py3-none-any.whl
-            sudo systemctl restart word-generator-api.service
+
+            # Clone or update the repository for configuration files
+            if [ -d .git ]; then
+              git fetch
+              git reset --hard origin/main
+            else
+              git clone https://github.com/bolinocroustibat/word-generator-api.git .
+            fi
+
+            # Login to GitHub Container Registry
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Set the image tag
+            export TAG="${{ github.ref_name }}"
+
+            # Pull the new Docker images
+            docker compose pull
+            # Restart services
+            docker compose down --remove-orphans
+            docker compose up -d
 
       - name: Create Sentry release
         uses: getsentry/action-release@v3
