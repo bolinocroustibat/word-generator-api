@@ -3,19 +3,22 @@ services:
     container_name: word-generator-api
     image: ghcr.io/bolinocroustibat/word-generator-api:${TAG:-latest}
     build: .
+    depends_on:
+    - db
     ports:
-      - "${PORT:-8000}:${PORT:-8000}"
+      - "${API_PORT:-8000}:8000"
     environment:
-      - PORT=${PORT:-8000}
-      - ENVIRONMENT=${ENVIRONMENT:-local}
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-}@db:5432/${POSTGRES_DB:-words}
+      # Application settings
+      - ENVIRONMENT=${ENVIRONMENT:-unknown}
+      # CORS settings
       - ALLOW_ORIGINS=${ALLOW_ORIGINS}
-      - DICTIONNARY_FR_API_KEY=${DICTIONNARY_FR_API_KEY}
+      # Authentication settings
       - API_USERNAME=${API_USERNAME}
       - API_PASSWORD=${API_PASSWORD}
-      - SENTRY_DSN=${SENTRY_DSN}
-      - SENTRY_CRON_MONITOR_ID_EN=${SENTRY_CRON_MONITOR_ID_EN}
-      - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
+      # Database settings
+      - POSTGRES_DB=${POSTGRES_DB}
+      # External API settings
+      - DICTIONNARY_FR_API_KEY=${DICTIONNARY_FR_API_KEY}
       # Twitter Configuration - English
       - TWITTER_EN_API_KEY=${TWITTER_EN_API_KEY}
       - TWITTER_EN_KEY_SECRET=${TWITTER_EN_KEY_SECRET}
@@ -26,23 +29,22 @@ services:
       - TWITTER_FR_KEY_SECRET=${TWITTER_FR_KEY_SECRET}
       - TWITTER_FR_ACCESS_TOKEN=${TWITTER_FR_ACCESS_TOKEN}
       - TWITTER_FR_TOKEN_SECRET=${TWITTER_FR_TOKEN_SECRET}
-      # Dictionary APIs
-      - DICTIONNARY_EN_API_URL=https://api.dictionaryapi.dev/api/v2/entries/en/
-      - DICTIONNARY_FR_API_URL=https://api.dicolink.com/v1/mot/
-    depends_on:
-      - db
+      # Sentry Configuration
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_CRON_MONITOR_ID_EN=${SENTRY_CRON_MONITOR_ID_EN}
+      - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
 
   db:
     container_name: word-generator-db
     image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-}
-      - POSTGRES_DB=${POSTGRES_DB:-words}
     ports:
-      - "5433:5432"
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
 
 volumes:
   postgres_data:

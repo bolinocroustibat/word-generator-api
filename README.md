@@ -69,49 +69,14 @@ docker compose logs -f
 
 The API will be available at `http://localhost:8000`.
 
-### Environment Variables
+### Environment Configuration
 
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# Environment
-ENVIRONMENT=local
-PORT=8000  # Optional, defaults to 8000
-
-# CORS Origins
-ALLOW_ORIGINS=http://localhost
-
-# Database Configuration
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=
-POSTGRES_DB=words
-POSTGRES_PORT=5432
-
-# Dictionary API Key (only needed for French)
-DICTIONNARY_FR_API_KEY=your_api_key
-
-# API Authentication
-API_USERNAME=your_username
-API_PASSWORD=your_password
-
-# Sentry Configuration (optional)
-SENTRY_DSN=your_sentry_dsn
-SENTRY_CRON_MONITOR_ID_EN=your_monitor_id
-SENTRY_CRON_MONITOR_ID_FR=your_monitor_id
-
-# Twitter Configuration (optional)
-# English Bot
-TWITTER_EN_API_KEY=your_api_key
-TWITTER_EN_KEY_SECRET=your_key_secret
-TWITTER_EN_ACCESS_TOKEN=your_access_token
-TWITTER_EN_TOKEN_SECRET=your_token_secret
-
-# French Bot
-TWITTER_FR_API_KEY=your_api_key
-TWITTER_FR_KEY_SECRET=your_key_secret
-TWITTER_FR_ACCESS_TOKEN=your_access_token
-TWITTER_FR_TOKEN_SECRET=your_token_secret
+1. Copy the example environment file:
+```bash
+cp .env.example .env
 ```
+
+2. Update the `.env` file with your configuration values. See `.env.example` for all available options and their descriptions.
 
 ## Local Development Setup
 

@@ -17,8 +17,8 @@ def get_database_url(host: str | None = None) -> str:
         host = "db" if os.getenv("ENVIRONMENT") != "local" else "localhost"
 
     user = os.getenv("POSTGRES_USER", "postgres")
-    password = os.getenv("POSTGRES_PASSWORD", "")
-    db = os.getenv("POSTGRES_DB", "words")
+    password = os.getenv("POSTGRES_PASSWORD", "postgres")
+    db = os.getenv("POSTGRES_DB")
     port = os.getenv("POSTGRES_PORT", "5432")
 
     return f"postgres://{user}:{password}@{host}:{port}/{db}"

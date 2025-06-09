@@ -19,8 +19,8 @@ RUN uv sync --locked
 
 # Port configuration:
 # EXPOSE documents which port the application uses (purely informational)
-ENV PORT=${PORT:-8000}
-EXPOSE ${PORT}
+ENV API_PORT=${API_PORT:-8000}
+EXPOSE ${API_PORT}
 
 # Start the application using gunicorn
-CMD uv run gunicorn --bind 0.0.0.0:$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker api:app
+CMD uv run gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker api:app --bind 0.0.0.0:$API_PORT
