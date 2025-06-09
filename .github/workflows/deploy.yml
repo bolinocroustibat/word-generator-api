@@ -6,14 +6,15 @@ on:
       - '*'
 
 jobs:
-  deploy-prod:
-    name: Deploy to prod from ${{ github.ref_name }}/${{ github.sha }}
+  bump-version:
+    name: Bump version to ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
@@ -32,18 +33,14 @@ jobs:
           commit_user_email: me@adriencarpentier.com
           commit_author: Adrien Carpentier <me@adriencarpentier.com>
 
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          name: id_rsa
-          known_hosts: ${{ secrets.SSH_HOST }}
-
-      - name: Adding known hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }}  >> ~/.ssh/known_hosts
-
+  deploy-prod:
+    name: Deploy ${{ github.ref_name }} to prod
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Execute server commands for deploy
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -59,11 +56,11 @@ jobs:
             sudo systemctl restart word-generator-api.service
 
       - name: Create Sentry release
-        uses: getsentry/action-release@v1.7.0
+        uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: "adrien-carpentier"
           SENTRY_PROJECT: "word-generator-api"
         with:
           environment: production
-          version: ${{ github.ref_name }}
+          release: ${{ github.ref_name }}
