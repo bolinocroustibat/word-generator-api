@@ -100,6 +100,9 @@ jobs:
             docker compose down --remove-orphans
             docker compose up -d
 
+      - name: Checkout repository for Sentry
+        uses: actions/checkout@v4
+
       - name: Create Sentry release
         uses: getsentry/action-release@v3
         env:
