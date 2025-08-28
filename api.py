@@ -27,7 +27,7 @@ load_dotenv()
 # Load app name, version, commit variables from config file
 # Need an absolute path for when we launch the scripts not from the project root dir (tweet command from cron, for example)
 pyproject_filepath = Path(__file__).parent / "pyproject.toml"
-with open(pyproject_filepath, "rb") as f:
+with pyproject_filepath.open("rb") as f:
     config: dict = tomllib.load(f)
 APP_NAME: str = config["project"]["name"]
 DESCRIPTION: str = config["project"]["description"]

@@ -1,7 +1,7 @@
 import os
 from datetime import UTC, datetime
 
-import requests
+import httpx
 from dotenv import load_dotenv
 from tortoise.contrib.postgres.functions import Random
 
@@ -159,22 +159,23 @@ async def get_definition_from_word_fr(word: str) -> dict:
     type: str | None = None
     definition: str | None = None
 
-    response = requests.get(
-        f"{DICTIONNARY_FR_API_URL}{word}/definitions?limite=1&api_key={DICTIONNARY_FR_API_KEY}"
-    )
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{DICTIONNARY_FR_API_URL}{word}/definitions?limite=1&api_key={DICTIONNARY_FR_API_KEY}"
+        )
 
-    try:
-        res = response.json()[0]
-        type = res["nature"].split()[0]
-        definition = res["definition"].strip()
-    except Exception:
-        print(f"Dicolink API error: {str(response)}")
-    else:
-        print(res)  # TODO: to remove, it's for debug
-        if type:
-            type = ALLOWED_TYPES_FR.get(type, "unknown")
+        try:
+            res = response.json()[0]
+            type = res["nature"].split()[0]
+            definition = res["definition"].strip()
+        except Exception:
+            print(f"Dicolink API error: {str(response)}")
         else:
-            type = "unknown"
+            print(res)  # TODO: to remove, it's for debug
+            if type:
+                type = ALLOWED_TYPES_FR.get(type, "unknown")
+            else:
+                type = "unknown"
 
     return {
         "type": type,

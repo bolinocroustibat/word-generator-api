@@ -1,6 +1,7 @@
 import json
 import random
 from datetime import UTC, datetime
+from pathlib import Path
 
 from tortoise.exceptions import IntegrityError
 
@@ -65,9 +66,9 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     - the generated word already exists in the dictionnary (optional)
     Try only 5 times, if not possible, will return the word generated before.
     """
-    json_proba_file = f"{lang}/data/proba_table_2char_{lang.upper()}.json"
+    json_proba_file = Path(f"{lang}/data/proba_table_2char_{lang.upper()}.json")
 
-    generated_word = _generate_word_core(json_proba_file=json_proba_file)
+    generated_word = _generate_word_core(json_proba_file)
     real_exists = False
     if must_not_be_real:
         real_exists = await if_real_exists(lang=lang, string=generated_word)
@@ -75,7 +76,7 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     i = 0
     while (len(generated_word) < 3) or (len(generated_word) > 13) or real_exists:
         print(f"Generated word '{generated_word}' not acceptable. Retrying...")
-        generated_word = _generate_word_core(json_proba_file=json_proba_file)
+        generated_word = _generate_word_core(json_proba_file)
         real_exists = False
         if must_not_be_real:
             real_exists = await if_real_exists(lang=lang, string=generated_word)
@@ -86,12 +87,12 @@ async def generate_word(lang: str, must_not_be_real: bool = True) -> str:
     return generated_word
 
 
-def _generate_word_core(json_proba_file: str) -> str:
+def _generate_word_core(json_proba_file: Path) -> str:
     """
     Generate a word that don't exist, based on the characters probability table,
     depending on each language.
     """
-    with open(json_proba_file, "r") as file:
+    with json_proba_file.open("r") as file:
         probas: dict = json.load(file)
     char1 = random.choices(
         list(probas["first_letter"].keys()),

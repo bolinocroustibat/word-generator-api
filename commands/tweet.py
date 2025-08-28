@@ -1,7 +1,7 @@
 import os
 from asyncio import run as aiorun
 
-import requests
+import httpx
 import tweepy
 import typer
 from dotenv import load_dotenv
@@ -32,12 +32,13 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
     sentry_monitor_id = os.getenv(f"SENTRY_CRON_MONITOR_ID_{lang.upper()}")
     # SENTRY: Create the check-in
     json_data = {"status": "in_progress"}
-    response = requests.post(
-        f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/",
-        headers=SENTRY_HEADERS,
-        json=json_data,
-    )
-    checkin_id = response.json()["id"]
+    with httpx.Client() as client:
+        response = client.post(
+            f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/",
+            headers=SENTRY_HEADERS,
+            json=json_data,
+        )
+        checkin_id = response.json()["id"]
 
     if tweet:
         tries = 0
@@ -72,11 +73,12 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
     # SENTRY: Update the check-in status (required) and duration (optional)
     json_data = {"status": "ok"}
-    response = requests.put(
-        f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/{checkin_id}/",
-        headers=SENTRY_HEADERS,
-        json=json_data,
-    )
+    with httpx.Client() as client:
+        response = client.put(
+            f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/{checkin_id}/",
+            headers=SENTRY_HEADERS,
+            json=json_data,
+        )
 
 
 def main(

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from models import Language, RealWord
 
 
@@ -26,7 +28,7 @@ async def if_real_exists(lang: str, string: str) -> bool:
     else:
         # For other languages, check against dictionary file
         dictionary = []
-        with open(f"{lang}/data/dictionary_{lang.upper()}.txt", "r") as dictionary_file:
+        with Path(f"{lang}/data/dictionary_{lang.upper()}.txt").open("r") as dictionary_file:
             for word in dictionary_file:
                 dictionary.append(word.strip())
         if string in dictionary:

@@ -1,8 +1,7 @@
-import os
 import random
 from datetime import UTC, datetime
 
-import requests
+import httpx
 from dotenv import load_dotenv
 from tortoise.contrib.postgres.functions import Random
 
@@ -120,17 +119,18 @@ async def get_definition_from_word_en(word: str) -> dict:
     definition: str | None = None
     example: str | None = None
 
-    response = requests.get(f"{DICTIONNARY_EN_API_URL}{word}")
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{DICTIONNARY_EN_API_URL}{word}")
 
-    try:
-        meanings: list = response.json()[0]["meanings"]
-    except Exception:
-        print(f"DictionaryAPI error: {response.json()}")
-    else:
-        meaning: dict = random.choice(meanings)
-        type = meaning["partOfSpeech"]
-        definitions: list = meaning["definitions"]
-        definition = random.choice(definitions)["definition"]
-        example = random.choice(definitions).get("example", None)
+        try:
+            meanings: list = response.json()[0]["meanings"]
+        except Exception:
+            print(f"DictionaryAPI error: {response.json()}")
+        else:
+            meaning: dict = random.choice(meanings)
+            type = meaning["partOfSpeech"]
+            definitions: list = meaning["definitions"]
+            definition = random.choice(definitions)["definition"]
+            example = random.choice(definitions).get("example", None)
 
     return {"type": type, "definition": definition, "example": example}

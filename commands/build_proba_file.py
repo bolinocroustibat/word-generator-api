@@ -16,7 +16,7 @@ def build_1char_probabilities(
         probabilities[char] = temp
 
     # Populate the dictionary with probabilities
-    with open(dictionary_filepath, "r", encoding="utf-8") as dictionary:
+    with dictionary_filepath.open("r", encoding="utf-8") as dictionary:
         for line in dictionary:
             word: str = line.strip()
             first_letter: str = word[0].lower()
@@ -52,7 +52,7 @@ def build_2char_probabilities(
     probabilities: dict = {"first_letter": alphabet_dict} | {chars: temp3.copy() for chars in temp2}
 
     # Populate the dictionary with probabilities
-    with open(dictionary_filepath, "r", encoding="utf-8") as dictionary:
+    with dictionary_filepath.open("r", encoding="utf-8") as dictionary:
         for line in dictionary:
             word: str = line.strip()
             first_letter: str = word[0].lower()
@@ -94,8 +94,9 @@ def build_chars_probability_file(lang: str, chars_nb: int = 2) -> None:
 
     async def _main():
         current_path = Path(__file__).parent.absolute()
+        alphabet_filepath: Path = current_path / f"../{lang}/data/alphabet_{lang.upper()}.json"
 
-        with open(current_path / f"../{lang}/data/alphabet_{lang.upper()}.json") as infile:
+        with alphabet_filepath.open() as infile:
             alphabet: list[str] = json.load(infile)
 
         dictionary_filepath: Path = current_path / f"../{lang}/data/dictionary_{lang.upper()}.txt"
@@ -112,7 +113,7 @@ def build_chars_probability_file(lang: str, chars_nb: int = 2) -> None:
                 alphabet, dictionary_filepath, json_filepath
             )
 
-        with open(json_filepath, "w", encoding="utf-8") as outfile:
+        with json_filepath.open("w", encoding="utf-8") as outfile:
             json.dump(probabilities, outfile, ensure_ascii=False)
 
         typer.secho(f"File generated as {dictionary_filepath}.", fg="green")

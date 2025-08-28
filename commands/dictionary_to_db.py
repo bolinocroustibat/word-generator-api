@@ -1,4 +1,5 @@
 from asyncio import run as aiorun
+from pathlib import Path
 
 import typer
 
@@ -18,7 +19,7 @@ def dictionary_to_db(lang: str, classify=True) -> None:
         # Get language ID
         language = await Language.get(code=lang)
 
-        with open(f"{lang}/data/adverbs_{lang.upper()}.txt", "r") as dictionary_file:
+        with Path(f"{lang}/data/adverbs_{lang.upper()}.txt").open("r") as dictionary_file:
             i = 1
             for j, word in enumerate(dictionary_file):
                 word = word.strip()
