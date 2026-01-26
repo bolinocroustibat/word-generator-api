@@ -37,9 +37,9 @@ services:
 
   db:
     container_name: word-generator-db
-    image: postgres:17
+    image: pgautoupgrade/pgautoupgrade:18-trixie
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql
     ports:
       - "${DB_PORT:-5432}:5432"
     environment:
