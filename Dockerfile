@@ -1,7 +1,7 @@
-# Use Python 3.12 as base image
-FROM python:3.12-slim
-# Copy latest uv binary from official image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# Use official uv image with Python 3.12 with uv preinstalled
+# (alpine is smaller, but longer to build and less compatible with setuptools-scm)
+# https://docs.astral.sh/uv/guides/integration/docker/
+FROM ghcr.io/astral-sh/uv:python3.12-trixie-slim
 
 # Python environment variables:
 # PYTHONDONTWRITEBYTECODE=1: Prevents Python from writing .pyc files (speeds up development and reduces container size)
