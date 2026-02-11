@@ -14,13 +14,14 @@ ADD . /app
 
 # Set work directory and install dependencies in a new environment
 WORKDIR /app
+RUN chmod +x /app/scripts/cron-entrypoint.sh
 # Sync the project, asserting the lockfile is up to date
 RUN uv sync --locked
 
 # Install required packages and download language models
 RUN apt-get update && \
     # Install temporary packages (wget and unzip) needed for downloads
-    apt-get install -y --no-install-recommends wget unzip && \
+    apt-get install -y --no-install-recommends wget unzip cron && \
     # Download and install French spaCy model
     wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.5.0/fr_core_news_sm-3.5.0-py3-none-any.whl -P /tmp && \
     unzip /tmp/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.12/site-packages && \

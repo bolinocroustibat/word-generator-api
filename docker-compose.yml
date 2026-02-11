@@ -49,5 +49,31 @@ services:
       - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
     restart: unless-stopped
 
+  cron:
+    container_name: word-generator-cron
+    image: ghcr.io/bolinocroustibat/word-generator-api:${TAG:-latest}
+    build: .
+    depends_on:
+      - db
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-unknown}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DICTIONNARY_FR_API_KEY=${DICTIONNARY_FR_API_KEY}
+      - TWITTER_EN_API_KEY=${TWITTER_EN_API_KEY}
+      - TWITTER_EN_KEY_SECRET=${TWITTER_EN_KEY_SECRET}
+      - TWITTER_EN_ACCESS_TOKEN=${TWITTER_EN_ACCESS_TOKEN}
+      - TWITTER_EN_TOKEN_SECRET=${TWITTER_EN_TOKEN_SECRET}
+      - TWITTER_FR_API_KEY=${TWITTER_FR_API_KEY}
+      - TWITTER_FR_KEY_SECRET=${TWITTER_FR_KEY_SECRET}
+      - TWITTER_FR_ACCESS_TOKEN=${TWITTER_FR_ACCESS_TOKEN}
+      - TWITTER_FR_TOKEN_SECRET=${TWITTER_FR_TOKEN_SECRET}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_CRON_MONITOR_ID_EN=${SENTRY_CRON_MONITOR_ID_EN}
+      - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
+    command: ["/app/scripts/cron-entrypoint.sh"]
+    restart: unless-stopped
+
 volumes:
   postgres_data:
