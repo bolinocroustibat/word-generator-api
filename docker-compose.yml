@@ -1,4 +1,18 @@
 services:
+
+  db:
+    container_name: word-generator-db
+    image: pgautoupgrade/pgautoupgrade:18-trixie
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    restart: unless-stopped
+
   api:
     container_name: word-generator-api
     image: ghcr.io/bolinocroustibat/word-generator-api:${TAG:-latest}
@@ -33,19 +47,6 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
       - SENTRY_CRON_MONITOR_ID_EN=${SENTRY_CRON_MONITOR_ID_EN}
       - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
-    restart: unless-stopped
-
-  db:
-    container_name: word-generator-db
-    image: pgautoupgrade/pgautoupgrade:18-trixie
-    volumes:
-      - postgres_data:/var/lib/postgresql
-    ports:
-      - "${DB_PORT:-5432}:5432"
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     restart: unless-stopped
 
 volumes:
