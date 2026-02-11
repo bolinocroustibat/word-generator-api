@@ -193,6 +193,11 @@ async def alter_text(request: Request, lang: str, text: str, percentage: float |
         raise HTTPException(status_code=400, detail="Language not supported.")
 
 
+@app.get("/health", include_in_schema=False)
+async def health():
+    return {"status": "ok", "version": VERSION, "environment": ENVIRONMENT}
+
+
 @app.get("/docs", include_in_schema=False)
 async def get_swagger_documentation(username: str = Depends(authenticate)):
     return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")

@@ -12,13 +12,20 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -q"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   api:
     container_name: word-generator-api
     image: ghcr.io/bolinocroustibat/word-generator-api:${TAG:-latest}
     build: .
     depends_on:
-    - db
+      db:
+        condition: service_healthy
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
@@ -48,13 +55,20 @@ services:
       - SENTRY_CRON_MONITOR_ID_EN=${SENTRY_CRON_MONITOR_ID_EN}
       - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "uv", "run", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   cron:
     container_name: word-generator-cron
     image: ghcr.io/bolinocroustibat/word-generator-api:${TAG:-latest}
     build: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - ENVIRONMENT=${ENVIRONMENT:-unknown}
       - POSTGRES_DB=${POSTGRES_DB}
