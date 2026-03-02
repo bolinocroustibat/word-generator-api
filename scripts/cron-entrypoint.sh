@@ -12,4 +12,4 @@ export -p > /app/.cronenv
   echo "0 */6 * * * . /app/.cronenv 2>/dev/null; cd /app && uv run python -m commands.tweet fr >> /var/log/cron.log 2>&1"
 } | crontab -
 
-exec crond -f
+exec cron -f
