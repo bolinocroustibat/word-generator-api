@@ -23,8 +23,8 @@ RUN apt-get update && \
     # Install temporary packages (wget and unzip) needed for downloads
     apt-get install -y --no-install-recommends wget unzip cron && \
     # Download and install French spaCy model
-    wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.5.0/fr_core_news_sm-3.5.0-py3-none-any.whl -P /tmp && \
-    unzip /tmp/fr_core_news_sm-3.5.0-py3-none-any.whl -d ./.venv/lib/python3.12/site-packages && \
+    wget https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl -P /tmp && \
+    unzip /tmp/fr_core_news_sm-3.8.0-py3-none-any.whl -d ./.venv/lib/python3.12/site-packages && \
     # Download NLTK data using uv
     uv run python -m nltk.downloader averaged_perceptron_tagger_eng punkt_tab && \
     # Download and set up spacy-lefff model files
@@ -44,4 +44,4 @@ RUN apt-get update && \
 EXPOSE 8000
 
 # Start the application using gunicorn
-CMD uv run gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker api:app --bind 0.0.0.0:8000
+CMD uv run gunicorn --workers 2 --worker-class uvicorn.workers.UvicornWorker api:app --bind 0.0.0.0:8000

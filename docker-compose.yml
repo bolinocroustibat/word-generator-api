@@ -12,6 +12,11 @@ services:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     restart: unless-stopped
+    # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
+    ulimits:
+      core: 0
+    sysctls:
+      - kernel.core_pattern=/dev/null
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -q"]
       interval: 5s
@@ -55,6 +60,11 @@ services:
       - SENTRY_CRON_MONITOR_ID_EN=${SENTRY_CRON_MONITOR_ID_EN}
       - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
     restart: unless-stopped
+    # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
+    ulimits:
+      core: 0
+    sysctls:
+      - kernel.core_pattern=/dev/null
     healthcheck:
       test: ["CMD", "uv", "run", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
@@ -88,6 +98,11 @@ services:
       - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
     command: ["/app/scripts/cron-entrypoint.sh"]
     restart: unless-stopped
+    # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
+    ulimits:
+      core: 0
+    sysctls:
+      - kernel.core_pattern=/dev/null
 
 volumes:
   postgres_data:
