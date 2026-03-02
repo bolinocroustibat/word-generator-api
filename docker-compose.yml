@@ -15,8 +15,6 @@ services:
     # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
     ulimits:
       core: 0
-    sysctls:
-      - kernel.core_pattern=/dev/null
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -q"]
       interval: 5s
@@ -63,8 +61,6 @@ services:
     # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
     ulimits:
       core: 0
-    sysctls:
-      - kernel.core_pattern=/dev/null
     healthcheck:
       test: ["CMD", "uv", "run", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
@@ -101,8 +97,6 @@ services:
     # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
     ulimits:
       core: 0
-    sysctls:
-      - kernel.core_pattern=/dev/null
 
 volumes:
   postgres_data:
