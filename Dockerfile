@@ -44,4 +44,4 @@ RUN apt-get update && \
 EXPOSE 8000
 
 # Start the application using gunicorn
-CMD uv run gunicorn --workers 2 --worker-class uvicorn.workers.UvicornWorker api:app --bind 0.0.0.0:8000
+CMD ["uv", "run", "gunicorn", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--max-requests", "1000", "--max-requests-jitter", "50", "api:app", "--bind", "0.0.0.0:8000"]
