@@ -1149,7 +1149,7 @@ wheels = [
 
 [[package]]
 name = "word-generator-api"
-version = "1.8.9"
+version = "1.9.0"
 source = { virtual = "." }
 dependencies = [
     { name = "asyncpg" },
