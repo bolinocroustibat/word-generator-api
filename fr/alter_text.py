@@ -27,9 +27,18 @@ def create_melt_tagger(nlp, name):
     return POSTagger()
 
 
-nlp = spacy.load("fr_core_news_sm")
-nlp.add_pipe("melt_tagger", after="parser")
-nlp.add_pipe("french_lemmatizer", after="melt_tagger")
+_nlp = None
+
+
+def _get_nlp():
+    global _nlp
+    if _nlp is None:
+        _nlp = spacy.load("fr_core_news_sm", exclude=["ner"])
+        _nlp.add_pipe("melt_tagger", after="parser")
+        _nlp.add_pipe("french_lemmatizer", after="melt_tagger")
+    return _nlp
+
+
 Token.set_extension("replacement", default=None)
 Token.set_extension("type", default=None)
 Token.set_extension("number", default=None)
@@ -70,7 +79,7 @@ async def alter_text_fr(
     forced_replacements = forced_replacements or {}
 
     # Split into tokens/words
-    doc: Doc = nlp(text)
+    doc: Doc = _get_nlp()(text)
 
     # Get French language ID
     french = await LanguageModel.get(code="fr")
@@ -170,7 +179,7 @@ async def replace_tokens(
                         t.text, t._.type[0], t._.gender, t._.number, t._.replacement
                     )
                 )
-                matcher = Matcher(nlp.vocab)
+                matcher = Matcher(_get_nlp().vocab)
                 matcher.add("pattern1", [[{"LOWER": t.text}]])
                 matches = matcher(doc)
                 for _, pos, _ in matches:
