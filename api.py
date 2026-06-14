@@ -2,7 +2,6 @@ import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-import nltk
 import sentry_sdk
 import tomllib
 from dotenv import load_dotenv
@@ -74,9 +73,6 @@ app.add_middleware(
     allow_methods=["GET"],
     allow_headers=["*"],
 )
-
-nltk.download("averaged_perceptron_tagger_eng")
-nltk.download("punkt_tab")
 
 
 @app.get("/{lang}/word/generate", tags=["word"])
