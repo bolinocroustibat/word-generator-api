@@ -1,7 +1,7 @@
 import random
 from datetime import UTC, datetime
 
-import httpx
+import niquests
 from dotenv import load_dotenv
 from tortoise.contrib.postgres.functions import Random
 
@@ -119,7 +119,7 @@ async def get_definition_from_word_en(word: str) -> dict:
     definition: str | None = None
     example: str | None = None
 
-    async with httpx.AsyncClient() as client:
+    async with niquests.AsyncSession() as client:
         response = await client.get(f"{DICTIONNARY_EN_API_URL}{word}")
 
         try:

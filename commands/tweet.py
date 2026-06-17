@@ -1,7 +1,7 @@
 import os
 from asyncio import run as aiorun
 
-import httpx
+import niquests
 import tweepy
 import typer
 from dotenv import load_dotenv
@@ -32,7 +32,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
     sentry_monitor_id = os.getenv(f"SENTRY_CRON_MONITOR_ID_{lang.upper()}")
     # SENTRY: Create the check-in
     json_data = {"status": "in_progress"}
-    with httpx.Client() as client:
+    with niquests.Session() as client:
         response = client.post(
             f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/",
             headers=SENTRY_HEADERS,
@@ -73,7 +73,7 @@ async def _send_tweet(lang: str, dry_run: bool = False) -> None:
 
     # SENTRY: Update the check-in status (required) and duration (optional)
     json_data = {"status": "ok"}
-    with httpx.Client() as client:
+    with niquests.Session() as client:
         response = client.put(
             f"https://sentry.io/api/0/organizations/{SENTRY_ORG_SLUG}/monitors/{sentry_monitor_id}/checkins/{checkin_id}/",
             headers=SENTRY_HEADERS,
