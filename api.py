@@ -1,9 +1,8 @@
 import os
-from contextlib import asynccontextmanager
+import tomllib
 from pathlib import Path
 
 import sentry_sdk
-import tomllib
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +11,7 @@ from fastapi.openapi.utils import get_openapi
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
-from tortoise import Tortoise
+from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.postgres.functions import Random
 
 from common import authenticate, generate_word_and_save
@@ -49,18 +48,16 @@ if ENVIRONMENT not in ["local", "test"]:
     )
 
 
-@asynccontextmanager
-async def lifespan(application: FastAPI):
-    await Tortoise.init(db_url=get_database_url(), modules={"models": ["models"]})
-    yield
-    await Tortoise.close_connections()
-
-
 app = FastAPI(
-    lifespan=lifespan,
     title=APP_NAME,
     description=DESCRIPTION,
     version=VERSION,
+)
+
+register_tortoise(
+    app,
+    db_url=get_database_url(),
+    modules={"models": ["models"]},
 )
 
 limiter = Limiter(key_func=get_remote_address)
