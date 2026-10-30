@@ -94,6 +94,11 @@ services:
       - SENTRY_CRON_MONITOR_ID_FR=${SENTRY_CRON_MONITOR_ID_FR}
     command: ["/app/scripts/cron-entrypoint.sh"]
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
     # Prevent 1.7GB core dumps from filling the disk if spaCy/NumPy crashes
     ulimits:
       core: 0

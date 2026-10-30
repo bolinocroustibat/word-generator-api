@@ -83,6 +83,8 @@ async def get_random_definition_en() -> dict:
     english = await Language.get(code="en")
 
     while (not definition) or (type not in ALLOWED_TYPES_EN):
+        if count >= 10:
+            raise RuntimeError("Could not get a valid definition after 10 tries")
         if count > 0:
             print(
                 f"Definition for word '{real_string}' or type '{type}' not supported, trying another word and definition..."

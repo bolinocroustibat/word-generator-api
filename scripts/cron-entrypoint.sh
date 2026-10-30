@@ -8,8 +8,8 @@ export -p > /app/.cronenv
 # SHELL and sourcing .cronenv ensure jobs run with the same env as the container
 {
   echo "SHELL=/bin/bash"
-  echo "0 */6 * * * . /app/.cronenv 2>/dev/null; cd /app && uv run python -m commands.tweet en >> /var/log/cron.log 2>&1"
-  echo "0 */6 * * * . /app/.cronenv 2>/dev/null; cd /app && uv run python -m commands.tweet fr >> /var/log/cron.log 2>&1"
+  echo "0 */6 * * * . /app/.cronenv 2>/dev/null; cd /app && uv run python -m commands.tweet en >> /proc/1/fd/1 2>&1"
+  echo "0 */6 * * * . /app/.cronenv 2>/dev/null; cd /app && uv run python -m commands.tweet fr >> /proc/1/fd/1 2>&1"
 } | crontab -
 
 exec cron -f

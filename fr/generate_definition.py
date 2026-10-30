@@ -91,6 +91,8 @@ async def get_random_definition_fr() -> dict:
     french = await Language.get(code="fr")
 
     while (not definition) or (type not in ALLOWED_TYPES_FR.values()):
+        if count >= 10:
+            raise RuntimeError("Could not get a valid definition after 10 tries")
         if count > 0:
             print(
                 f"Definition for word '{real_string}' or type '{type}' not "
@@ -171,7 +173,6 @@ async def get_definition_from_word_fr(word: str) -> dict:
         except Exception:
             print(f"Dicolink API error: {str(response)}")
         else:
-            print(res)  # TODO: to remove, it's for debug
             if type:
                 type = ALLOWED_TYPES_FR.get(type, "unknown")
             else:
