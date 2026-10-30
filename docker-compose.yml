@@ -2,7 +2,7 @@ services:
 
   db:
     container_name: word-generator-db
-    image: pgautoupgrade/pgautoupgrade:18-trixie
+    image: postgres:18
     volumes:
       - postgres_data:/var/lib/postgresql
     ports:
