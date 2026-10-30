@@ -7,7 +7,7 @@ class Language(Model):
     code = fields.CharField(max_length=2, unique=True)  # e.g. 'en', 'es', 'it'
     name = fields.CharField(max_length=50)  # e.g. 'English', 'Spanish', 'Italian'
 
-    class Meta:
+    class Meta:  # ty: ignore[invalid-attribute-override]
         table = "languages"
 
     def __str__(self):
@@ -25,7 +25,7 @@ class RealWord(Model):
     proper = fields.BooleanField(default=False)  # For proper nouns
     complex = fields.BooleanField(null=True)  # For complex words
 
-    class Meta:
+    class Meta:  # ty: ignore[invalid-attribute-override]
         table = "real_words"
         unique_together = ("string", "type", "language")
 
@@ -45,7 +45,7 @@ class GeneratedWord(Model):
     date = fields.DatetimeField()
     ip = fields.CharField(max_length=16)
 
-    class Meta:
+    class Meta:  # ty: ignore[invalid-attribute-override]
         table = "generated_words"
         unique_together = ("string", "language")
 
@@ -62,7 +62,7 @@ class GeneratedDefinition(Model):
     date = fields.DatetimeField()
     ip = fields.CharField(max_length=16)
 
-    class Meta:
+    class Meta:  # ty: ignore[invalid-attribute-override]
         table = "generated_definitions"
         unique_together = ("generated_word_id", "text")
 
