@@ -100,6 +100,10 @@ jobs:
             docker compose down --remove-orphans
             docker compose up -d
 
+            # Remove previous images of this project to free disk space
+            docker image ls ghcr.io/${{ github.repository }} --format '{{.Repository}}:{{.Tag}}' \
+              | grep -v ":${TAG}$" | xargs -r docker rmi || true
+
       - name: Checkout repository for Sentry
         uses: actions/checkout@v7
 
